@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, getProductImageUrl, type ProductWithCategory } from '../lib/supabase'
 
+export type ProductSort = 'newest' | 'price_asc' | 'price_desc' | 'featured'
+
 interface UseProductsOptions {
   categorySlug?: string
   search?: string
   featured?: boolean
   bulkOnly?: boolean
+  inStockOnly?: boolean
+  minPrice?: number
+  maxPrice?: number
+  sort?: ProductSort
   page?: number
   pageSize?: number
 }
@@ -20,7 +26,18 @@ interface UseProductsResult {
 }
 
 export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
-  const { categorySlug, search, featured, bulkOnly, page = 1, pageSize = 50 } = opts
+  const {
+    categorySlug,
+    search,
+    featured,
+    bulkOnly,
+    inStockOnly,
+    minPrice,
+    maxPrice,
+    sort = 'newest',
+    page = 1,
+    pageSize = 50,
+  } = opts
   const [products, setProducts] = useState<ProductWithCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -44,11 +61,31 @@ export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
           { count: 'exact' },
         )
         .eq('active', true)
-        .order('created_at', { ascending: false })
-        .range(from, to)
+
+      // Sorting
+      switch (sort) {
+        case 'price_asc':
+          query = query.order('retail_price', { ascending: true })
+          break
+        case 'price_desc':
+          query = query.order('retail_price', { ascending: false })
+          break
+        case 'featured':
+          query = query.order('featured', { ascending: false }).order('created_at', { ascending: false })
+          break
+        case 'newest':
+        default:
+          query = query.order('created_at', { ascending: false })
+          break
+      }
+
+      query = query.range(from, to)
 
       if (featured) query = query.eq('featured', true)
       if (bulkOnly) query = query.eq('is_bulk_available', true)
+      if (inStockOnly) query = query.eq('stock_status', 'in_stock')
+      if (typeof minPrice === 'number') query = query.gte('retail_price', minPrice)
+      if (typeof maxPrice === 'number') query = query.lte('retail_price', maxPrice)
       if (search) query = query.ilike('name', `%${search}%`)
       if (categorySlug) query = query.eq('categories.slug', categorySlug)
 
@@ -77,7 +114,7 @@ export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
 
     fetch()
     return () => { cancelled = true }
-  }, [categorySlug, search, featured, bulkOnly, page, pageSize, version])
+  }, [categorySlug, search, featured, bulkOnly, inStockOnly, minPrice, maxPrice, sort, page, pageSize, version])
 
   return {
     products,
