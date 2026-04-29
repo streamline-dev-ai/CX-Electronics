@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2 } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { useProduct } from '../../hooks/useProduct'
@@ -174,6 +174,23 @@ export function ProductDetail() {
             {description && (
               <p className="text-gray-600 text-sm leading-relaxed mb-6">{description}</p>
             )}
+
+            {/* Reviews Preview */}
+            <div className="bg-gray-50 rounded-xl p-4 mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">Customer Reviews</h3>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < 4 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                    />
+                  ))}
+                  <span className="text-sm text-gray-600 ml-2">4.0 (8 reviews)</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">Customer reviews coming soon</p>
+            </div>
 
             {/* Quantity + Add to cart */}
             {!isOutOfStock && (
