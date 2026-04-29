@@ -13,7 +13,7 @@ import { Footer } from '../../components/store/Footer'
 // ── Hero slides ──────────────────────────────────────────────
 const HERO_SLIDES = [
   {
-    image: '/hero/hero-1.jpg',
+    image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/n2kIN_lmgy9y.jpg',
     eyebrow: 'New Stock In',
     title: 'Powering South Africa',
     titleAccent: 'Direct from Dragon City',
@@ -22,7 +22,7 @@ const HERO_SLIDES = [
     secondary: { label: 'Browse Bulk Deals', href: '/deals' },
   },
   {
-    image: '/hero/hero-2.jpg',
+    image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/jjm1c_lyxled.jpg',
     eyebrow: 'Security First',
     title: 'CCTV & 4K Surveillance',
     titleAccent: 'Protect Your Business',
@@ -31,7 +31,7 @@ const HERO_SLIDES = [
     secondary: { label: 'Get Installer Quote', href: '/deals' },
   },
   {
-    image: '/hero/hero-3.jpg',
+    image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/buLqZ_cik8zf.jpg',
     eyebrow: 'Off-Grid Ready',
     title: 'Solar Lamps & WiFi',
     titleAccent: 'Built for Africa',
@@ -43,12 +43,12 @@ const HERO_SLIDES = [
 
 // ── Categories ───────────────────────────────────────────────
 const CATEGORIES = [
-  { slug: 'chargers', label: 'Chargers & Cables', icon: Plug, desc: 'USB-C, Lightning, Fast Charge', img: '/products/usb-c-charger.jpg' },
-  { slug: 'cctv', label: 'CCTV & Security', icon: Shield, desc: '4K Cameras & NVR Kits', img: '/products/cctv-camera.jpg' },
-  { slug: 'routers', label: 'Routers & Networking', icon: Wifi, desc: 'WiFi 6, LTE, Mesh Systems', img: '/products/wifi-router.jpg' },
-  { slug: 'smartwatches', label: 'Smartwatches', icon: Watch, desc: 'Fitness & Health Tracking', img: '/products/smartwatch.jpg' },
-  { slug: 'solar', label: 'Solar Lamps & Lighting', icon: Sun, desc: 'Off-Grid Street Lighting', img: '/products/solar-lamp.jpg' },
-  { slug: 'accessories', label: 'Phone & Laptop Accessories', icon: Smartphone, desc: 'Cases, Stands, Adapters', img: '/products/car-charger.jpg' },
+  { slug: 'chargers', label: 'Chargers & Cables', icon: Plug, desc: 'USB-C, Lightning, Fast Charge', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Chargers_Cables_Category_bcxrsr.jpg' },
+  { slug: 'cctv', label: 'CCTV & Security', icon: Shield, desc: '4K Cameras & NVR Kits', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/CCTV_Security_Category_2_y2g9zt.jpg' },
+  { slug: 'routers', label: 'Routers & Networking', icon: Wifi, desc: 'WiFi 6, LTE, Mesh Systems', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Routers_Networking_Category_um72f1.jpg' },
+  { slug: 'smartwatches', label: 'Smartwatches', icon: Watch, desc: 'Fitness & Health Tracking', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Smartwatches_c2flp6.jpg' },
+  { slug: 'solar', label: 'Solar Lamps & Lighting', icon: Sun, desc: 'Off-Grid Street Lighting', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Solar_Lamps_Lighting_ev6x1n.jpg' },
+  { slug: 'accessories', label: 'Phone & Laptop Accessories', icon: Smartphone, desc: 'Cases, Stands, Adapters', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Phone_Laptop_Accessories_y5kvpa.jpg' },
 ]
 
 // ── Best Sellers (placeholder demo) ─────────────────────────
