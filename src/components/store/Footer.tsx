@@ -66,6 +66,7 @@ export function Footer() {
               <li><Link to="/" className="hover:text-[#E63939] transition-colors">{t('home')}</Link></li>
               <li><Link to="/shop" className="hover:text-[#E63939] transition-colors">{t('shop')}</Link></li>
               <li><Link to="/bulk" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
+              <li><Link to="/about" className="hover:text-[#E63939] transition-colors">About &amp; Contact</Link></li>
               <li><Link to="/shop?category=chargers" className="hover:text-[#E63939] transition-colors">Chargers &amp; Cables</Link></li>
               <li><Link to="/shop?category=cctv" className="hover:text-[#E63939] transition-colors">CCTV &amp; Security</Link></li>
               <li><Link to="/shop?category=solar" className="hover:text-[#E63939] transition-colors">Solar Lighting</Link></li>

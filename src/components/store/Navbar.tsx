@@ -13,6 +13,7 @@ const navLinks = [
   { to: '/shop', label: 'Shop' },
   { to: '/deals', label: 'Deals' },
   { to: '/bulk', label: 'Wholesale' },
+  { to: '/about', label: 'About' },
 ]
 
 const CATEGORIES = [
