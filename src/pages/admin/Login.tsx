@@ -1,0 +1,94 @@
+import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Zap } from 'lucide-react'
+import { signIn } from '../../hooks/useAuth'
+
+export function AdminLogin() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const { error: err } = await signIn(email, password)
+
+    if (err) {
+      setError('Invalid email or password')
+      setLoading(false)
+      return
+    }
+
+    navigate('/admin/dashboard')
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-10 h-10 bg-cxx-navy rounded-lg flex items-center justify-center">
+            <Zap className="w-5 h-5 text-cxx-blue" />
+          </div>
+          <div>
+            <p className="font-bold text-cxx-navy leading-tight">C&X Electronics</p>
+            <p className="text-xs text-cxx-muted">Admin Panel</p>
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h1 className="font-semibold text-gray-900 mb-5">Sign in</h1>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cxx-blue focus:border-transparent"
+                placeholder="admin@cxxelectronics.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cxx-blue focus:border-transparent"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-cxx-blue hover:bg-cxx-blue-hover text-white font-medium py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
