@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // CXX Electronics brand system
+        // CXX Electronics brand system — Red & Black
         cxx: {
-          navy: '#0F1B2D',      // dark header background
-          blue: '#0066FF',      // primary accent / CTAs
-          'blue-hover': '#0052CC',
-          'blue-light': '#E8F0FF', // light accent bg
-          bg: '#F8FAFF',        // subtle page section bg
-          red: '#EF4444',       // sale / out-of-stock badges
-          text: '#111827',      // primary text
-          muted: '#6B7280',     // secondary text
+          navy: '#111827',          // primary dark / navbar
+          blue: '#E63939',          // primary red accent / CTAs
+          'blue-hover': '#C82020',  // red hover
+          'blue-light': '#FEE9E9',  // light red tint bg
+          bg: '#F9FAFB',            // subtle page section bg
+          red: '#E63939',           // sale / badges
+          text: '#111827',          // primary text
+          muted: '#6B7280',         // secondary text
         },
       },
       fontFamily: {

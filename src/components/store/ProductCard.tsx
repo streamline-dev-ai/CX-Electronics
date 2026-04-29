@@ -40,7 +40,7 @@ export function ProductCard({ product, basePath = '/shop' }: ProductCardProps) {
       transition={{ duration: 0.3 }}
     >
       <Link to={`${basePath}/${product.slug}`} className="group block">
-        <div className="bg-white rounded-2xl border border-gray-100 hover:border-cxx-blue/30 hover:shadow-lg transition-all duration-200 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-100 hover:border-[#E63939]/30 hover:shadow-lg transition-all duration-200 overflow-hidden">
           {/* Image */}
           <div className="relative aspect-square bg-gray-50 overflow-hidden">
             {product.thumbnail_url ? (
@@ -64,12 +64,12 @@ export function ProductCard({ product, basePath = '/shop' }: ProductCardProps) {
                 </span>
               )}
               {product.featured && !isOutOfStock && (
-                <span className="text-xs bg-cxx-blue text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#E63939] text-white px-2 py-0.5 rounded-full font-medium">
                   {t('featured')}
                 </span>
               )}
               {product.is_bulk_available && basePath === '/shop' && (
-                <span className="text-xs bg-cxx-navy text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#111827] text-white px-2 py-0.5 rounded-full font-medium">
                   {t('bulkAvailable')}
                 </span>
               )}
@@ -99,7 +99,7 @@ export function ProductCard({ product, basePath = '/shop' }: ProductCardProps) {
                 className={`flex-shrink-0 flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
                   isOutOfStock
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-cxx-blue hover:bg-cxx-blue-hover text-white'
+                    : 'bg-[#E63939] hover:bg-[#C82020] text-white'
                 }`}
               >
                 <ShoppingCart className="w-4 h-4" />
