@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2 } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { useProduct } from '../../hooks/useProduct'
