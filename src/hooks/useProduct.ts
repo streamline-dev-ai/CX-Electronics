@@ -21,7 +21,7 @@ export function useProduct(slug: string): UseProductResult {
       const { data, error: err } = await supabase
         .from('products')
         .select(
-          'id, name, name_zh, slug, description, description_zh, category_id, retail_price, bulk_price, bulk_min_qty, is_bulk_available, images, thumbnail_url, active, featured, stock_status, created_at, updated_at, categories(id, name, name_zh, slug)',
+          'id, name, name_zh, slug, description, description_zh, category_id, retail_price, bulk_price, bulk_min_qty, is_bulk_available, images, thumbnail_url, active, featured, stock_status, variants, created_at, updated_at, categories(id, name, name_zh, slug)',
         )
         .eq('slug', slug)
         .eq('active', true)
@@ -40,6 +40,7 @@ export function useProduct(slug: string): UseProductResult {
         thumbnail_url: data.thumbnail_url ? getProductImageUrl(data.thumbnail_url, 800) : null,
         images: (data.images ?? []).map((path: string) => getProductImageUrl(path, 800)),
         categories: Array.isArray(data.categories) ? data.categories[0] ?? null : data.categories,
+        variants: data.variants ?? [],
       }
 
       setProduct(resolved)

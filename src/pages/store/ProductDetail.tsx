@@ -23,6 +23,7 @@ export function ProductDetail() {
   const [qty, setQty] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
   const [tab, setTab] = useState<'description' | 'specs'>('description')
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
 
   // Related products
   const { products: related } = useProducts({
@@ -249,6 +250,58 @@ export function ProductDetail() {
                 </div>
               )}
             </div>
+
+            {/* Variants */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {product.variants.map((variant) => {
+                  const isColor = /colou?r/i.test(variant.name)
+                  return (
+                    <div key={variant.name}>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+                        {variant.name}
+                        {selectedVariants[variant.name] && (
+                          <span className="ml-2 text-gray-700 normal-case font-semibold tracking-normal">
+                            — {selectedVariants[variant.name]}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {variant.options.map((opt) => {
+                          const active = selectedVariants[variant.name] === opt
+                          if (isColor) {
+                            return (
+                              <button
+                                key={opt}
+                                onClick={() => setSelectedVariants((prev) => ({ ...prev, [variant.name]: opt }))}
+                                title={opt}
+                                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                                  active ? 'border-[#E63939] scale-110 ring-2 ring-[#E63939]/30' : 'border-gray-300 hover:border-gray-500'
+                                }`}
+                                style={{ backgroundColor: opt.toLowerCase() }}
+                              />
+                            )
+                          }
+                          return (
+                            <button
+                              key={opt}
+                              onClick={() => setSelectedVariants((prev) => ({ ...prev, [variant.name]: opt }))}
+                              className={`px-3 py-1.5 text-sm font-semibold rounded-lg border-2 transition-all ${
+                                active
+                                  ? 'border-[#E63939] bg-[#FEE9E9] text-[#E63939]'
+                                  : 'border-gray-200 text-gray-700 hover:border-gray-400'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
 
             {/* Quantity + Add to cart */}
             {!isOutOfStock && (

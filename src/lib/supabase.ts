@@ -31,6 +31,11 @@ export interface Category {
   created_at: string
 }
 
+export interface Variant {
+  name: string
+  options: string[]
+}
+
 export interface Product {
   id: string
   name: string
@@ -48,6 +53,7 @@ export interface Product {
   active: boolean
   featured: boolean
   stock_status: StockStatus
+  variants: Variant[] | null
   created_at: string
   updated_at: string
 }
