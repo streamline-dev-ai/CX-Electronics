@@ -36,7 +36,7 @@ export function ProductCard({ product, basePath = '/shop' }: ProductCardProps) {
     if (cardImages.length < 2) return
     timerRef.current = setInterval(() => {
       setHoverImg((prev) => (prev + 1) % cardImages.length)
-    }, 750)
+    }, 2500)
   }
 
   function handleMouseLeave() {
@@ -90,7 +90,7 @@ export function ProductCard({ product, basePath = '/shop' }: ProductCardProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.6 }}
                     className={`w-full h-full object-contain p-5 transition-transform duration-500 ${
                       cardImages.length < 2 ? 'group-hover:scale-110' : ''
                     }`}
