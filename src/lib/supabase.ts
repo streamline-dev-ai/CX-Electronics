@@ -122,6 +122,9 @@ export interface ShippingAddress {
 // ─── Storage Helpers ──────────────────────────────────────────────────────────
 
 export function getProductImageUrl(path: string, width = 600): string {
+  // Pass through external URLs and local /public/ paths unchanged
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) return path
+
   const { data } = supabase.storage.from('products').getPublicUrl(path, {
     transform: {
       width,
