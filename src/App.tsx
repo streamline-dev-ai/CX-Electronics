@@ -24,6 +24,8 @@ import { About } from './pages/store/About'
 import { CartPage } from './pages/store/CartPage'
 import { Checkout } from './pages/store/Checkout'
 import { OrderConfirmation } from './pages/store/OrderConfirmation'
+import { RetailInvoice } from './pages/invoices/RetailInvoice'
+import { WholesaleInvoice } from './pages/invoices/WholesaleInvoice'
 
 // Admin — lazy loaded (never bundled with store)
 const AdminLogin = lazy(() => import('./pages/admin/Login').then((m) => ({ default: m.AdminLogin })))
@@ -61,6 +63,8 @@ export default function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderConfirmation />} />
+            <Route path="/invoice/retail" element={<RetailInvoice />} />
+            <Route path="/invoice/wholesale" element={<WholesaleInvoice />} />
 
             {/* ── Customer account ──────────────────────────────── */}
             <Route path="/account/login"    element={<Suspense fallback={<AdminFallback />}><AccountLogin /></Suspense>} />
