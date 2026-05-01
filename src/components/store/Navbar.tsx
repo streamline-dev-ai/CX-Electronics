@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
+import { useWishlist } from '../../context/WishlistContext'
 import { CartDrawer } from './CartDrawer'
 
 const navLinks = [
@@ -28,6 +29,7 @@ const CATEGORIES = [
 export function Navbar() {
   const { itemCount, openCart } = useCart()
   const { lang, setLang } = useLang()
+  const { ids: wishlistIds } = useWishlist()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [catsOpen, setCatsOpen] = useState(false)
@@ -117,14 +119,19 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* Wishlist (decorative) */}
-            <button
-              type="button"
+            {/* Wishlist */}
+            <Link
+              to="/account/wishlist"
               aria-label="Wishlist"
-              className="hidden sm:flex p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="hidden sm:flex relative p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             >
-              <Heart className="w-5 h-5" />
-            </button>
+              <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#E63939] text-[#E63939]' : ''}`} />
+              {wishlistIds.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E63939] text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-[#111827]">
+                  {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
+                </span>
+              )}
+            </Link>
 
             {/* Account */}
             <Link

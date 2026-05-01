@@ -1,11 +1,48 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Loader2, CheckCircle } from 'lucide-react'
+import { ShoppingCart, Loader2, CheckCircle, Store, Truck, Zap } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
+
+type DeliveryMethod = 'collection' | 'economic' | 'express'
+
+const DELIVERY_OPTIONS: {
+  key: DeliveryMethod
+  label: string
+  sub: string
+  eta: string
+  price: number
+  note?: string
+  icon: typeof Store
+}[] = [
+  {
+    key: 'collection',
+    label: 'Store Collection',
+    sub: 'Dragon City, Shop 14, Fordsburg',
+    eta: 'Ready within 1–2 hours',
+    price: 0,
+    icon: Store,
+  },
+  {
+    key: 'economic',
+    label: 'Economic Delivery',
+    sub: 'Nationwide via courier',
+    eta: '3–5 business days',
+    price: 99,
+    icon: Truck,
+  },
+  {
+    key: 'express',
+    label: 'Express Same-Day',
+    sub: 'Gauteng only · Order before 11am',
+    eta: 'Delivered by 6pm today',
+    price: 199,
+    icon: Zap,
+  },
+]
 
 const SA_PROVINCES = [
   'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -63,12 +100,17 @@ function saveOrderLocally(order: OrderWithDetails) {
 }
 
 export function Checkout() {
-  const { items, subtotal, shippingFee, total, clearCart } = useCart()
+  const { items, subtotal, clearCart } = useCart()
   const { t } = useLang()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
+
+  const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
+  const shippingFee = subtotal >= 2000 && delivery === 'economic' ? 0 : selectedDelivery.price
+  const total = subtotal + shippingFee
 
   if (items.length === 0) {
     return (
@@ -177,7 +219,7 @@ export function Checkout() {
           payment_status: 'paid',
           payment_method: 'payfast',
           payment_reference: null,
-          notes: null,
+          notes: `Delivery: ${selectedDelivery.label}`,
           subtotal,
           shipping_fee: shippingFee,
           total,
@@ -212,7 +254,7 @@ export function Checkout() {
       payment_status: 'paid',
       payment_method: 'payfast',
       payment_reference: null,
-      notes: null,
+      notes: `Delivery: ${selectedDelivery.label}`,
       subtotal,
       shipping_fee: shippingFee,
       total,
@@ -245,8 +287,48 @@ export function Checkout() {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Shipping form */}
             <div className="flex-1 space-y-5">
+
+              {/* Delivery method */}
               <div className="bg-white rounded-2xl border border-gray-200 p-5">
-                <h2 className="font-semibold text-gray-900 mb-4">{t('shippingDetails')}</h2>
+                <h2 className="font-semibold text-gray-900 mb-4">Delivery Method</h2>
+                <div className="space-y-2">
+                  {DELIVERY_OPTIONS.map(({ key, label, sub, eta, price, icon: Icon }) => {
+                    const effectivePrice = subtotal >= 2000 && key === 'economic' ? 0 : price
+                    const isSelected = delivery === key
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setDelivery(key)}
+                        className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                          isSelected
+                            ? 'border-[#E63939] bg-[#FEF2F2]'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${isSelected ? 'bg-[#E63939] text-white' : 'bg-gray-100 text-gray-500'}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <p className="font-semibold text-gray-900 text-sm">{label}</p>
+                            <p className={`text-sm font-bold flex-shrink-0 ${effectivePrice === 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                              {effectivePrice === 0 ? 'FREE' : `R${effectivePrice}`}
+                            </p>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">{sub}</p>
+                          <p className="text-xs font-semibold text-[#E63939] mt-0.5">{eta}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 className="font-semibold text-gray-900 mb-4">
+                  {delivery === 'collection' ? 'Your Details' : t('shippingDetails')}
+                </h2>
 
                 <div className="space-y-4">
                   <Field label={t('fullName')} error={errors.name} required>
@@ -285,7 +367,7 @@ export function Checkout() {
                     </select>
                   </Field>
                 </div>
-              </div>
+              </div>{/* end shipping details card */}
 
               {/* Payment note */}
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
@@ -323,14 +405,14 @@ export function Checkout() {
                     <span>R{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>{t('shipping')}</span>
+                    <span>{selectedDelivery.label}</span>
                     <span className={shippingFee === 0 ? 'text-green-600 font-medium' : ''}>
-                      {shippingFee === 0 ? t('freeShipping') : `R${shippingFee.toFixed(2)}`}
+                      {shippingFee === 0 ? 'FREE' : `R${shippingFee.toFixed(2)}`}
                     </span>
                   </div>
-                  <div className="flex justify-between font-bold text-lg text-gray-900 pt-1">
+                  <div className="flex justify-between font-bold text-lg text-gray-900 pt-1 border-t border-gray-100 mt-2">
                     <span>{t('total')}</span>
-                    <span>R{total.toFixed(2)}</span>
+                    <span className="text-[#E63939]">R{total.toFixed(2)}</span>
                   </div>
                 </div>
 
