@@ -4,6 +4,8 @@ import viteCompression from 'vite-plugin-compression'
 import { resolve } from 'path'
 
 export default defineConfig({
+  // Expose both VITE_* (legacy) and NEXT_PUBLIC_* (set by Vercel Supabase integration) env vars
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   plugins: [
     react(),
     viteCompression({ algorithm: 'brotliCompress', ext: '.br' }),
