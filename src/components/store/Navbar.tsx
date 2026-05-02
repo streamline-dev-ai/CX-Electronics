@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   ShoppingCart, Menu, X, Zap, Search, Heart, User, ChevronDown,
@@ -60,23 +60,13 @@ export function Navbar() {
       <header className="sticky top-0 z-40 bg-[#111827] shadow-lg">
         {/* Top promo bar */}
         <div className="bg-[#E63939] py-1.5 text-center text-xs text-white font-medium tracking-wide">
-          Wholesale &amp; Retail Electronics — Dragon City, Fordsburg JHB &nbsp;|&nbsp; Free delivery over R2,000
+          Wholesale &amp; Retail Electronics â€” Dragon City, Fordsburg JHB &nbsp;|&nbsp; Free delivery over R2,000
         </div>
 
         {/* Main row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-4 lg:gap-6">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-10 h-10 bg-[#E63939] rounded-lg flex items-center justify-center shadow-md shadow-[#E63939]/30">
-              <Zap className="w-5 h-5 text-white fill-white" />
-            </div>
-            <div className="leading-tight">
-              <span className="font-extrabold text-white text-xl tracking-tight">CXX</span>
-              <span className="block text-[10px] text-white/50 font-bold uppercase tracking-[0.18em] -mt-0.5">
-                Electronics
-              </span>
-            </div>
-          </Link>
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0"><img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-10 w-auto" /></Link>
 
           {/* Desktop search bar (centered) */}
           <form
@@ -115,7 +105,7 @@ export function Navbar() {
                 onClick={() => setLang('zh')}
                 className={`px-2.5 py-1.5 transition-colors ${lang === 'zh' ? 'bg-[#E63939] text-white font-semibold' : 'text-white/60 hover:text-white'}`}
               >
-                中文
+                ä¸­æ–‡
               </button>
             </div>
 
@@ -157,7 +147,7 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Get a Quote — desktop only */}
+            {/* Get a Quote â€” desktop only */}
             <Link
               to="/bulk"
               className="hidden lg:inline-flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors shadow-md shadow-[#E63939]/30 whitespace-nowrap"
@@ -308,7 +298,7 @@ export function Navbar() {
                 onClick={() => setLang('zh')}
                 className={`text-sm ${lang === 'zh' ? 'text-[#E63939] font-semibold' : 'text-white/60'}`}
               >
-                中文
+                ä¸­æ–‡
               </button>
             </div>
           </div>
@@ -319,3 +309,5 @@ export function Navbar() {
     </>
   )
 }
+
+
