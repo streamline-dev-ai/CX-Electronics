@@ -57,10 +57,10 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#111827] shadow-lg">
+      <header className="sticky top-0 z-40 bg-black shadow-lg shadow-black/50">
         {/* Top promo bar */}
-        <div className="bg-[#E63939] py-1.5 text-center text-xs text-white font-medium tracking-wide">
-          Wholesale &amp; Retail Electronics â€” Dragon City, Fordsburg JHB &nbsp;|&nbsp; Free delivery over R2,000
+        <div className="bg-[#E63939] py-1.5 text-center text-xs text-white font-semibold tracking-wide">
+          Wholesale &amp; Retail Electronics — China Mart, Crown Mines JHB &nbsp;|&nbsp; Free delivery on orders over R2,000
         </div>
 
         {/* Main row */}
@@ -141,7 +141,7 @@ export function Navbar() {
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden md:inline">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-[#111827]">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-black">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
@@ -214,18 +214,12 @@ export function Navbar() {
               )}
             </div>
 
-            <Link
-              to="/shop?brands=all"
-              className="px-4 py-2 text-sm font-semibold text-white/80 hover:text-white rounded-md transition-colors"
-            >
-              Brands
-            </Link>
           </div>
         </div>
 
         {/* Mobile drawer */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-white/10 bg-[#111827] px-4 py-4">
+          <div className="lg:hidden border-t border-white/10 bg-black px-4 py-4">
             {/* Mobile search */}
             <form onSubmit={handleSearch} className="mb-4">
               <div className="flex bg-white rounded-lg overflow-hidden">

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import {
   Zap, MapPin, Phone, Mail, MessageCircle, Clock,
-  Facebook, Instagram, CreditCard,
+  CreditCard,
 } from 'lucide-react'
 import { useLang } from '../../context/LangContext'
 
@@ -10,7 +10,7 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#111827] text-white">
+    <footer className="bg-black text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
@@ -20,15 +20,15 @@ export function Footer() {
                 <Zap className="w-5 h-5 text-white fill-white" />
               </div>
               <div className="leading-tight">
-                <span className="font-extrabold text-white text-xl tracking-tight">CXX</span>
+                <span className="font-extrabold text-white text-xl tracking-tight">CW</span>
                 <span className="block text-[10px] text-white/50 font-bold uppercase tracking-[0.18em] -mt-0.5">
                   Electronics
                 </span>
               </div>
             </div>
             <p className="text-sm text-white/60 leading-relaxed mb-5">
-              Wholesale &amp; retail electronics importer based in Dragon City, Fordsburg JHB.
-              Powering South Africa since 2022.
+              Wholesale &amp; retail electronics importer based at China Mart, Crown Mines, Johannesburg.
+              Powering South Africa with quality CCTV, solar, networking &amp; mobile electronics.
             </p>
             <div className="flex items-center gap-2">
               <a
@@ -39,20 +39,6 @@ export function Footer() {
                 className="w-9 h-9 bg-white/5 hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="w-9 h-9 bg-white/5 hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="w-9 h-9 bg-white/5 hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors"
-              >
-                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -102,8 +88,8 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
-                <a href="mailto:info@cxxelectronics.co.za" className="hover:text-white transition-colors">
-                  info@cxxelectronics.co.za
+                <a href="mailto:info@cw-electronics.co.za" className="hover:text-white transition-colors">
+                  info@cw-electronics.co.za
                 </a>
               </li>
               <li className="flex items-start gap-3">
@@ -154,7 +140,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-white/40">
-            © {year} CXX Electronics. {t('allRightsReserved')}
+            © {year} CW Electronics. {t('allRightsReserved')}
           </p>
 
           <div className="flex items-center gap-1 border border-white/10 rounded-lg overflow-hidden text-xs">
