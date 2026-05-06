@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Zap, Wifi, Shield, Watch, Sun, Plug, Smartphone,
-  ArrowRight, ChevronLeft, ChevronRight, ShoppingCart,
+  Wifi, Shield, Watch, Sun, Plug, Smartphone,
+  ArrowRight, ShoppingCart,
   Truck, Tag, BadgeCheck, MapPin, Star, TrendingUp,
   Phone, MessageCircle, Sparkles,
 } from 'lucide-react'
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { TopBanner, HeroSection, BenefitCards, RedCTASection } from '../../components/store/HeroSection'
@@ -14,7 +14,6 @@ import SEO from '../../components/SEO'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27000000000'
-const WA_RESELLER = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%2C%20I%27d%20like%20to%20become%20a%20reseller.`
 const MAP_EMBED =
   'https://www.google.com/maps?q=China+Mart+3+Press+Avenue+Crown+Mines+Johannesburg&output=embed'
 const DIRECTIONS_URL =
@@ -85,216 +84,9 @@ export function Home() {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════
-// HERO CAROUSEL with parallax + spring transitions
-// ═══════��═══════════════════════════════════════════════════════
-function HeroCarousel() {
-  const [index, setIndex] = useState(0)
-  const heroRef = useRef<HTMLDivElement>(null)
-  const { scrollY } = useScroll()
-  const yParallax = useTransform(scrollY, [0, 600], [0, 120])
-  const opacityParallax = useTransform(scrollY, [0, 400], [1, 0.4])
 
-  useEffect(() => {
-    const t = setInterval(
-      () => setIndex((i) => (i + 1) % HERO_SLIDES.length),
-      6500,
-    )
-    return () => clearInterval(t)
-  }, [])
 
-  const slide = HERO_SLIDES[index]
-
-  function go(delta: number) {
-    setIndex((i) => (i + delta + HERO_SLIDES.length) % HERO_SLIDES.length)
-  }
-
-  return (
-    <section
-      ref={heroRef}
-      className="relative bg-[#0F172A] overflow-hidden isolate"
-    >
-      <div className="relative h-[520px] sm:h-[580px] lg:h-[620px]">
-        {/* Background parallax */}
-        <motion.div
-          style={{ y: yParallax, opacity: opacityParallax }}
-          className="absolute inset-0"
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
-              transition={{ duration: 0.9, ease: EASE }}
-              className="absolute inset-0"
-            >
-              <img
-                src={slide.image || '/placeholder.svg'}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 w-full h-full object-cover opacity-90"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/90 via-[#0F172A]/60 to-[#0F172A]/20" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/70 via-transparent to-transparent" />
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Decorative red lightning bolt */}
-        <motion.div
-          animate={{ y: [0, -8, 0], rotate: [0, 2, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute right-0 top-0 h-full w-1/2 hidden md:flex items-center justify-end pointer-events-none"
-        >
-          <Zap
-            className="w-[480px] h-[480px] text-[#E63939] opacity-20 translate-x-20"
-            strokeWidth={1}
-          />
-        </motion.div>
-
-        {/* Red glow */}
-        <div className="absolute -bottom-40 -left-20 w-[500px] h-[500px] bg-[#E63939]/10 rounded-full blur-[120px] pointer-events-none" />
-
-        {/* Content */}
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.7, ease: EASE }}
-              className="max-w-2xl"
-            >
-              {/* Eyebrow */}
-              <motion.div
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="inline-flex items-center gap-2 bg-[#E63939]/15 border border-[#E63939]/40 rounded-full px-4 py-1.5 text-xs text-[#E63939] font-bold mb-5 uppercase tracking-widest backdrop-blur-sm"
-              >
-                <Zap className="w-3 h-3 fill-[#E63939]" />
-                {slide.eyebrow}
-              </motion.div>
-
-              {/* Headline */}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.18, duration: 0.6, ease: EASE }}
-                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-[1.02] mb-5 text-balance tracking-tight"
-              >
-                {slide.title}
-                <br />
-                <span className="bg-gradient-to-r from-[#E63939] via-[#FF6B6B] to-[#E63939] bg-clip-text text-transparent">
-                  {slide.titleAccent}
-                </span>
-              </motion.h1>
-
-              {/* Sub */}
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28, duration: 0.5 }}
-                className="text-white/70 text-base sm:text-lg leading-relaxed mb-8 max-w-xl text-pretty"
-              >
-                {slide.sub}
-              </motion.p>
-
-              {/* CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.36, duration: 0.5 }}
-                className="flex flex-wrap gap-3"
-              >
-                <Link
-                  to={slide.primary.href}
-                  className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#E63939]/40 text-sm hover:shadow-xl hover:shadow-[#E63939]/50 hover:-translate-y-0.5"
-                >
-                  {slide.primary.label}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to={slide.secondary.href}
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-md"
-                >
-                  {slide.secondary.label}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Arrows */}
-        <button
-          onClick={() => go(-1)}
-          className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-[#E63939] backdrop-blur-md border border-white/20 rounded-full items-center justify-center text-white transition-all hover:scale-110"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => go(1)}
-          className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-[#E63939] backdrop-blur-md border border-white/20 rounded-full items-center justify-center text-white transition-all hover:scale-110"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
-        {/* Dots */}
-        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex items-center gap-2">
-          {HERO_SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                i === index ? 'w-10 bg-[#E63939]' : 'w-1.5 bg-white/40 hover:bg-white/60'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
-// TRUST BAR
-// ═══════════════════════════════════════════════════════════════
-function TrustBar() {
-  return (
-    <section className="bg-white border-b border-gray-100/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-100">
-          {TRUST.map(({ icon: Icon, title, sub }, i) => (
-            <motion.div
-              key={title}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06, ease: EASE }}
-              className="flex items-center gap-3 px-5 py-5 group"
-            >
-              <div className="w-11 h-11 bg-[#FEE9E9] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#E63939] transition-colors">
-                <Icon className="w-5 h-5 text-[#E63939] group-hover:text-white transition-colors" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900">{title}</p>
-                <p className="text-xs text-gray-500">{sub}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════���
 // FEATURED CATEGORIES — dark theme with hover effects
 // ═══════════════════════════════════════════════════════════════
 function FeaturedCategories() {
@@ -764,61 +556,4 @@ function WhyChooseCW() {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════
-// FINAL CTA — high-conversion, conversion-focused
-// ═══════════════════════════════════════════════════════════════
-function FinalCTA() {
-  return (
-    <section className="py-20 bg-gradient-to-br from-[#E63939] via-[#D62828] to-[#C82020] relative overflow-hidden">
-      {/* Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-      </div>
 
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <Sparkles className="w-10 h-10 text-white mx-auto mb-4" />
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 text-balance tracking-tight">
-            Ready to grow your security business?
-          </h2>
-          <p className="text-white/85 text-lg max-w-2xl mx-auto mb-8 text-pretty">
-            Join hundreds of South African installers and retailers buying
-            smarter from CW Electronics. Get trade pricing today.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={WA_RESELLER}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 bg-white text-[#E63939] font-bold px-8 py-4 rounded-xl transition-all shadow-2xl shadow-black/20 text-sm hover:-translate-y-0.5"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Get Trade Pricing
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <Link
-              to="/shop"
-              className="inline-flex items-center gap-2 bg-black hover:bg-black/85 text-white font-bold px-8 py-4 rounded-xl transition-all text-sm"
-            >
-              Browse Products
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
