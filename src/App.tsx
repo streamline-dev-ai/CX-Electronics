@@ -5,6 +5,7 @@ import { LangProvider } from './context/LangContext'
 import { CustomerAuthProvider } from './context/CustomerAuthContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { ProtectedRoute } from './components/admin/ProtectedRoute'
+import { ScrollToTop } from './components/ScrollToTop'
 
 // Customer account — lazy loaded
 const AccountLogin    = lazy(() => import('./pages/account/Login').then((m) => ({ default: m.AccountLogin })))
@@ -22,6 +23,7 @@ import { BulkShop } from './pages/store/BulkShop'
 import { BulkProductDetail } from './pages/store/BulkProductDetail'
 import { Deals } from './pages/store/Deals'
 import { About } from './pages/store/About'
+import { Terms } from './pages/store/Terms'
 import { CartPage } from './pages/store/CartPage'
 import { Checkout } from './pages/store/Checkout'
 import { OrderConfirmation } from './pages/store/OrderConfirmation'
@@ -52,6 +54,7 @@ export default function App() {
       <WishlistProvider>
       <CartProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             {/* ── Public store ─────────────────────────────────── */}
             <Route path="/" element={<Home />} />
@@ -62,6 +65,8 @@ export default function App() {
             <Route path="/deals" element={<Deals />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<About />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/returns" element={<Terms />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderConfirmation />} />

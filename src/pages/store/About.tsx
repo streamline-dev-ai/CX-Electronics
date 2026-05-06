@@ -33,14 +33,14 @@ const REASONS = [
 
 const WHATSAPP_NUMBER = '27000000000'
 const PHONE_DISPLAY = '+27 00 000 0000'
-const EMAIL = 'info@cxxelectronics.co.za'
-const ADDRESS = 'Dragon City, Shop 123, Main Reef Road, Fordsburg, Johannesburg, 2092'
+const EMAIL = 'info@cw-electronics.co.za'
+const ADDRESS = 'China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092'
 
-// Google Maps embed URL for Dragon City Fordsburg
+// Google Maps embed URL for China Mart, Crown Mines
 const MAP_EMBED =
-  'https://www.google.com/maps?q=Dragon+City+Mall+Fordsburg+Johannesburg&output=embed'
+  'https://www.google.com/maps?q=China+Mart+3+Press+Avenue+Crown+Mines+Johannesburg&output=embed'
 const DIRECTIONS_URL =
-  'https://www.google.com/maps/dir/?api=1&destination=Dragon+City+Mall+Fordsburg+Johannesburg'
+  'https://www.google.com/maps/dir/?api=1&destination=China+Mart+3+Press+Avenue+Crown+Mines+Johannesburg+2092'
 
 export function About() {
   const [form, setForm] = useState({
@@ -75,7 +75,7 @@ export function About() {
 
       <main className="flex-1">
         {/* ─── Hero ─────────────────────────────────── */}
-        <section className="relative bg-[#111827] overflow-hidden">
+        <section className="relative bg-black overflow-hidden">
           {/* Subtle red glow */}
           <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-[#E63939]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#E63939]/10 rounded-full blur-3xl pointer-events-none" />
@@ -106,7 +106,7 @@ export function About() {
               transition={{ duration: 0.7, delay: 0.05 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight text-balance leading-[1.05]"
             >
-              About <span className="text-[#E63939]">C&amp;X Electronics</span>
+              About <span className="text-[#E63939]">CW Electronics</span>
             </motion.h1>
 
             <motion.p
@@ -115,7 +115,7 @@ export function About() {
               transition={{ duration: 0.7, delay: 0.15 }}
               className="mt-5 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-pretty leading-relaxed"
             >
-              Your trusted electronics importer in Dragon City, Johannesburg —
+              Your trusted electronics importer at China Mart, Crown Mines, Johannesburg —
               powering South Africa with quality wholesale &amp; retail electronics.
             </motion.p>
 
@@ -162,11 +162,11 @@ export function About() {
               </h2>
               <div className="space-y-4 text-gray-600 text-base leading-relaxed">
                 <p>
-                  C&amp;X Electronics is a fast-growing importer and wholesaler of
-                  quality electronics based in <strong className="text-[#111827]">Dragon City,
-                  Johannesburg</strong>. Since 2022 we have been supplying South African
-                  retailers and businesses with chargers, CCTV systems, routers, solar
-                  lighting, smartwatches and more — direct from trusted manufacturers
+                  CW Electronics is a fast-growing importer and wholesaler of
+                  quality electronics based at <strong className="text-[#111827]">China Mart,
+                  Crown Mines, Johannesburg</strong>. Since 2022 we have been supplying South African
+                  installers, retailers and businesses with CCTV systems, solar lighting,
+                  routers, chargers, smartwatches and more — direct from trusted manufacturers
                   in China.
                 </p>
                 <p>
@@ -205,20 +205,20 @@ export function About() {
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5">
                 <img
                   src="/about/warehouse.jpg"
-                  alt="C&X Electronics warehouse and team in Dragon City, Johannesburg"
+                  alt="CW Electronics warehouse and team at China Mart, Crown Mines, Johannesburg"
                   className="w-full h-full object-cover"
                 />
               </div>
               {/* Floating badge */}
-              <div className="absolute -bottom-5 -left-5 bg-[#111827] text-white rounded-xl px-5 py-4 shadow-xl flex items-center gap-3">
+              <div className="absolute -bottom-5 -left-5 bg-black text-white rounded-xl px-5 py-4 shadow-xl flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#E63939] rounded-lg flex items-center justify-center">
                   <Zap className="w-5 h-5 fill-white" />
                 </div>
                 <div className="leading-tight">
                   <div className="text-[10px] text-white/50 uppercase tracking-widest font-bold">
-                    Based in
+                    Based at
                   </div>
-                  <div className="text-sm font-bold">Dragon City, JHB</div>
+                  <div className="text-sm font-bold">China Mart, Crown Mines</div>
                 </div>
               </div>
             </motion.div>
@@ -271,8 +271,8 @@ export function About() {
               Visit Our Showroom
             </h2>
             <p className="mt-3 text-gray-600 leading-relaxed">
-              Come see our full range in person at Dragon City — Johannesburg's largest
-              import retail hub.
+              Come see our full range in person at China Mart, Crown Mines —
+              Johannesburg's premier electronics import hub.
             </p>
           </div>
 
@@ -286,7 +286,7 @@ export function About() {
             {/* Map */}
             <div className="lg:col-span-2 rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5 bg-white aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
               <iframe
-                title="C&X Electronics Location — Dragon City, Fordsburg, Johannesburg"
+                title="CW Electronics Location — China Mart, Crown Mines, Johannesburg"
                 src={MAP_EMBED}
                 width="100%"
                 height="100%"
@@ -298,7 +298,7 @@ export function About() {
             </div>
 
             {/* Address card */}
-            <div className="bg-[#111827] rounded-2xl p-7 text-white flex flex-col">
+            <div className="bg-black rounded-2xl p-7 text-white flex flex-col">
               <div className="w-12 h-12 bg-[#E63939] rounded-xl flex items-center justify-center mb-5">
                 <MapPin className="w-6 h-6" />
               </div>
@@ -576,7 +576,7 @@ export function About() {
         </section>
 
         {/* ─── Final CTA ────────────────────────────── */}
-        <section className="bg-[#111827] text-white">
+        <section className="bg-black text-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 text-center relative overflow-hidden">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#E63939]/15 rounded-full blur-3xl pointer-events-none" />
             <div className="relative">

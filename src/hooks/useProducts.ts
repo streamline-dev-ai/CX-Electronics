@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, getProductImageUrl, type ProductWithCategory } from '../lib/supabase'
 
-export type ProductSort = 'newest' | 'price_asc' | 'price_desc' | 'featured'
+export type ProductSort = 'newest' | 'price_asc' | 'price_desc' | 'featured' | 'popularity'
 
 interface UseProductsOptions {
   categorySlug?: string
@@ -72,6 +72,10 @@ export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
           break
         case 'featured':
           query = query.order('featured', { ascending: false }).order('created_at', { ascending: false })
+          break
+        case 'popularity':
+          // Sort by featured first, then by retail_price descending (higher price = more popular assumption)
+          query = query.order('featured', { ascending: false }).order('retail_price', { ascending: false })
           break
         case 'newest':
         default:

@@ -80,7 +80,7 @@ export const translations = {
 
     // Footer
     contactUs: 'Contact Us',
-    address_store: 'Dragon City, Fordsburg, Johannesburg',
+    address_store: 'China Mart, Shop C15, 3 Press Ave, Crown Mines, Johannesburg, 2092',
     allRightsReserved: 'All rights reserved.',
 
     // Status
@@ -188,7 +188,7 @@ export const translations = {
 
     // Footer
     contactUs: '联系我们',
-    address_store: '约翰内斯堡福斯堡龙城',
+    address_store: '约翰内斯堡 Crown Mines, China Mart, C15号',
     allRightsReserved: '版权所有。',
 
     // Status
