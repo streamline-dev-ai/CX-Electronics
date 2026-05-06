@@ -38,6 +38,13 @@ export interface Variant {
   options: string[]
 }
 
+export interface ProductVariantGroup {
+  id: string
+  name: string
+  slug: string
+  created_at: string
+}
+
 export interface Product {
   id: string
   name: string
@@ -56,6 +63,8 @@ export interface Product {
   featured: boolean
   stock_status: StockStatus
   variants: Variant[] | null
+  variant_group_id: string | null
+  variant_label: string | null
   created_at: string
   updated_at: string
 }
