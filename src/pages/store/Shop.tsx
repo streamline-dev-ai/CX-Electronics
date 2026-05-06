@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight, X, Zap,
+  Search, SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight, X,
   LayoutGrid, Grid2X2, Grid3X3, List,
 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'

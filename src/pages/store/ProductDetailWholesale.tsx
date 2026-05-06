@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
-  ShoppingCart, ArrowLeft, Package, Loader2, Star,
+  ShoppingCart, ArrowLeft, Package, Loader2,
   MessageCircle, Truck, Shield, RotateCcw, BadgeCheck, Zap, TrendingDown,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
