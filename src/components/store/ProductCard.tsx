@@ -120,13 +120,13 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -3 }}
     >
       <Link to={`${basePath}/${product.slug}`} className="group block h-full">
-        <div className="relative bg-white rounded-2xl border border-gray-100 group-hover:border-[#E63939]/40 group-hover:shadow-[0_12px_32px_-12px_rgba(230,57,57,0.35)] transition-all duration-300 overflow-hidden h-full flex flex-col">
+        <div className="relative bg-neutral-900 rounded-xl border border-neutral-800 hover:border-neutral-700 transition-all duration-300 overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div
-            className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden"
+            className="relative aspect-square bg-neutral-800 overflow-hidden"
             onMouseEnter={startCycling}
             onMouseLeave={stopCycling}
           >
@@ -142,7 +142,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
                     className={`w-full h-full object-contain p-4 sm:p-5 transition-transform duration-500 ${
-                      cardImages.length < 2 ? 'group-hover:scale-110' : ''
+                      cardImages.length < 2 ? 'group-hover:scale-105' : ''
                     }`}
                     loading="lazy"
                   />
@@ -154,7 +154,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                       <span
                         key={i}
                         className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          i === hoverImg ? 'bg-[#E63939] w-3' : 'bg-gray-300'
+                          i === hoverImg ? 'bg-[#DC2626] w-3' : 'bg-neutral-600'
                         }`}
                       />
                     ))}
@@ -163,31 +163,31 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Zap className="w-12 h-12 text-gray-200" />
+                <Zap className="w-12 h-12 text-neutral-700" />
               </div>
             )}
 
             {/* Badges */}
             <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
               {isOutOfStock && (
-                <span className="text-[10px] bg-gray-900 text-white px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                <span className="text-[10px] bg-neutral-700 text-neutral-300 px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
                   {t('outOfStock')}
                 </span>
               )}
               {product.featured && !isOutOfStock && (
-                <span className="text-[10px] bg-[#E63939] text-white px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                <span className="text-[10px] bg-[#DC2626] text-white px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
                   {t('featured')}
                 </span>
               )}
               {!isBulkView && product.is_bulk_available && product.bulk_price && (
-                <span className="text-[10px] bg-[#0F172A] text-white px-2 py-0.5 rounded-md font-bold">
+                <span className="text-[10px] bg-neutral-900/90 text-white px-2 py-0.5 rounded-md font-semibold border border-neutral-700">
                   Bulk from R{product.bulk_price.toFixed(0)}
                 </span>
               )}
             </div>
 
             {isBulkView && product.bulk_min_qty && (
-              <span className="absolute bottom-10 left-2.5 text-[10px] bg-[#E63939] text-white px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+              <span className="absolute bottom-10 left-2.5 text-[10px] bg-[#DC2626] text-white px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
                 {product.bulk_min_qty}+ units
               </span>
             )}
@@ -195,14 +195,14 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
             {/* Wishlist */}
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.id) }}
-              className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-110 ${inWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+              className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center transition-all hover:scale-110 ${inWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
               aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#E63939] text-[#E63939]' : 'text-gray-400'}`} />
+              <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#DC2626] text-[#DC2626]' : 'text-neutral-400'}`} />
             </button>
 
             {savingsPct > 0 && (
-              <span className="absolute bottom-2.5 right-2.5 text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+              <span className="absolute bottom-2.5 right-2.5 text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
                 Save {savingsPct}%
               </span>
             )}
@@ -211,36 +211,36 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
           {/* Info */}
           <div className="p-3 sm:p-4 flex flex-col flex-1">
             {product.categories && (
-              <p className="text-[10px] sm:text-[11px] text-gray-400 mb-1 truncate uppercase tracking-wider font-semibold">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 mb-1 truncate uppercase tracking-wider font-medium">
                 {product.categories.name}
               </p>
             )}
-            <p className={`font-semibold text-gray-900 ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
+            <p className={`font-semibold text-white ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
               {name}
             </p>
 
             <div className="mt-auto flex items-end justify-between gap-2">
               <div className="leading-tight">
                 {isBulkView && product.retail_price > price && (
-                  <p className="text-xs text-gray-400 line-through leading-none mb-0.5">
+                  <p className="text-xs text-neutral-500 line-through leading-none mb-0.5">
                     R{product.retail_price.toFixed(2)}
                   </p>
                 )}
-                <p className={`${priceSize} font-extrabold text-[#E63939] leading-none`}>
+                <p className={`${priceSize} font-bold text-[#DC2626] leading-none`}>
                   R{price.toFixed(2)}
                 </p>
                 {isBulkView && (
-                  <p className="text-[10px] text-gray-500 mt-1 font-medium">per unit</p>
+                  <p className="text-[10px] text-neutral-500 mt-1 font-medium">per unit</p>
                 )}
               </div>
 
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-all ${
+                className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all ${
                   isOutOfStock
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-[#E63939] hover:bg-[#C82020] text-white group-hover:shadow-md group-hover:shadow-[#E63939]/30'
+                    ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                    : 'bg-[#DC2626] hover:bg-[#B91C1C] text-white'
                 }`}
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
@@ -250,9 +250,6 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               </button>
             </div>
           </div>
-
-          {/* Bottom accent */}
-          <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E63939] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300" />
         </div>
       </Link>
     </motion.div>

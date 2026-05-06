@@ -54,24 +54,17 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0F172A] shadow-lg shadow-black/40">
-        {/* Top promo bar */}
-        <div className="bg-[#E63939] py-1.5 text-center text-xs text-white font-semibold tracking-wide">
-          Wholesale &amp; Retail Electronics — China Mart, Crown Mines JHB &nbsp;|&nbsp; Free delivery on orders over R2,000
-        </div>
-
+      <header className="sticky top-0 z-40 bg-[#0a0a0a] border-b border-neutral-800">
         {/* Main row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-4 lg:gap-6">
           {/* Logo + brand name */}
           <Link to="/" className="flex items-center gap-3 flex-shrink-0">
-            <img
-              src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png"
-              alt="CW Electronics Logo"
-              className="h-9 w-auto"
-            />
+            <div className="w-9 h-9 bg-[#DC2626] rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white fill-white" />
+            </div>
             <div className="hidden sm:block leading-tight">
-              <span className="font-extrabold text-white text-base tracking-tight">CW Electronics</span>
-              <span className="block text-[10px] text-white/40 font-medium uppercase tracking-widest -mt-0.5">
+              <span className="font-bold text-white text-base tracking-tight">CXX Electronics</span>
+              <span className="block text-[10px] text-neutral-500 font-medium uppercase tracking-widest -mt-0.5">
                 Wholesale &amp; Retail
               </span>
             </div>
@@ -79,17 +72,17 @@ export function Navbar() {
 
           {/* Desktop search bar */}
           <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl mx-4">
-            <div className="flex w-full bg-white/10 hover:bg-white/15 border border-white/10 rounded-lg overflow-hidden transition-colors focus-within:bg-white focus-within:border-transparent group">
+            <div className="flex w-full bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden transition-colors focus-within:border-[#DC2626]">
               <input
                 type="search"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search chargers, CCTV, routers..."
-                className="flex-1 px-4 py-2 text-sm bg-transparent text-white placeholder:text-white/40 focus:outline-none group-focus-within:text-gray-900 group-focus-within:placeholder:text-gray-400"
+                className="flex-1 px-4 py-2 text-sm bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
               />
               <button
                 type="submit"
-                className="bg-[#E63939] hover:bg-[#C82020] px-5 flex items-center justify-center transition-colors"
+                className="bg-[#DC2626] hover:bg-[#B91C1C] px-5 flex items-center justify-center transition-colors"
                 aria-label="Search"
               >
                 <Search className="w-4 h-4 text-white" />
@@ -103,11 +96,11 @@ export function Navbar() {
             <Link
               to="/account/wishlist"
               aria-label="Wishlist"
-              className="hidden sm:flex relative p-2 text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
+              className="hidden sm:flex relative p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
             >
-              <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#E63939] text-[#E63939]' : ''}`} />
+              <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#DC2626] text-[#DC2626]' : ''}`} />
               {wishlistIds.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E63939] text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0a0a0a]">
                   {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
                 </span>
               )}
@@ -117,7 +110,7 @@ export function Navbar() {
             <Link
               to="/account/login"
               aria-label="My Account"
-              className="hidden sm:flex p-2 text-white/60 hover:text-white hover:bg-white/8 rounded-lg transition-colors"
+              className="hidden sm:flex p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
             >
               <User className="w-5 h-5" />
             </Link>
@@ -125,13 +118,13 @@ export function Navbar() {
             {/* Cart */}
             <button
               onClick={openCart}
-              className="relative flex items-center gap-2 bg-white/8 hover:bg-white/15 border border-white/10 text-white text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
+              className="relative flex items-center gap-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
               aria-label="Cart"
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden md:inline">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#DC2626] text-white text-[10px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0a0a0a]">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
@@ -140,7 +133,7 @@ export function Navbar() {
             {/* Get a Quote */}
             <Link
               to="/bulk"
-              className="hidden lg:inline-flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors shadow-md shadow-[#E63939]/25 whitespace-nowrap"
+              className="hidden lg:inline-flex items-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
               Get a Quote
@@ -149,7 +142,7 @@ export function Navbar() {
             {/* Mobile toggle */}
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              className="lg:hidden p-2 text-white/70 hover:text-white rounded-lg"
+              className="lg:hidden p-2 text-neutral-400 hover:text-white rounded-lg"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -158,7 +151,7 @@ export function Navbar() {
         </div>
 
         {/* Secondary nav row (desktop) */}
-        <div className="hidden lg:block border-t border-white/8">
+        <div className="hidden lg:block border-t border-neutral-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-11 gap-1">
             {navLinks.map(({ to, label, exact }) => (
               <NavLink
@@ -166,8 +159,8 @@ export function Navbar() {
                 to={to}
                 end={exact}
                 className={({ isActive }) =>
-                  `px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
-                    isActive ? 'text-[#E63939]' : 'text-white/70 hover:text-white'
+                  `px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    isActive ? 'text-[#DC2626]' : 'text-neutral-400 hover:text-white'
                   }`
                 }
               >
@@ -179,25 +172,25 @@ export function Navbar() {
             <div ref={catsRef} className="relative">
               <button
                 onClick={() => setCatsOpen((v) => !v)}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-semibold text-white/70 hover:text-white rounded-md transition-colors"
+                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white rounded-md transition-colors"
               >
                 Categories
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${catsOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {catsOpen && (
-                <div className="absolute left-0 top-full mt-1 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 p-2 z-50">
+                <div className="absolute left-0 top-full mt-1 w-72 bg-neutral-900 rounded-xl border border-neutral-800 p-2 z-50">
                   {CATEGORIES.map(({ slug, label, icon: Icon }) => (
                     <Link
                       key={slug}
                       to={`/shop?category=${slug}`}
                       onClick={() => setCatsOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#FEE9E9] group transition-colors"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-neutral-800 group transition-colors"
                     >
-                      <div className="w-8 h-8 bg-gray-100 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors">
-                        <Icon className="w-4 h-4 text-gray-600 group-hover:text-white transition-colors" />
+                      <div className="w-8 h-8 bg-neutral-800 group-hover:bg-[#DC2626] rounded-lg flex items-center justify-center transition-colors">
+                        <Icon className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-sm font-medium text-gray-800">{label}</span>
+                      <span className="text-sm font-medium text-neutral-200">{label}</span>
                     </Link>
                   ))}
                 </div>
@@ -208,20 +201,20 @@ export function Navbar() {
 
         {/* Mobile drawer */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-white/8 bg-[#0F172A] px-4 py-4">
+          <div className="lg:hidden border-t border-neutral-800 bg-[#0a0a0a] px-4 py-4">
             {/* Mobile search */}
             <form onSubmit={handleSearch} className="mb-4">
-              <div className="flex bg-white rounded-lg overflow-hidden">
+              <div className="flex bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden">
                 <input
                   type="search"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-white bg-transparent placeholder:text-neutral-500 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="bg-[#E63939] px-5 flex items-center justify-center"
+                  className="bg-[#DC2626] px-5 flex items-center justify-center"
                   aria-label="Search"
                 >
                   <Search className="w-4 h-4 text-white" />
@@ -236,14 +229,14 @@ export function Navbar() {
                 end={exact}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `block py-3 text-sm border-b border-white/8 ${isActive ? 'text-[#E63939] font-semibold' : 'text-white/70'}`
+                  `block py-3 text-sm border-b border-neutral-800 ${isActive ? 'text-[#DC2626] font-semibold' : 'text-neutral-400'}`
                 }
               >
                 {label}
               </NavLink>
             ))}
 
-            <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-white/40 font-bold">
+            <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-neutral-600 font-semibold">
               Categories
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -252,9 +245,9 @@ export function Navbar() {
                   key={slug}
                   to={`/shop?category=${slug}`}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 p-2.5 bg-white/5 rounded-lg text-xs text-white/80 hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-2 p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-neutral-300 hover:bg-neutral-800 transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-[#E63939]" />
+                  <Icon className="w-4 h-4 text-[#DC2626]" />
                   {label}
                 </Link>
               ))}
@@ -263,7 +256,7 @@ export function Navbar() {
             <Link
               to="/bulk"
               onClick={() => setMobileOpen(false)}
-              className="mt-4 flex items-center justify-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-bold px-4 py-3 rounded-lg w-full transition-colors"
+              className="mt-4 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
               Get a Quote
