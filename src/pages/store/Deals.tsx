@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 
 // ── Featured Deal Cards (big offers) ───────────────────────
 const FEATURED_DEALS = [
@@ -129,6 +130,11 @@ const buildWA = (msg: string) =>
 export function Deals() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <SEO
+        title="Deals & Specials | CW Electronics Johannesburg"
+        description="Hot deals on electronics — bulk discounts, clearance specials & trade pricing. Chargers, CCTV, solar & more. Limited stock, best prices in JHB."
+        url="https://cw-electronics.co.za/deals"
+      />
       <Navbar />
       <Hero />
       <FeaturedOffers />

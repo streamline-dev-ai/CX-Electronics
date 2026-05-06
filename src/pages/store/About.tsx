@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 
 const REASONS = [
   {
@@ -71,6 +72,11 @@ export function About() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+      <SEO
+        title="About Us | CW Electronics — Crown Mines, Johannesburg"
+        description="CW Electronics is a direct importer of electronics in Crown Mines, Johannesburg. Visit our store or get in touch for trade pricing & wholesale enquiries."
+        url="https://cw-electronics.co.za/about"
+      />
       <Navbar />
 
       <main className="flex-1">

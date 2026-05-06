@@ -1,5 +1,6 @@
 import { StrictMode, useState, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
+import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App'
 import { LoadingScreen } from './components/LoadingScreen'
@@ -21,6 +22,8 @@ function Root() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Root />
+    <HelmetProvider>
+      <Root />
+    </HelmetProvider>
   </StrictMode>,
 )

@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27000000000'
@@ -94,6 +95,11 @@ const EASE = [0.22, 1, 0.36, 1] as const
 export function Home() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <SEO
+        title="CW Electronics — Wholesale & Retail Electronics | Crown Mines JHB"
+        description="Direct importer of chargers, CCTV, solar, routers, smartwatches & accessories in Johannesburg. Trade pricing for resellers. Free Gauteng delivery over R2,000."
+        url="https://cw-electronics.co.za/"
+      />
       <Navbar />
       <HeroCarousel />
       <TrustBar />

@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
 import {
   ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star,
   MessageCircle, Truck, Shield, RotateCcw, BadgeCheck, Zap, Heart,
@@ -8,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { ProductCard } from '../../components/store/ProductCard'
+import SEO from '../../components/SEO'
 import { useProduct } from '../../hooks/useProduct'
 import { useProducts } from '../../hooks/useProducts'
 import { useCart } from '../../context/CartContext'
@@ -18,6 +20,7 @@ const WHATSAPP_NUMBER = '27000000000'
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
   const { product, loading, error } = useProduct(slug ?? '')
   const { addItem } = useCart()
   const { lang } = useLang()
@@ -27,6 +30,21 @@ export function ProductDetail() {
   const [activeImage, setActiveImage] = useState(0)
   const [tab, setTab] = useState<'description' | 'specs'>('description')
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
+
+  // Redirect to group page if this product is part of a variant group
+  useEffect(() => {
+    if (!product?.variant_group_id) return
+    supabase
+      .from('product_variant_groups')
+      .select('slug')
+      .eq('id', product.variant_group_id)
+      .single()
+      .then(({ data }) => {
+        if (data?.slug) {
+          navigate(`/shop/group/${data.slug}?variant=${product.slug}`, { replace: true })
+        }
+      })
+  }, [product, navigate])
 
   // Related products
   const { products: related } = useProducts({
@@ -102,6 +120,13 @@ export function ProductDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title={`${product.name} | CW Electronics`}
+        description={product.description ? product.description.slice(0, 160) : `Buy ${product.name} at the best price in Johannesburg. Fast delivery across South Africa.`}
+        image={images[0] || undefined}
+        url={`https://cw-electronics.co.za/shop/${product.slug}`}
+        type="product"
+      />
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">

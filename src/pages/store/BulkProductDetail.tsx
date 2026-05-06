@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { MessageCircle, ArrowLeft, Package, Loader2 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 import { useProduct } from '../../hooks/useProduct'
 import { useLang } from '../../context/LangContext'
 
@@ -45,6 +46,13 @@ export function BulkProductDetail() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title={`${product.name} — Wholesale | CW Electronics`}
+        description={description ? description.slice(0, 160) : `Wholesale pricing on ${product.name}. Bulk discounts available in Johannesburg. Min ${product.bulk_min_qty ?? 6} units.`}
+        image={images[0] || undefined}
+        url={`https://cw-electronics.co.za/bulk/${product.slug}`}
+        type="product"
+      />
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">

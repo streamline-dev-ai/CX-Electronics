@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 import { ProductCard } from '../../components/store/ProductCard'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
@@ -80,6 +81,11 @@ export function BulkShop() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Wholesale Electronics — Bulk Pricing | CW Electronics"
+        description="Trade pricing for resellers, installers & businesses. Minimum 6 units for bulk rates. CCTV, solar, chargers, routers & more. Johannesburg."
+        url="https://cw-electronics.co.za/bulk"
+      />
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────── */}

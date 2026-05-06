@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 import { ProductCard } from '../../components/store/ProductCard'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
@@ -247,6 +248,11 @@ export function Shop() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+      <SEO
+        title="Shop Electronics | CW Electronics Johannesburg"
+        description="Browse chargers, CCTV, solar lights, routers, smartwatches & more. Retail & bulk pricing available. Fast delivery across South Africa."
+        url="https://cw-electronics.co.za/shop"
+      />
       <Navbar />
 
       {/* Hero */}

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Scale, CreditCard, Truck, RefreshCcw, Package, ShieldCheck, Phone } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
+import SEO from '../../components/SEO'
 
 const LAST_UPDATED = '1 May 2025'
 const EMAIL = 'info@cw-electronics.co.za'
@@ -58,6 +59,11 @@ function Note({ children }: { children: React.ReactNode }) {
 export function Terms() {
   return (
     <div className="min-h-screen bg-[#0F172A]">
+      <SEO
+        title="Terms & Returns Policy | CW Electronics"
+        description="Our terms of service, payment options, 7-day return policy, wholesale terms, and POPIA privacy compliance. CW Electronics, Johannesburg."
+        url="https://cw-electronics.co.za/terms"
+      />
       <Navbar />
 
       {/* Page hero */}

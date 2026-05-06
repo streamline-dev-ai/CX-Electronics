@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /account/
+
+Sitemap: https://cw-electronics.co.za/sitemap.xml
