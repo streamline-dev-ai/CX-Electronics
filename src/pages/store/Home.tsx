@@ -4,7 +4,7 @@ import {
   Zap, Wifi, Shield, Watch, Sun, Plug, Smartphone,
   ArrowRight, ChevronLeft, ChevronRight, ShoppingCart,
   Truck, Tag, BadgeCheck, MapPin, Star, TrendingUp,
-  Phone, MessageCircle, Sparkles, CheckCircle2,
+  Phone, MessageCircle, Sparkles,
 } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
@@ -94,11 +94,10 @@ const EASE = [0.22, 1, 0.36, 1] as const
 // ─────────────────────────────────────────────────────────────
 export function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <HeroCarousel />
       <TrustBar />
-      <FeaturedDealStrip />
       <FeaturedCategories />
       <StatsBand />
       <BestSellers />
@@ -112,7 +111,7 @@ export function Home() {
 
 // ═══════════════════════════════════════════════════════════════
 // HERO CAROUSEL with parallax + spring transitions
-// ═══════════════════════════════════════════════════════════════
+// ═══════��═══════════════════════════════════════════════════════
 function HeroCarousel() {
   const [index, setIndex] = useState(0)
   const heroRef = useRef<HTMLDivElement>(null)
@@ -137,7 +136,7 @@ function HeroCarousel() {
   return (
     <section
       ref={heroRef}
-      className="relative bg-black overflow-hidden isolate"
+      className="relative bg-[#0F172A] overflow-hidden isolate"
     >
       <div className="relative h-[520px] sm:h-[580px] lg:h-[620px]">
         {/* Background parallax */}
@@ -158,10 +157,10 @@ function HeroCarousel() {
                 src={slide.image || '/placeholder.svg'}
                 alt=""
                 aria-hidden
-                className="absolute inset-0 w-full h-full object-cover opacity-55"
+                className="absolute inset-0 w-full h-full object-cover opacity-90"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/90 via-[#0F172A]/60 to-[#0F172A]/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/70 via-transparent to-transparent" />
             </motion.div>
           </AnimatePresence>
         </motion.div>
@@ -292,7 +291,7 @@ function HeroCarousel() {
 // ═══════════════════════════════════════════════════════════════
 function TrustBar() {
   return (
-    <section className="bg-white border-b border-gray-100">
+    <section className="bg-white border-b border-gray-100/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-100">
           {TRUST.map(({ icon: Icon, title, sub }, i) => (
@@ -314,104 +313,6 @@ function TrustBar() {
             </motion.div>
           ))}
         </div>
-      </div>
-    </section>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
-// FEATURED DEAL STRIP — Trade Pricing & Free Delivery banner
-// ═══════════════════════════════════════════════════════════════
-function FeaturedDealStrip() {
-  return (
-    <section className="py-10 sm:py-12 bg-black relative overflow-hidden">
-      {/* Animated grid bg */}
-      <div className="absolute inset-0 opacity-[0.07]">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage:
-              'linear-gradient(#E63939 1px, transparent 1px), linear-gradient(90deg, #E63939 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-      </div>
-      {/* Red glow */}
-      <div className="absolute -top-32 right-1/3 w-[400px] h-[400px] bg-[#E63939]/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: EASE }}
-          className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-0 bg-gradient-to-br from-[#1a0606] via-black to-[#1a0606] border border-[#E63939]/30 rounded-3xl overflow-hidden"
-        >
-          {/* Left: badge + content */}
-          <div className="flex-1 p-7 sm:p-9 lg:p-10 flex flex-col justify-center">
-            <div className="flex items-center gap-2 mb-3">
-              <motion.div
-                animate={{ scale: [1, 1.08, 1] }}
-                transition={{ duration: 1.6, repeat: Infinity }}
-                className="inline-flex items-center gap-1.5 bg-[#E63939] text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-widest"
-              >
-                <Zap className="w-3 h-3 fill-white" />
-                Trade Account
-              </motion.div>
-              <span className="text-[#E63939] text-xs font-bold uppercase tracking-widest">
-                Installers &amp; Resellers
-              </span>
-            </div>
-
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3 text-balance leading-tight">
-              Get Trade Pricing on{' '}
-              <span className="text-[#E63939]">CCTV, Solar &amp; Networking</span>
-            </h3>
-            <p className="text-white/65 text-sm sm:text-base mb-6 text-pretty max-w-xl leading-relaxed">
-              Free Gauteng delivery on orders over R2,000. Bulk discounts from 10+ units.
-              Buy direct from the importer at China Mart, Crown Mines.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <a
-                href={WA_TRADE}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Get Trade Pricing
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <Link
-                to="/bulk"
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-semibold px-6 py-3 rounded-xl transition-colors border border-white/20 text-sm"
-              >
-                Shop Wholesale
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Right: 3 value props */}
-          <div className="lg:w-[360px] bg-black/50 lg:border-l border-t lg:border-t-0 border-[#E63939]/20 p-7 sm:p-8 grid grid-cols-1 gap-4 backdrop-blur-sm">
-            {[
-              { icon: Truck, title: 'Free Gauteng Delivery', sub: 'On orders over R2,000' },
-              { icon: Tag, title: 'Bulk Discounts', sub: 'From 10 units up' },
-              { icon: CheckCircle2, title: 'Same-Day Dispatch', sub: 'Order before 12pm' },
-            ].map(({ icon: Icon, title, sub }) => (
-              <div key={title} className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#E63939]/15 rounded-lg flex items-center justify-center flex-shrink-0 ring-1 ring-[#E63939]/30">
-                  <Icon className="w-5 h-5 text-[#E63939]" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-white leading-tight">{title}</p>
-                  <p className="text-xs text-white/50 mt-0.5">{sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   )
@@ -517,7 +418,7 @@ function FeaturedCategories() {
 // ═══════════════════════════════════════════════════════════════
 function StatsBand() {
   return (
-    <section className="py-14 bg-white border-y border-gray-100">
+    <section className="py-14 bg-[#0F172A] border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {STATS.map((s, i) => (
@@ -565,12 +466,12 @@ function AnimatedStat({
       className="text-center"
     >
       <p className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-        <span className="bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent">
+        <span className="text-white">
           {stat.isFloat ? display.toFixed(1) : display.toLocaleString()}
         </span>
         <span className="text-[#E63939]">{stat.suffix}</span>
       </p>
-      <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-2">
+      <p className="text-xs text-white/50 uppercase tracking-widest font-bold mt-2">
         {stat.label}
       </p>
     </motion.div>
@@ -748,7 +649,7 @@ function LocationSection() {
           </div>
 
           {/* Address card */}
-          <div className="bg-black text-white rounded-2xl p-7 flex flex-col">
+          <div className="bg-[#0F172A] text-white rounded-2xl p-7 flex flex-col">
             <div className="w-12 h-12 bg-[#E63939] rounded-xl flex items-center justify-center mb-5">
               <MapPin className="w-6 h-6" />
             </div>
@@ -817,7 +718,7 @@ function LocationSection() {
 // ═══════════════════════════════════════════════════════════════
 function WhyChooseCW() {
   return (
-    <section className="py-20 bg-black relative overflow-hidden">
+    <section className="py-20 bg-[#0F172A] relative overflow-hidden">
       {/* Animated bolt */}
       <motion.div
         animate={{ y: [0, -10, 0], rotate: [0, 1, 0] }}

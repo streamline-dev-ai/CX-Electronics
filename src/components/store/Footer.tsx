@@ -6,11 +6,11 @@ import {
 import { useLang } from '../../context/LangContext'
 
 export function Footer() {
-  const { lang, setLang, t } = useLang()
+  const { t } = useLang()
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-black text-white border-t border-white/5">
+    <footer className="bg-[#0F172A] text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
@@ -53,6 +53,7 @@ export function Footer() {
               <li><Link to="/shop" className="hover:text-[#E63939] transition-colors">{t('shop')}</Link></li>
               <li><Link to="/bulk" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
               <li><Link to="/about" className="hover:text-[#E63939] transition-colors">About &amp; Contact</Link></li>
+              <li><Link to="/terms" className="hover:text-[#E63939] transition-colors">Terms &amp; Returns Policy</Link></li>
               <li><Link to="/shop?category=chargers" className="hover:text-[#E63939] transition-colors">Chargers &amp; Cables</Link></li>
               <li><Link to="/shop?category=cctv" className="hover:text-[#E63939] transition-colors">CCTV &amp; Security</Link></li>
               <li><Link to="/shop?category=solar" className="hover:text-[#E63939] transition-colors">Solar Lighting</Link></li>
@@ -142,21 +143,9 @@ export function Footer() {
           <p className="text-xs text-white/40">
             © {year} CW Electronics. {t('allRightsReserved')}
           </p>
-
-          <div className="flex items-center gap-1 border border-white/10 rounded-lg overflow-hidden text-xs">
-            <button
-              onClick={() => setLang('en')}
-              className={`px-3 py-1.5 transition-colors ${lang === 'en' ? 'bg-[#E63939] text-white font-semibold' : 'text-white/60 hover:text-white'}`}
-            >
-              English
-            </button>
-            <button
-              onClick={() => setLang('zh')}
-              className={`px-3 py-1.5 transition-colors ${lang === 'zh' ? 'bg-[#E63939] text-white font-semibold' : 'text-white/60 hover:text-white'}`}
-            >
-              中文
-            </button>
-          </div>
+          <p className="text-xs text-white/30">
+            China Mart, Shop C15, Crown Mines, Johannesburg
+          </p>
         </div>
       </div>
     </footer>
