@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useSearchParams, Link } from 'react-router-dom'
 import {
   ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star,
   Truck, Shield, RotateCcw, BadgeCheck, Zap, Heart, ChevronLeft, ChevronRight,
@@ -28,7 +28,6 @@ function resolveProduct(data: Record<string, unknown>): ProductWithCategory {
 export function VariantProductDetail() {
   const { groupSlug } = useParams<{ groupSlug: string }>()
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
 
   const [group, setGroup] = useState<ProductVariantGroup | null>(null)
   const [variants, setVariants] = useState<ProductWithCategory[]>([])
