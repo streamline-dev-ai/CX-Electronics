@@ -43,7 +43,7 @@ export function Shop() {
     setPage(1)
   }, [categorySlug, search, sort, priceRange.min, priceRange.max, inStockOnly, bulkOnly])
 
-  const { products, loading, totalCount, hasMore } = useProducts({
+  const { products, loading, totalCount } = useProducts({
     categorySlug: categorySlug || undefined,
     search: search || undefined,
     sort,
