@@ -83,104 +83,6 @@ export function Home() {
     </div>
   )
 }
-
-
-
-// ══════════════════════════════════════════════════════════════���
-// FEATURED CATEGORIES — dark theme with hover effects
-// ═══════════════════════════════════════════════════════════════
-function FeaturedCategories() {
-  return (
-    <section className="py-16 sm:py-24 bg-[#1E293B]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12 sm:mb-16"
-        >
-          <p className="text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-2">
-            Browse By Category
-          </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-balance tracking-tight">
-            Featured Categories
-          </h2>
-          <p className="text-neutral-400 mt-3 max-w-xl mx-auto text-pretty">
-            From CCTV to chargers — explore the categories driving our biggest sales.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {CATEGORIES.map(({ slug, label, desc, icon: Icon, img }, i) => (
-            <motion.div
-              key={slug}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: EASE }}
-              whileHover={{ y: -4 }}
-              className="will-change-transform"
-            >
-              <Link
-                to={`/shop?category=${slug}`}
-                className="group block bg-neutral-900 rounded-xl border border-neutral-800 hover:border-neutral-700 transition-all overflow-hidden h-full"
-              >
-                <div className="aspect-[16/10] bg-neutral-800 overflow-hidden relative">
-                  <img
-                    src={img || '/placeholder.svg'}
-                    alt={label}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute top-3 left-3 w-10 h-10 bg-[#DC2626]/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-[#DC2626]/30">
-                    <Icon className="w-5 h-5 text-[#DC2626]" />
-                  </div>
-                </div>
-
-                <div className="p-5 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold text-white mb-0.5 text-base">{label}</h3>
-                    <p className="text-xs text-neutral-500">{desc}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#DC2626] group-hover:gap-2 transition-all">
-                    Shop
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Bottom CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-4"
-        >
-          <Link
-            to="/shop"
-            className="group inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
-          >
-            Shop All Products
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          <Link
-            to="/shop?view=categories"
-            className="group inline-flex items-center gap-2 border-2 border-neutral-700 text-white hover:border-neutral-500 font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
-          >
-            View All Categories
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
 // ══════════════════════════════════════════════════════════════
 // FEATURED CATEGORIES — white background with dark cards
 // ══════════════════════════════════════════════════════════════
@@ -323,6 +225,24 @@ function AnimatedStat({
     </motion.div>
   )
 }
+
+// ═══════════════════════════════════════════════════════════════
+// STATS BAND with animated counters
+// ═══════════════════════════════════════════════════════════════
+function StatsBand() {
+  return (
+    <section className="py-14 bg-[#0F172A] border-y border-white/5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+          {STATS.map((s, i) => (
+            <AnimatedStat key={s.label} stat={s} delay={i * 0.08} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 
 // ═══════════════════════════════════════════════════════════════
 // BEST SELLERS — dark theme product grid
