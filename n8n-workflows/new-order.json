@@ -1,0 +1,89 @@
+{
+  "name": "CXX — New Order Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cxx-new-order",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "cxx-node-0001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "cxx-webhook-new-order"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst fmt = (n) => 'R' + Number(n).toFixed(2);\nconst isCollection = d.fulfillment_type === 'collection';\nconst addr = d.order.shipping_address;\nconst addrStr = addr ? [addr.address_line1, addr.city, addr.province, addr.postal_code].filter(Boolean).join(', ') : '';\nconst shipping = d.order.shipping_fee === 0 ? 'FREE' : fmt(d.order.shipping_fee);\n\nconst itemsHtml = d.order.items.map(i =>\n  `<tr><td style='padding:12px 20px;font-size:14px;color:#111827;border-bottom:1px solid #F3F4F6;'>${i.name}</td><td style='padding:8px;text-align:center;font-size:14px;color:#6B7280;border-bottom:1px solid #F3F4F6;'>x${i.quantity}</td><td style='padding:12px 20px;text-align:right;font-size:14px;font-weight:600;color:#111827;border-bottom:1px solid #F3F4F6;'>${fmt(i.line_total)}</td></tr>`\n).join('');\n\nconst orderTable = `<table width='100%' cellpadding='0' cellspacing='0' style='border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;margin-bottom:28px;'><tr style='background:#F9FAFB;'><td colspan='3' style='padding:12px 20px;font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;'>Order Summary</td></tr>${itemsHtml}<tr style='border-top:1px solid #E5E7EB;'><td colspan='2' style='padding:10px 20px;font-size:13px;color:#6B7280;'>Shipping</td><td style='padding:10px 20px;text-align:right;font-size:13px;color:#6B7280;'>${shipping}</td></tr><tr style='background:#0B1929;'><td colspan='2' style='padding:14px 20px;font-size:15px;font-weight:800;color:#fff;'>Total</td><td style='padding:14px 20px;text-align:right;font-size:16px;font-weight:800;color:#E63939;'>${fmt(d.order.total)}</td></tr></table>`;\n\nconst fulfillBlock = isCollection\n  ? `<div style='background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:16px 20px;margin-bottom:28px;'><p style='margin:0 0 4px;font-size:13px;font-weight:700;color:#1E40AF;'>Collection Point</p><p style='margin:0;font-size:13px;color:#3B82F6;'>Dragon City Mall, Shop 14, Fordsburg, Johannesburg</p><p style='margin:4px 0 0;font-size:12px;color:#6B7280;'>Bring your order number and a valid ID to collect</p></div>`\n  : `<div style='background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:16px 20px;margin-bottom:28px;'><p style='margin:0 0 4px;font-size:13px;font-weight:700;color:#166534;'>Delivery Address</p><p style='margin:0;font-size:13px;color:#16A34A;'>${addrStr}</p><p style='margin:4px 0 0;font-size:12px;color:#6B7280;'>Nationwide delivery · 3–5 business days</p></div>`;\n\nconst header = (label) => `<table width='100%' cellpadding='0' cellspacing='0'><tr><td><img src='https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png' alt='CXX Electronics' height='32' style='display:block;'></td><td align='right'><span style='color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;'>${label}</span></td></tr></table>`;\n\nconst footer = `<table width='100%' cellpadding='0' cellspacing='0'><tr><td><p style='margin:0;font-size:12px;color:#9CA3AF;'>CXX Electronics · Dragon City, Shop 14, Fordsburg, JHB</p><p style='margin:3px 0 0;font-size:12px;color:#9CA3AF;'>info@cw-electronics.co.za · 12-month warranty on all products</p></td><td align='right' style='padding-left:16px;'><img src='https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png' alt='CXX' height='20' style='display:block;opacity:0.35;'></td></tr></table>`;\n\nconst wrap = (rows) => `<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head><body style='margin:0;padding:0;background:#F4F6F8;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,sans-serif;'><table width='100%' cellpadding='0' cellspacing='0'><tr><td align='center' style='padding:32px 16px;'><table width='600' cellpadding='0' cellspacing='0' style='max-width:600px;width:100%;'>${rows}</table></td></tr></table></body></html>`;\n\nconst customerHtml = wrap(\n  `<tr><td style='background:#0B1929;border-radius:16px 16px 0 0;padding:28px 40px;'>${header('Order Confirmation')}</td></tr>` +\n  `<tr><td style='background:#E63939;padding:20px 40px;'><p style='margin:0;color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.3px;'>Order Confirmed ✓</p><p style='margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;'>Order #${d.order_number}</p></td></tr>` +\n  `<tr><td style='background:#fff;padding:40px;'><p style='margin:0 0 6px;color:#111827;font-size:17px;font-weight:700;'>Hi ${d.customer.name},</p><p style='margin:0 0 28px;color:#4B5563;font-size:15px;line-height:1.7;'>Thank you for your order! Our team will contact you shortly to confirm payment. Once confirmed we will get everything packed and dispatched.</p>${orderTable}${fulfillBlock}<p style='margin:0;color:#6B7280;font-size:13px;line-height:1.6;'>Questions? Email us at <a href='mailto:info@cw-electronics.co.za' style='color:#E63939;text-decoration:none;font-weight:600;'>info@cw-electronics.co.za</a></p></td></tr>` +\n  `<tr><td style='background:#F9FAFB;border-radius:0 0 16px 16px;padding:24px 40px;border-top:1px solid #E5E7EB;'>${footer}</td></tr>`\n);\n\nconst ownerItemsHtml = d.order.items.map(i =>\n  `<tr><td style='padding:10px 20px;font-size:13px;color:#111827;border-bottom:1px solid #F3F4F6;'>${i.name} x${i.quantity}</td><td style='padding:10px 20px;text-align:right;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #F3F4F6;'>${fmt(i.line_total)}</td></tr>`\n).join('');\n\nconst ownerHtml = wrap(\n  `<tr><td style='background:#0B1929;border-radius:16px 16px 0 0;padding:28px 40px;'>${header('New Order Alert')}</td></tr>` +\n  `<tr><td style='background:#E63939;padding:20px 40px;'><p style='margin:0;color:#fff;font-size:22px;font-weight:800;'>New Order — ${fmt(d.order.total)}</p><p style='margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px;'>#${d.order_number} · ${isCollection ? 'Collection' : 'Delivery'} · ${d.order_type}</p></td></tr>` +\n  `<tr><td style='background:#fff;padding:40px;'><table width='100%' cellpadding='0' cellspacing='0' style='border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;margin-bottom:24px;'><tr style='background:#F9FAFB;'><td colspan='2' style='padding:12px 20px;font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;'>Customer</td></tr><tr><td style='padding:10px 20px;font-size:13px;color:#6B7280;border-bottom:1px solid #F3F4F6;width:90px;'>Name</td><td style='padding:10px 20px;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #F3F4F6;'>${d.customer.name}</td></tr><tr><td style='padding:10px 20px;font-size:13px;color:#6B7280;border-bottom:1px solid #F3F4F6;'>Email</td><td style='padding:10px 20px;font-size:13px;color:#111827;border-bottom:1px solid #F3F4F6;'>${d.customer.email}</td></tr><tr><td style='padding:10px 20px;font-size:13px;color:#6B7280;'>Phone</td><td style='padding:10px 20px;font-size:13px;color:#111827;'>${d.customer.phone}</td></tr></table><table width='100%' cellpadding='0' cellspacing='0' style='border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;margin-bottom:24px;'><tr style='background:#F9FAFB;'><td colspan='2' style='padding:12px 20px;font-size:10px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;'>Items Ordered</td></tr>${ownerItemsHtml}<tr style='border-top:1px solid #E5E7EB;'><td style='padding:10px 20px;font-size:13px;color:#6B7280;'>Shipping</td><td style='padding:10px 20px;text-align:right;font-size:13px;color:#6B7280;'>${shipping}</td></tr><tr style='background:#0B1929;'><td style='padding:14px 20px;font-size:15px;font-weight:800;color:#fff;'>Total</td><td style='padding:14px 20px;text-align:right;font-size:16px;font-weight:800;color:#E63939;'>${fmt(d.order.total)}</td></tr></table><div style='background:${isCollection ? '#EFF6FF' : '#F0FDF4'};border-radius:10px;padding:14px 20px;border:1px solid ${isCollection ? '#BFDBFE' : '#BBF7D0'};'><p style='margin:0 0 4px;font-size:13px;font-weight:700;color:${isCollection ? '#1E40AF' : '#166534'};'>${isCollection ? 'Collection Order' : 'Delivery Order'}</p><p style='margin:0;font-size:13px;color:${isCollection ? '#3B82F6' : '#16A34A'};'>${isCollection ? 'Customer collects from Dragon City, Shop 14, Fordsburg' : addrStr}</p></div></td></tr>` +\n  `<tr><td style='background:#F9FAFB;border-radius:0 0 16px 16px;padding:20px 40px;border-top:1px solid #E5E7EB;'><p style='margin:0;font-size:12px;color:#9CA3AF;'>CXX Electronics Admin Notification · Log in to your admin panel to process this order</p></td></tr>`\n);\n\nreturn [{ json: { ...d, customerHtml, ownerHtml } }];"
+      },
+      "id": "cxx-node-0002",
+      "name": "Build Emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@cw-electronics.co.za",
+        "toEmail": "={{ $json.customer.email }}",
+        "subject": "={{ 'Order Confirmed — #' + $json.order_number }}",
+        "emailType": "html",
+        "message": "={{ $json.customerHtml }}",
+        "options": {}
+      },
+      "id": "cxx-node-0003",
+      "name": "Customer Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 180],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Zoho Mail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@cw-electronics.co.za",
+        "toEmail": "info@cw-electronics.co.za",
+        "subject": "={{ '🛒 New Order #' + $json.order_number + ' — R' + $json.order.total.toFixed(2) }}",
+        "emailType": "html",
+        "message": "={{ $json.ownerHtml }}",
+        "options": {}
+      },
+      "id": "cxx-node-0004",
+      "name": "Store Owner Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 420],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE_WITH_YOUR_SMTP_CREDENTIAL_ID",
+          "name": "Zoho Mail"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "Build Emails", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Emails": {
+      "main": [
+        [
+          { "node": "Customer Confirmation Email", "type": "main", "index": 0 },
+          { "node": "Store Owner Alert Email", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "cxx-electronics" }]
+}

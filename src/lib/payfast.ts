@@ -1,105 +1,95 @@
-import MD5 from 'crypto-js/md5'
-import type { ShippingAddress } from './supabase'
+import CryptoJS from 'crypto-js'
 
-interface PayFastPaymentData {
-  merchant_id: string
-  merchant_key: string
-  return_url: string
-  cancel_url: string
-  notify_url: string
-  name_first: string
-  name_last: string
-  email_address: string
-  cell_number?: string
-  m_payment_id: string
-  amount: string
-  item_name: string
-  item_description?: string
-  custom_str1?: string   // order_number
-  email_confirmation?: '1' | '0'
-  confirmation_address?: string
-}
+const MERCHANT_ID  = import.meta.env.VITE_PAYFAST_MERCHANT_ID  as string
+const MERCHANT_KEY = import.meta.env.VITE_PAYFAST_MERCHANT_KEY as string
+const PASSPHRASE   = (import.meta.env.VITE_PAYFAST_PASSPHRASE  as string) || ''
 
-const isSandbox = import.meta.env.DEV
-const PAYFAST_URL = 'https://www.payfast.co.za/eng/process'
-const SANDBOX_URL = 'https://sandbox.payfast.co.za/eng/process'
+// Toggle sandbox via env var — DEV alone is not enough since preview deploys use DEV=false
+const IS_SANDBOX   = import.meta.env.VITE_PAYFAST_SANDBOX === 'true'
 
-const config = {
-  merchantId: import.meta.env.VITE_PAYFAST_MERCHANT_ID as string || '10000100',
-  merchantKey: import.meta.env.VITE_PAYFAST_MERCHANT_KEY as string || '46f0cd694581a',
-  passphrase: import.meta.env.VITE_PAYFAST_PASSPHRASE as string | undefined,
-  notifyUrl: import.meta.env.VITE_N8N_WEBHOOK_URL as string || '',
-}
+const PAYFAST_URL  = IS_SANDBOX
+  ? 'https://sandbox.payfast.co.za/eng/process'
+  : 'https://www.payfast.co.za/eng/process'
 
-function generateSignature(data: PayFastPaymentData, passphrase?: string): string {
-  const paramString = (Object.keys(data) as (keyof PayFastPaymentData)[])
-    .sort()
-    .map((key) => {
-      const value = data[key] ?? ''
-      return `${key}=${encodeURIComponent(String(value)).replace(/%20/g, '+')}`
-    })
+// ITN handler — Supabase Edge Function
+const NOTIFY_URL   = 'https://vsneqdjdkzbykkvvliju.supabase.co/functions/v1/payfast-itn'
+
+// Param order matters for signature — keep this array fixed
+const PARAM_ORDER = [
+  'merchant_id', 'merchant_key',
+  'return_url', 'cancel_url', 'notify_url',
+  'name_first', 'name_last', 'email_address', 'cell_number',
+  'm_payment_id', 'amount', 'item_name',
+  'custom_str1',
+] as const
+
+type ParamKey = typeof PARAM_ORDER[number]
+type Params = Partial<Record<ParamKey, string>>
+
+function buildSignature(params: Params): string {
+  const qs = PARAM_ORDER
+    .filter((k) => params[k] !== undefined && params[k] !== '')
+    .map((k) => `${k}=${encodeURIComponent(params[k]!).replace(/%20/g, '+')}`)
     .join('&')
 
-  const stringToHash = passphrase
-    ? `${paramString}&passphrase=${encodeURIComponent(passphrase).replace(/%20/g, '+')}`
-    : paramString
+  const input = PASSPHRASE
+    ? `${qs}&passphrase=${encodeURIComponent(PASSPHRASE).replace(/%20/g, '+')}`
+    : qs
 
-  return MD5(stringToHash).toString()
+  return CryptoJS.MD5(input).toString()
 }
 
-export interface PayFastOrderData {
-  orderNumber: string    // e.g. CXX-2026-001
-  orderId: string        // Supabase order UUID
-  amount: number         // total in ZAR (including shipping)
-  shippingAddress: ShippingAddress
-  email: string
-  items: Array<{ name: string; quantity: number; price: number }>
+export interface PayFastPayload {
+  orderId:     string  // Supabase UUID — used in return/cancel URLs
+  orderNumber: string  // CXX-YYYY-NNNN — sent as m_payment_id for ITN lookup
+  nameFirst:   string
+  nameLast:    string
+  email:       string
+  phone?:      string
+  amount:      number
 }
 
-export function redirectToPayFast(data: PayFastOrderData): void {
+export function redirectToPayFast(payload: PayFastPayload): void {
   const origin = window.location.origin
-  const nameParts = data.shippingAddress.name.trim().split(' ')
-  const nameFirst = nameParts[0] ?? ''
-  const nameLast = nameParts.slice(1).join(' ') || nameFirst
 
-  const paymentData: PayFastPaymentData = {
-    merchant_id: config.merchantId,
-    merchant_key: config.merchantKey,
-    return_url: `${origin}/order/${data.orderId}`,
-    cancel_url: `${origin}/checkout?cancelled=true`,
-    notify_url: config.notifyUrl,
-    name_first: nameFirst,
-    name_last: nameLast,
-    email_address: data.email,
-    cell_number: data.shippingAddress.phone || undefined,
-    m_payment_id: data.orderId,
-    amount: data.amount.toFixed(2),
-    item_name: data.items.length === 1
-      ? `${data.items[0].name} (x${data.items[0].quantity})`
-      : `CXX Order (${data.items.length} items)`,
-    item_description: data.items
-      .map((i) => `${i.name} x${i.quantity} @ R${i.price.toFixed(2)}`)
-      .join(', ')
-      .slice(0, 255),
-    custom_str1: data.orderNumber,
-    email_confirmation: '1',
-    confirmation_address: data.email,
+  const params: Params = {
+    merchant_id:   MERCHANT_ID,
+    merchant_key:  MERCHANT_KEY,
+    return_url:    `${origin}/order/${payload.orderId}`,
+    cancel_url:    `${origin}/checkout`,
+    notify_url:    NOTIFY_URL,
+    name_first:    payload.nameFirst,
+    name_last:     payload.nameLast || payload.nameFirst,
+    email_address: payload.email,
+    cell_number:   payload.phone || undefined,
+    m_payment_id:  payload.orderNumber,
+    amount:        payload.amount.toFixed(2),
+    item_name:     `CXX Electronics Order ${payload.orderNumber}`,
+    custom_str1:   payload.orderId,
   }
 
-  const signature = generateSignature(paymentData, config.passphrase)
+  const signature = buildSignature(params)
+
   const form = document.createElement('form')
   form.method = 'POST'
-  form.action = isSandbox ? SANDBOX_URL : PAYFAST_URL
+  form.action = PAYFAST_URL
 
-  const allData = { ...paymentData, signature }
-  for (const [key, value] of Object.entries(allData)) {
-    if (value == null) continue
-    const input = document.createElement('input')
-    input.type = 'hidden'
-    input.name = key
-    input.value = String(value)
-    form.appendChild(input)
+  // Fields added in PARAM_ORDER so browser sends them in signature order
+  for (const key of PARAM_ORDER) {
+    const val = params[key]
+    if (!val) continue
+    const el = document.createElement('input')
+    el.type  = 'hidden'
+    el.name  = key
+    el.value = val
+    form.appendChild(el)
   }
+
+  const sigEl = document.createElement('input')
+  sigEl.type  = 'hidden'
+  sigEl.name  = 'signature'
+  sigEl.value = signature
+  form.appendChild(sigEl)
 
   document.body.appendChild(form)
   form.submit()
