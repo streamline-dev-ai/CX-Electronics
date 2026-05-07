@@ -7,24 +7,24 @@ import { motion, AnimatePresence } from 'framer-motion'
 const HERO_SLIDES = [
   {
     image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/n2kIN_lmgy9y.jpg',
-    title: 'Wholesale Electronics',
+    title: 'Powering South Africa with CCTV & Security',
     highlight: 'Direct Importer',
-    subtitle: 'Chargers, cables, adapters and routers — straight from the importer.',
-    location: 'Stocked at China Mart, Crown Mines.',
+    subtitle: 'Professional-grade surveillance systems, from 4K cameras to complete NVR kits.',
+    location: 'Trusted by installers, retailers & businesses nationwide.',
   },
   {
     image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/CCTV_Security_Category_2_y2g9zt.jpg',
-    title: 'CCTV & Security',
-    highlight: 'Professional Grade',
-    subtitle: '4K cameras, NVR kits, and complete surveillance systems.',
-    location: 'For installers, retailers & businesses.',
+    title: 'Premium CCTV Systems',
+    highlight: 'Enterprise Grade',
+    subtitle: '4K surveillance, NVR kits, and complete monitoring solutions for every need.',
+    location: 'Tested and verified — backed by our warranty.',
   },
   {
     image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Solar_Lamps_Lighting_ev6x1n.jpg',
-    title: 'Solar Lighting',
-    highlight: 'Off-Grid Solutions',
-    subtitle: 'LED street lamps, flood lights, and garden lighting.',
-    location: 'IP65 rated for South African conditions.',
+    title: 'Off-Grid Solar Solutions',
+    highlight: 'Energy Efficient',
+    subtitle: 'LED street lamps, flood lights, and garden lighting for South African conditions.',
+    location: 'IP65 rated — built to last.',
   },
 ]
 
@@ -159,7 +159,7 @@ export function HeroSection() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
-              to="/bulk"
+              to="/wholesale"
               className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border-2 border-slate-500 hover:border-slate-300 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
             >
               Browse Wholesale Deals
@@ -294,7 +294,7 @@ export function RedCTASection() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
-              to="/bulk"
+              to="/wholesale"
               className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0F172A] hover:bg-slate-900 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
             >
               Browse Wholesale Deals
