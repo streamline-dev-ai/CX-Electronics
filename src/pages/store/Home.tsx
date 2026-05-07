@@ -63,11 +63,11 @@ const EASE = [0.22, 1, 0.36, 1] as const
 // ─────────────────────────────────────────────────────────────
 export function Home() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0F172A]">
       <SEO
-        title="CXX Electronics — Wholesale & Retail Electronics | Crown Mines JHB"
+        title="CW Electronics — Wholesale & Retail Electronics | Crown Mines JHB"
         description="Direct importer of chargers, CCTV, solar, routers, smartwatches & accessories in Johannesburg. Trade pricing for resellers. Free Gauteng delivery over R2,000."
-        url="https://cxx-electronics.co.za/"
+        url="https://cw-electronics.co.za/"
       />
       <TopBanner />
       <Navbar />
@@ -91,7 +91,7 @@ export function Home() {
 // ═══════════════════════════════════════════════════════════════
 function FeaturedCategories() {
   return (
-    <section className="py-16 sm:py-24 bg-[#111111]">
+    <section className="py-16 sm:py-24 bg-[#1E293B]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -186,7 +186,7 @@ function FeaturedCategories() {
 // ═══════════════════════════════════════════════════════════════
 function StatsBand() {
   return (
-    <section className="py-14 bg-[#0a0a0a] border-y border-neutral-800/50">
+    <section className="py-14 bg-[#0F172A] border-y border-slate-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {STATS.map((s, i) => (
@@ -251,7 +251,7 @@ function AnimatedStat({
 // ═══════════════════════════════════════════════════════════════
 function BestSellers() {
   return (
-    <section className="py-16 sm:py-24 bg-[#111111]">
+    <section className="py-16 sm:py-24 bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -261,14 +261,14 @@ function BestSellers() {
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 sm:mb-12"
         >
           <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-2">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-2">
               <TrendingUp className="w-3.5 h-3.5" />
               Top Picks
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
               Best Sellers
             </h2>
-            <p className="text-neutral-400 mt-2 max-w-md text-sm">
+            <p className="text-slate-600 mt-2 max-w-md text-sm">
               Real products. Real installer prices. Stocked in Crown Mines.
             </p>
           </div>
@@ -289,22 +289,22 @@ function BestSellers() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: (i % 4) * 0.06, duration: 0.5, ease: EASE }}
               whileHover={{ y: -4 }}
-              className="group bg-neutral-900 rounded-xl border border-neutral-800 hover:border-neutral-700 transition-all overflow-hidden flex flex-col will-change-transform"
+              className="group bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all overflow-hidden flex flex-col will-change-transform"
             >
-              <div className="aspect-square bg-neutral-800 relative overflow-hidden">
+              <div className="aspect-square bg-slate-50 relative overflow-hidden">
                 <img
                   src={p.image || '/placeholder.svg'}
                   alt={p.name}
                   className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
                 {p.tag && (
-                  <span className="absolute top-3 left-3 bg-[#DC2626] text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                  <span className="absolute top-3 left-3 bg-[#E63939] text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">
                     {p.tag}
                   </span>
                 )}
                 {p.bulk && (
-                  <span className="absolute top-3 right-3 bg-neutral-900/90 text-white text-[10px] font-semibold px-2 py-1 rounded-md backdrop-blur-sm border border-neutral-700">
-                    Bulk R{p.bulk}
+                  <span className="absolute top-3 right-3 bg-slate-900/90 text-white text-[10px] font-semibold px-2 py-1 rounded-md backdrop-blur-sm">
+                    Wholesale R{p.bulk}
                   </span>
                 )}
 
@@ -312,7 +312,7 @@ function BestSellers() {
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                   <button
                     type="button"
-                    className="w-full bg-white text-[#DC2626] text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 hover:bg-[#DC2626] hover:text-white transition-colors"
+                    className="w-full bg-white text-[#E63939] text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 hover:bg-[#E63939] hover:text-white transition-colors"
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
                     Quick Add
@@ -320,30 +320,30 @@ function BestSellers() {
                 </div>
               </div>
 
-              <div className="p-4 flex flex-col flex-1">
+              <div className="p-4 flex flex-col flex-1 bg-white">
                 {/* Rating */}
                 <div className="flex items-center gap-1 mb-2">
                   <Star className="w-3.5 h-3.5 fill-[#FFB400] text-[#FFB400]" />
-                  <span className="text-xs font-semibold text-white">{p.rating}</span>
-                  <span className="text-xs text-neutral-500">({p.sold} sold)</span>
+                  <span className="text-xs font-semibold text-slate-900">{p.rating}</span>
+                  <span className="text-xs text-slate-500">({p.sold} sold)</span>
                 </div>
 
-                <h3 className="font-semibold text-sm text-white mb-3 line-clamp-2 min-h-[2.5rem]">
+                <h3 className="font-semibold text-sm text-slate-900 mb-3 line-clamp-2 min-h-[2.5rem]">
                   {p.name}
                 </h3>
 
                 <div className="mt-auto flex items-end justify-between gap-2">
                   <div>
-                    <p className="text-[10px] text-neutral-500 uppercase tracking-wider leading-none">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider leading-none">
                       Retail
                     </p>
-                    <p className="text-xl font-bold text-[#DC2626] leading-tight">
+                    <p className="text-xl font-bold text-[#E63939] leading-tight">
                       R{p.price.toLocaleString()}
                     </p>
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-1 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
+                    className="flex items-center gap-1 bg-[#E63939] hover:bg-[#C82020] text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
                     aria-label={`Add ${p.name} to cart`}
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ function BestSellers() {
         <div className="mt-12 text-center">
           <Link
             to="/shop"
-            className="group inline-flex items-center gap-2 border-2 border-neutral-700 text-white hover:border-neutral-500 font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
+            className="group inline-flex items-center gap-2 border-2 border-slate-300 text-slate-900 hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
           >
             View All Products
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -374,7 +374,7 @@ function BestSellers() {
 // ═══════════════════════════════════════════════════════════════
 function LocationSection() {
   return (
-    <section className="py-16 sm:py-24 bg-[#0a0a0a]">
+    <section className="py-16 sm:py-24 bg-[#0F172A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -405,7 +405,7 @@ function LocationSection() {
           {/* Map */}
           <div className="lg:col-span-2 rounded-xl overflow-hidden border border-neutral-800 bg-neutral-900 aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
             <iframe
-              title="CXX Electronics Location — China Mart, Crown Mines, Johannesburg"
+              title="CW Electronics Location — China Mart, Crown Mines, Johannesburg"
               src={MAP_EMBED}
               width="100%"
               height="100%"
@@ -482,11 +482,11 @@ function LocationSection() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// WHY CHOOSE CXX
+// WHY CHOOSE CW
 // ═══════════════════════════════════════════════════════════════
 function WhyChooseCW() {
   return (
-    <section className="py-20 bg-[#111111] relative overflow-hidden">
+    <section className="py-20 bg-[#1E293B] relative overflow-hidden">
       {/* Subtle glow */}
       <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#DC2626]/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -499,14 +499,14 @@ function WhyChooseCW() {
             transition={{ duration: 0.6, ease: EASE }}
             className="max-w-xl"
           >
-            <p className="text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-3">
-              Why Choose CXX Electronics
+            <p className="text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-3">
+              Why Choose CW Electronics
             </p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 text-balance tracking-tight">
               Trusted by retailers, traders &amp; installers across SA
             </h2>
-            <p className="text-neutral-400 leading-relaxed mb-7 text-pretty">
-              CXX Electronics is a direct importer based at China Mart, Crown Mines.
+            <p className="text-slate-400 leading-relaxed mb-7 text-pretty">
+              CW Electronics is a direct importer based at China Mart, Crown Mines.
               We supply CCTV, networking, solar &amp; mobile electronics at true wholesale
               prices — backed by quality testing and fast nationwide delivery.
             </p>

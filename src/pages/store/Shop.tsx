@@ -247,16 +247,16 @@ export function Shop() {
   )
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="min-h-screen bg-[#0F172A] flex flex-col">
       <SEO
-        title="Shop Electronics | CXX Electronics Johannesburg"
+        title="Shop Electronics | CW Electronics Johannesburg"
         description="Browse chargers, CCTV, solar lights, routers, smartwatches & more. Retail & bulk pricing available. Fast delivery across South Africa."
-        url="https://cxx-electronics.co.za/shop"
+        url="https://cw-electronics.co.za/shop"
       />
       <Navbar />
 
       {/* Hero */}
-      <section className="relative bg-[#111111] text-white border-b border-neutral-800">
+      <section className="relative bg-[#1E293B] text-white border-b border-slate-700">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-2">
