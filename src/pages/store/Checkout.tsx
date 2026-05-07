@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { ShoppingCart, Loader2, CheckCircle, Store, Truck, Zap } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
@@ -7,6 +7,7 @@ import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
 import { notifyNewOrder } from '../../lib/webhooks'
+import { redirectToPayFast } from '../../lib/payfast'
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
@@ -100,7 +101,6 @@ function saveOrderLocally(order: OrderWithDetails) {
 export function Checkout() {
   const { items, subtotal, clearCart } = useCart()
   const { t } = useLang()
-  const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -254,10 +254,20 @@ export function Checkout() {
         }
 
         saveOrderLocally(localOrder)
-        // Fire new-order webhook (non-blocking)
-        notifyNewOrder(localOrder)
+        notifyNewOrder(localOrder) // fire-and-forget
         clearCart()
-        navigate(`/order/${order.id}`, { state: { order: localOrder } })
+
+        // Redirect to PayFast payment page
+        const nameParts = form.name.trim().split(' ')
+        redirectToPayFast({
+          orderId:     order.id,
+          orderNumber: order.order_number,
+          nameFirst:   nameParts[0],
+          nameLast:    nameParts.slice(1).join(' '),
+          email:       form.email,
+          phone:       form.phone || undefined,
+          amount:      total,
+        })
         return
       }
     } catch { /* fall through to local order */ }
@@ -296,7 +306,17 @@ export function Checkout() {
     saveOrderLocally(localOrder)
     notifyNewOrder(localOrder)
     clearCart()
-    navigate(`/order/${localId}`, { state: { order: localOrder } })
+
+    const nameParts = form.name.trim().split(' ')
+    redirectToPayFast({
+      orderId:     localId,
+      orderNumber: orderNumber,
+      nameFirst:   nameParts[0],
+      nameLast:    nameParts.slice(1).join(' '),
+      email:       form.email,
+      phone:       form.phone || undefined,
+      amount:      total,
+    })
   }
 
   return (
@@ -411,9 +431,9 @@ export function Checkout() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-amber-800">Secure Checkout</p>
+                  <p className="text-sm font-semibold text-amber-800">Secure PayFast Payment</p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    Your order will be placed instantly. Our team will contact you to confirm payment via EFT or PayFast.
+                    You'll be redirected to PayFast to complete payment securely. Card, EFT & instant EFT accepted.
                   </p>
                 </div>
               </div>
@@ -460,11 +480,11 @@ export function Checkout() {
                   className="w-full flex items-center justify-center gap-2 bg-cxx-blue hover:bg-cxx-blue-hover text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60"
                 >
                   {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {submitting ? 'Placing Order...' : 'Place Order'}
+                  {submitting ? 'Redirecting to PayFast...' : 'Pay with PayFast'}
                 </button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">
-                  No payment required now — we'll confirm with you
+                  Secured by PayFast · 256-bit SSL encryption
                 </p>
               </div>
             </div>
