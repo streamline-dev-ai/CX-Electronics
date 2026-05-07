@@ -12,7 +12,7 @@ const navLinks = [
   { to: '/', label: 'Home', exact: true },
   { to: '/shop', label: 'Shop' },
   { to: '/deals', label: 'Deals' },
-  { to: '/bulk', label: 'Wholesale' },
+  { to: '/wholesale', label: 'Wholesale' },
   { to: '/about', label: 'About' },
 ]
 
@@ -137,7 +137,7 @@ export function Navbar() {
 
             {/* Get a Quote */}
             <Link
-              to="/bulk"
+              to="/wholesale"
               className="hidden lg:inline-flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
@@ -259,7 +259,7 @@ export function Navbar() {
             </div>
 
             <Link
-              to="/bulk"
+              to="/wholesale"
               onClick={() => setMobileOpen(false)}
               className="mt-4 flex items-center justify-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
             >
