@@ -6,6 +6,7 @@ import { Footer } from '../../components/store/Footer'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
+import { notifyNewOrder } from '../../lib/webhooks'
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
@@ -15,7 +16,6 @@ const DELIVERY_OPTIONS: {
   sub: string
   eta: string
   price: number
-  note?: string
   icon: typeof Store
 }[] = [
   {
@@ -75,7 +75,6 @@ function generateOrderNumber(): string {
 }
 
 function saveOrderLocally(order: OrderWithDetails) {
-  // Save full order for OrderConfirmation fallback
   try {
     const stored: Record<string, OrderWithDetails> = JSON.parse(
       localStorage.getItem(LOCAL_ORDERS_KEY) ?? '{}',
@@ -84,7 +83,6 @@ function saveOrderLocally(order: OrderWithDetails) {
     localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(stored))
   } catch { /* ignore */ }
 
-  // Save summary for MyOrders list
   try {
     const list = JSON.parse(localStorage.getItem(ORDERS_KEY) ?? '[]')
     list.unshift({
@@ -108,6 +106,7 @@ export function Checkout() {
   const [submitting, setSubmitting] = useState(false)
   const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
 
+  const isCollection = delivery === 'collection'
   const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
   const shippingFee = subtotal >= 2000 && delivery === 'economic' ? 0 : selectedDelivery.price
   const total = subtotal + shippingFee
@@ -136,9 +135,11 @@ export function Checkout() {
     if (!form.name.trim()) errs.name = 'Required'
     if (!form.email.trim() || !form.email.includes('@')) errs.email = 'Valid email required'
     if (!form.phone.trim()) errs.phone = 'Required'
-    if (!form.address_line1.trim()) errs.address_line1 = 'Required'
-    if (!form.city.trim()) errs.city = 'Required'
-    if (!form.postal_code.trim()) errs.postal_code = 'Required'
+    if (!isCollection) {
+      if (!form.address_line1.trim()) errs.address_line1 = 'Required'
+      if (!form.city.trim()) errs.city = 'Required'
+      if (!form.postal_code.trim()) errs.postal_code = 'Required'
+    }
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -149,7 +150,8 @@ export function Checkout() {
     setSubmitting(true)
 
     const orderNumber = generateOrderNumber()
-    const shippingAddr: ShippingAddress = {
+    const fulfillmentType = isCollection ? 'collection' : 'delivery'
+    const shippingAddr: ShippingAddress | null = isCollection ? null : {
       name: form.name,
       address_line1: form.address_line1,
       address_line2: form.address_line2 || undefined,
@@ -162,15 +164,17 @@ export function Checkout() {
     const orderType = items.some((i) => i.orderType === 'bulk') ? 'bulk' : 'retail'
     const now = new Date().toISOString()
 
-    // Try saving to Supabase
     try {
       const { data: customer } = await supabase
         .from('customers')
         .upsert(
           {
             name: form.name, email: form.email, phone: form.phone,
-            address_line1: form.address_line1, address_line2: form.address_line2 || null,
-            city: form.city, province: form.province, postal_code: form.postal_code,
+            address_line1: isCollection ? null : form.address_line1,
+            address_line2: isCollection ? null : (form.address_line2 || null),
+            city: isCollection ? null : form.city,
+            province: isCollection ? null : form.province,
+            postal_code: isCollection ? null : form.postal_code,
           },
           { onConflict: 'email' },
         )
@@ -184,6 +188,9 @@ export function Checkout() {
           customer_id: customer?.id ?? null,
           order_type: orderType,
           status: 'pending',
+          fulfillment_type: fulfillmentType,
+          collection_name: isCollection ? form.name : null,
+          collection_phone: isCollection ? form.phone : null,
           subtotal,
           shipping_fee: shippingFee,
           total,
@@ -209,14 +216,24 @@ export function Checkout() {
           })),
         )
 
-        // Build local copy for OrderConfirmation + MyOrders
+        // Log initial status event
+        await supabase.from('order_status_events').insert({
+          order_id: order.id,
+          status: 'pending',
+          triggered_by: 'system',
+          created_at: now,
+        })
+
         const localOrder: OrderWithDetails = {
           id: order.id,
           order_number: order.order_number,
           customer_id: customer?.id ?? null,
           order_type: orderType,
           status: 'pending',
-          payment_status: 'paid',
+          fulfillment_type: fulfillmentType,
+          collection_name: isCollection ? form.name : null,
+          collection_phone: isCollection ? form.phone : null,
+          payment_status: 'unpaid',
           payment_method: 'payfast',
           payment_reference: null,
           notes: `Delivery: ${selectedDelivery.label}`,
@@ -237,13 +254,15 @@ export function Checkout() {
         }
 
         saveOrderLocally(localOrder)
+        // Fire new-order webhook (non-blocking)
+        notifyNewOrder(localOrder)
         clearCart()
         navigate(`/order/${order.id}`, { state: { order: localOrder } })
         return
       }
     } catch { /* fall through to local order */ }
 
-    // Fallback: create a fully local order (works even if Supabase RLS blocks insert)
+    // Fallback: local-only order
     const localId = crypto.randomUUID()
     const localOrder: OrderWithDetails = {
       id: localId,
@@ -251,7 +270,10 @@ export function Checkout() {
       customer_id: null,
       order_type: orderType,
       status: 'pending',
-      payment_status: 'paid',
+      fulfillment_type: fulfillmentType,
+      collection_name: isCollection ? form.name : null,
+      collection_phone: isCollection ? form.phone : null,
+      payment_status: 'unpaid',
       payment_method: 'payfast',
       payment_reference: null,
       notes: `Delivery: ${selectedDelivery.label}`,
@@ -272,6 +294,7 @@ export function Checkout() {
     }
 
     saveOrderLocally(localOrder)
+    notifyNewOrder(localOrder)
     clearCart()
     navigate(`/order/${localId}`, { state: { order: localOrder } })
   }
@@ -285,7 +308,7 @@ export function Checkout() {
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Shipping form */}
+            {/* Left column */}
             <div className="flex-1 space-y-5">
 
               {/* Delivery method */}
@@ -325,9 +348,10 @@ export function Checkout() {
                 </div>
               </div>
 
+              {/* Customer / shipping details */}
               <div className="bg-white rounded-2xl border border-gray-200 p-5">
                 <h2 className="font-semibold text-gray-900 mb-4">
-                  {delivery === 'collection' ? 'Your Details' : t('shippingDetails')}
+                  {isCollection ? 'Your Details' : t('shippingDetails')}
                 </h2>
 
                 <div className="space-y-4">
@@ -344,30 +368,44 @@ export function Checkout() {
                     </Field>
                   </div>
 
-                  <Field label={t('address')} error={errors.address_line1} required>
-                    <input type="text" value={form.address_line1} onChange={(e) => set('address_line1', e.target.value)} className={inp(errors.address_line1)} placeholder="123 Main Street" />
-                  </Field>
+                  {/* Address fields — hidden for collection */}
+                  {!isCollection && (
+                    <>
+                      <Field label={t('address')} error={errors.address_line1} required>
+                        <input type="text" value={form.address_line1} onChange={(e) => set('address_line1', e.target.value)} className={inp(errors.address_line1)} placeholder="123 Main Street" />
+                      </Field>
 
-                  <Field label={t('address2')}>
-                    <input type="text" value={form.address_line2} onChange={(e) => set('address_line2', e.target.value)} className={inp()} placeholder="Apartment, unit, etc." />
-                  </Field>
+                      <Field label={t('address2')}>
+                        <input type="text" value={form.address_line2} onChange={(e) => set('address_line2', e.target.value)} className={inp()} placeholder="Apartment, unit, etc." />
+                      </Field>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label={t('city')} error={errors.city} required>
-                      <input type="text" value={form.city} onChange={(e) => set('city', e.target.value)} className={inp(errors.city)} placeholder="Johannesburg" />
-                    </Field>
-                    <Field label={t('postalCode')} error={errors.postal_code} required>
-                      <input type="text" value={form.postal_code} onChange={(e) => set('postal_code', e.target.value)} className={inp(errors.postal_code)} placeholder="2001" />
-                    </Field>
-                  </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Field label={t('city')} error={errors.city} required>
+                          <input type="text" value={form.city} onChange={(e) => set('city', e.target.value)} className={inp(errors.city)} placeholder="Johannesburg" />
+                        </Field>
+                        <Field label={t('postalCode')} error={errors.postal_code} required>
+                          <input type="text" value={form.postal_code} onChange={(e) => set('postal_code', e.target.value)} className={inp(errors.postal_code)} placeholder="2001" />
+                        </Field>
+                      </div>
 
-                  <Field label={t('province')}>
-                    <select value={form.province} onChange={(e) => set('province', e.target.value)} className={inp()}>
-                      {SA_PROVINCES.map((p) => <option key={p}>{p}</option>)}
-                    </select>
-                  </Field>
+                      <Field label={t('province')}>
+                        <select value={form.province} onChange={(e) => set('province', e.target.value)} className={inp()}>
+                          {SA_PROVINCES.map((p) => <option key={p}>{p}</option>)}
+                        </select>
+                      </Field>
+                    </>
+                  )}
+
+                  {/* Collection info banner */}
+                  {isCollection && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
+                      <p className="font-semibold mb-0.5">Collection address</p>
+                      <p className="text-blue-600">Dragon City Mall, Shop 14, Fordsburg, Johannesburg</p>
+                      <p className="text-blue-500 text-xs mt-1">Bring your order number and ID when collecting.</p>
+                    </div>
+                  )}
                 </div>
-              </div>{/* end shipping details card */}
+              </div>
 
               {/* Payment note */}
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">

@@ -1,19 +1,31 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store } from 'lucide-react'
 import { useOrders } from '../../hooks/useOrders'
 import type { OrderStatus } from '../../lib/supabase'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
-  pending: 'bg-amber-100 text-amber-700',
-  paid: 'bg-blue-100 text-blue-700',
-  processing: 'bg-purple-100 text-purple-700',
-  shipped: 'bg-indigo-100 text-indigo-700',
-  delivered: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
+  pending:               'bg-amber-100 text-amber-700',
+  paid:                  'bg-blue-100 text-blue-700',
+  processing:            'bg-purple-100 text-purple-700',
+  packed:                'bg-indigo-100 text-indigo-700',
+  out_for_delivery:      'bg-sky-100 text-sky-700',
+  delivered:             'bg-green-100 text-green-700',
+  ready_for_collection:  'bg-teal-100 text-teal-700',
+  collected:             'bg-green-100 text-green-700',
+  cancelled:             'bg-red-100 text-red-700',
 }
 
-const ALL_STATUSES: OrderStatus[] = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled']
+function formatStatus(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+const ALL_STATUSES: OrderStatus[] = [
+  'pending', 'paid', 'processing', 'packed',
+  'out_for_delivery', 'delivered',
+  'ready_for_collection', 'collected',
+  'cancelled',
+]
 
 export function AdminOrders() {
   const [status, setStatus] = useState<OrderStatus | undefined>()
@@ -45,11 +57,11 @@ export function AdminOrders() {
           <button
             key={s}
             onClick={() => { setStatus(s); setPage(1) }}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors capitalize ${
+            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
               status === s ? 'bg-cxx-blue text-white border-cxx-blue' : 'border-gray-300 text-gray-600 hover:border-gray-400'
             }`}
           >
-            {s}
+            {formatStatus(s)}
           </button>
         ))}
       </div>
@@ -72,6 +84,7 @@ export function AdminOrders() {
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Order #</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Customer</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-600">Type</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-600">Fulfillment</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-600">Total</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-600">Status</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Date</th>
@@ -95,24 +108,32 @@ export function AdminOrders() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${
-                          order.order_type === 'bulk'
-                            ? 'bg-cxx-blue-light text-cxx-blue'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${
+                        order.order_type === 'bulk'
+                          ? 'bg-cxx-blue-light text-cxx-blue'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>
                         {order.order_type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
+                        order.fulfillment_type === 'collection'
+                          ? 'bg-teal-100 text-teal-700'
+                          : 'bg-sky-100 text-sky-700'
+                      }`}>
+                        {order.fulfillment_type === 'collection'
+                          ? <Store className="w-3 h-3" />
+                          : <Truck className="w-3 h-3" />}
+                        {order.fulfillment_type}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-gray-900">
                       R{order.total.toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${STATUS_STYLES[order.status]}`}
-                      >
-                        {order.status}
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[order.status]}`}>
+                        {formatStatus(order.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap">

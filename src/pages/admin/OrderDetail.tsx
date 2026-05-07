@@ -1,48 +1,103 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock } from 'lucide-react'
 import { getOrder, updateOrderStatus } from '../../hooks/useOrders'
+import { notifyStatusChange } from '../../lib/webhooks'
 import type { OrderWithDetails, OrderStatus } from '../../lib/supabase'
 
-const STATUS_STYLES: Record<OrderStatus, string> = {
-  pending: 'bg-amber-100 text-amber-700',
-  paid: 'bg-blue-100 text-blue-700',
-  processing: 'bg-purple-100 text-purple-700',
-  shipped: 'bg-indigo-100 text-indigo-700',
-  delivered: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
+// ─── Status helpers ───────────────────────────────────────────────────────────
+
+function formatStatus(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-const NEXT_STATUSES: Record<OrderStatus, OrderStatus[]> = {
-  pending: ['paid', 'cancelled'],
-  paid: ['processing', 'cancelled'],
-  processing: ['shipped', 'cancelled'],
-  shipped: ['delivered'],
-  delivered: [],
-  cancelled: [],
+const STATUS_STYLES: Record<string, string> = {
+  pending:               'bg-amber-100 text-amber-700',
+  paid:                  'bg-blue-100 text-blue-700',
+  processing:            'bg-purple-100 text-purple-700',
+  packed:                'bg-indigo-100 text-indigo-700',
+  out_for_delivery:      'bg-sky-100 text-sky-700',
+  delivered:             'bg-green-100 text-green-700',
+  ready_for_collection:  'bg-teal-100 text-teal-700',
+  collected:             'bg-green-100 text-green-700',
+  cancelled:             'bg-red-100 text-red-700',
 }
+
+// Delivery:   pending → paid → processing → packed → out_for_delivery → delivered
+// Collection: pending → paid → processing → packed → ready_for_collection → collected
+function getNextStatuses(
+  status: OrderStatus,
+  fulfillmentType: 'delivery' | 'collection',
+): OrderStatus[] {
+  const TERMINAL: OrderStatus[] = ['delivered', 'collected', 'cancelled']
+  if (TERMINAL.includes(status)) return []
+
+  const forward: Partial<Record<OrderStatus, OrderStatus>> =
+    fulfillmentType === 'collection'
+      ? {
+          pending:    'paid',
+          paid:       'processing',
+          processing: 'packed',
+          packed:     'ready_for_collection',
+          ready_for_collection: 'collected',
+        }
+      : {
+          pending:     'paid',
+          paid:        'processing',
+          processing:  'packed',
+          packed:      'out_for_delivery',
+          out_for_delivery: 'delivered',
+        }
+
+  const next: OrderStatus[] = []
+  const fwd = forward[status]
+  if (fwd) next.push(fwd)
+  if (status !== 'pending') next.push('cancelled')
+  return next
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function AdminOrderDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [order, setOrder] = useState<OrderWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(false)
+  const [updating, setUpdating] = useState<OrderStatus | null>(null)
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
   useEffect(() => {
     if (!id) return
-    getOrder(id).then((o) => {
-      setOrder(o)
-      setLoading(false)
-    })
+    getOrder(id).then((o) => { setOrder(o); setLoading(false) })
   }, [id])
+
+  function showToast(msg: string, ok: boolean) {
+    setToast({ msg, ok })
+    setTimeout(() => setToast(null), 3500)
+  }
 
   async function changeStatus(newStatus: OrderStatus) {
     if (!order) return
-    setUpdating(true)
-    await updateOrderStatus(order.id, newStatus)
-    setOrder((prev) => prev ? { ...prev, status: newStatus } : prev)
-    setUpdating(false)
+    setUpdating(newStatus)
+    const prev = order.status
+
+    const { error } = await updateOrderStatus(order.id, newStatus, 'admin')
+    if (error) {
+      showToast(`Failed to update: ${error}`, false)
+      setUpdating(null)
+      return
+    }
+
+    const updated = { ...order, status: newStatus }
+    setOrder(updated)
+    // Reload status events (refetch full order)
+    getOrder(order.id).then((o) => { if (o) setOrder(o) })
+
+    // Fire webhook non-blocking
+    notifyStatusChange(updated, prev, newStatus)
+
+    showToast(`Order marked as ${formatStatus(newStatus)}`, true)
+    setUpdating(null)
   }
 
   if (loading) {
@@ -63,10 +118,24 @@ export function AdminOrderDetail() {
   }
 
   const addr = order.shipping_address
-  const nextStatuses = NEXT_STATUSES[order.status]
+  const isCollection = order.fulfillment_type === 'collection'
+  const nextStatuses = getNextStatuses(order.status, order.fulfillment_type)
+  const events = order.order_status_events ?? []
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl relative">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          toast.ok ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        }`}>
+          {toast.ok
+            ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            : <XCircle className="w-4 h-4 flex-shrink-0" />}
+          {toast.msg}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate('/admin/orders')} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
@@ -78,9 +147,19 @@ export function AdminOrderDetail() {
             {new Date(order.created_at).toLocaleString('en-ZA')} · {order.order_type}
           </p>
         </div>
-        <span className={`ml-auto text-sm px-3 py-1 rounded-full font-medium capitalize ${STATUS_STYLES[order.status]}`}>
-          {order.status}
-        </span>
+        <div className="ml-auto flex items-center gap-2">
+          {/* Fulfillment badge */}
+          <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${
+            isCollection ? 'bg-teal-100 text-teal-700' : 'bg-sky-100 text-sky-700'
+          }`}>
+            {isCollection ? <Store className="w-3 h-3" /> : <Truck className="w-3 h-3" />}
+            {isCollection ? 'Collection' : 'Delivery'}
+          </span>
+          {/* Status badge */}
+          <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_STYLES[order.status] ?? 'bg-gray-100 text-gray-600'}`}>
+            {formatStatus(order.status)}
+          </span>
+        </div>
       </div>
 
       {/* Status actions */}
@@ -88,24 +167,72 @@ export function AdminOrderDetail() {
         <div className="bg-white rounded-xl border border-gray-200 p-4 mb-5">
           <p className="text-sm font-medium text-gray-700 mb-3">Update Status 更新状态</p>
           <div className="flex flex-wrap gap-2">
-            {nextStatuses.map((s) => (
-              <button
-                key={s}
-                onClick={() => changeStatus(s)}
-                disabled={updating}
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 capitalize transition-colors disabled:opacity-50"
-              >
-                {updating ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null}
-                Mark as {s}
-              </button>
-            ))}
+            {nextStatuses.map((s) => {
+              const isCancel = s === 'cancelled'
+              const isLoading = updating === s
+              return (
+                <button
+                  key={s}
+                  onClick={() => changeStatus(s)}
+                  disabled={updating !== null}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors disabled:opacity-50 ${
+                    isCancel
+                      ? 'border-red-300 text-red-600 hover:bg-red-50'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin inline mr-1.5" />}
+                  {isCancel ? 'Cancel Order' : `Mark as ${formatStatus(s)}`}
+                </button>
+              )
+            })}
           </div>
+        </div>
+      )}
+
+      {/* Status timeline */}
+      {events.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
+          <h2 className="font-semibold text-gray-900 mb-4">Timeline 状态历史</h2>
+          <ol className="space-y-3">
+            {events.map((ev, i) => {
+              const isLast = i === events.length - 1
+              return (
+                <li key={ev.id} className="flex items-start gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                      isLast ? 'bg-cxx-blue' : 'bg-gray-300'
+                    }`} />
+                    {!isLast && <div className="w-px h-full min-h-4 bg-gray-200 mt-1" />}
+                  </div>
+                  <div className="flex-1 pb-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className={`text-sm font-medium ${isLast ? 'text-gray-900' : 'text-gray-500'}`}>
+                        {formatStatus(ev.status)}
+                      </span>
+                      <span className="text-xs text-gray-400 whitespace-nowrap flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(ev.created_at).toLocaleString('en-ZA', {
+                          day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                    {ev.note && <p className="text-xs text-gray-400 mt-0.5">{ev.note}</p>}
+                    <p className="text-xs text-gray-400">{ev.triggered_by}</p>
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
         </div>
       )}
 
       {/* Order items */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
-        <h2 className="font-semibold text-gray-900 mb-4">Items 商品</h2>
+        <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <Package className="w-4 h-4 text-gray-400" />
+          Items 商品
+        </h2>
         <div className="space-y-2">
           {order.order_items.map((item) => (
             <div key={item.id} className="flex items-center justify-between text-sm py-2 border-b border-gray-100 last:border-0">
@@ -144,16 +271,43 @@ export function AdminOrderDetail() {
         </div>
       </div>
 
-      {/* Shipping address */}
-      {addr && (
+      {/* Delivery address */}
+      {!isCollection && addr && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
-          <h2 className="font-semibold text-gray-900 mb-3">Shipping Address 收货地址</h2>
+          <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Truck className="w-4 h-4 text-gray-400" />
+            Delivery Address 收货地址
+          </h2>
           <div className="text-sm text-gray-700 space-y-0.5">
             <p>{addr.name}</p>
             <p>{addr.address_line1}</p>
             {addr.address_line2 && <p>{addr.address_line2}</p>}
             <p>{addr.city}, {addr.province} {addr.postal_code}</p>
             <p className="text-gray-400">{addr.phone}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Collection info */}
+      {isCollection && (
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
+          <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <Store className="w-4 h-4 text-gray-400" />
+            Collection Details 取货信息
+          </h2>
+          <div className="text-sm text-gray-700 space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Collector</span>
+              <span className="font-medium">{order.collection_name ?? order.customers?.name ?? '—'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Phone</span>
+              <span>{order.collection_phone ?? order.customers?.phone ?? '—'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Location</span>
+              <span>Dragon City, Shop 14, Fordsburg</span>
+            </div>
           </div>
         </div>
       )}
