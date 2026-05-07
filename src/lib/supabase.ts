@@ -18,7 +18,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 // ─── Database Types ───────────────────────────────────────────────────────────
 
 export type StockStatus = 'in_stock' | 'out_of_stock' | 'on_order'
-export type OrderStatus = 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+export type OrderStatus =
+  | 'pending'
+  | 'paid'
+  | 'processing'
+  | 'packed'
+  | 'out_for_delivery'
+  | 'delivered'
+  | 'ready_for_collection'
+  | 'collected'
+  | 'cancelled'
+export type FulfillmentType = 'delivery' | 'collection'
 export type PaymentStatus = 'unpaid' | 'paid' | 'refunded'
 export type OrderType = 'retail' | 'bulk'
 export type PaymentMethod = 'payfast' | 'ozow' | 'eft'
@@ -97,12 +107,24 @@ export interface OrderItem {
   created_at: string
 }
 
+export interface OrderStatusEvent {
+  id: string
+  order_id: string
+  status: string
+  note: string | null
+  triggered_by: string
+  created_at: string
+}
+
 export interface Order {
   id: string
   order_number: string
   customer_id: string | null
   order_type: OrderType
   status: OrderStatus
+  fulfillment_type: FulfillmentType
+  collection_name: string | null
+  collection_phone: string | null
   subtotal: number
   shipping_fee: number
   total: number
@@ -118,6 +140,7 @@ export interface Order {
 export interface OrderWithDetails extends Order {
   customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'> | null
   order_items: Pick<OrderItem, 'id' | 'product_name' | 'quantity' | 'unit_price' | 'line_total'>[]
+  order_status_events?: OrderStatusEvent[]
 }
 
 export interface ShippingAddress {
