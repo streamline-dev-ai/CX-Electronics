@@ -231,7 +231,7 @@ export function About() {
           </div>
         </section>
 
-        {/* ─── Why Choose CXX ───────────────────────── */}
+        {/* ─── Why Choose CW ───────────────────────── */}
         <section className="bg-white border-y border-gray-100 py-16 sm:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="text-center max-w-2xl mx-auto mb-12">

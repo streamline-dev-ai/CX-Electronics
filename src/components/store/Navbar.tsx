@@ -12,7 +12,7 @@ const navLinks = [
   { to: '/', label: 'Home', exact: true },
   { to: '/shop', label: 'Shop' },
   { to: '/deals', label: 'Deals' },
-  { to: '/bulk', label: 'Wholesale' },
+  { to: '/wholesale', label: 'Wholesale' },
   { to: '/about', label: 'About' },
 ]
 
@@ -24,6 +24,9 @@ const CATEGORIES = [
   { slug: 'solar',       label: 'Solar Lamps',              icon: Sun },
   { slug: 'accessories', label: 'Phone Accessories',        icon: Smartphone },
 ]
+
+// CW Electronics logo URL
+const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
 
 export function Navbar() {
   const { itemCount, openCart } = useCart()
@@ -54,17 +57,19 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0a0a0a] border-b border-neutral-800">
+      <header className="sticky top-0 z-40 bg-[#0F172A] border-b border-slate-700">
         {/* Main row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-4 lg:gap-6">
           {/* Logo + brand name */}
           <Link to="/" className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-9 h-9 bg-[#DC2626] rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-white fill-white" />
-            </div>
+            <img 
+              src={LOGO_URL} 
+              alt="CW Electronics" 
+              className="h-9 w-auto"
+            />
             <div className="hidden sm:block leading-tight">
-              <span className="font-bold text-white text-base tracking-tight">CXX Electronics</span>
-              <span className="block text-[10px] text-neutral-500 font-medium uppercase tracking-widest -mt-0.5">
+              <span className="font-bold text-white text-base tracking-tight">CW Electronics</span>
+              <span className="block text-[10px] text-slate-400 font-medium uppercase tracking-widest -mt-0.5">
                 Wholesale &amp; Retail
               </span>
             </div>
@@ -72,17 +77,17 @@ export function Navbar() {
 
           {/* Desktop search bar */}
           <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-xl mx-4">
-            <div className="flex w-full bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden transition-colors focus-within:border-[#DC2626]">
+            <div className="flex w-full bg-slate-800 border border-slate-600 rounded-lg overflow-hidden transition-colors focus-within:border-[#E63939]">
               <input
                 type="search"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search chargers, CCTV, routers..."
-                className="flex-1 px-4 py-2 text-sm bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                className="flex-1 px-4 py-2 text-sm bg-transparent text-white placeholder:text-slate-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="bg-[#DC2626] hover:bg-[#B91C1C] px-5 flex items-center justify-center transition-colors"
+                className="bg-[#E63939] hover:bg-[#C82020] px-5 flex items-center justify-center transition-colors"
                 aria-label="Search"
               >
                 <Search className="w-4 h-4 text-white" />
@@ -96,11 +101,11 @@ export function Navbar() {
             <Link
               to="/account/wishlist"
               aria-label="Wishlist"
-              className="hidden sm:flex relative p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+              className="hidden sm:flex relative p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
             >
-              <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#DC2626] text-[#DC2626]' : ''}`} />
+              <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#E63939] text-[#E63939]' : ''}`} />
               {wishlistIds.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0a0a0a]">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E63939] text-white text-[9px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
                   {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
                 </span>
               )}
@@ -110,7 +115,7 @@ export function Navbar() {
             <Link
               to="/account/login"
               aria-label="My Account"
-              className="hidden sm:flex p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+              className="hidden sm:flex p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
             >
               <User className="w-5 h-5" />
             </Link>
@@ -118,13 +123,13 @@ export function Navbar() {
             {/* Cart */}
             <button
               onClick={openCart}
-              className="relative flex items-center gap-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
+              className="relative flex items-center gap-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
               aria-label="Cart"
             >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden md:inline">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#DC2626] text-white text-[10px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0a0a0a]">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
@@ -132,8 +137,8 @@ export function Navbar() {
 
             {/* Get a Quote */}
             <Link
-              to="/bulk"
-              className="hidden lg:inline-flex items-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+              to="/wholesale"
+              className="hidden lg:inline-flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
               Get a Quote
@@ -142,7 +147,7 @@ export function Navbar() {
             {/* Mobile toggle */}
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              className="lg:hidden p-2 text-neutral-400 hover:text-white rounded-lg"
+              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg"
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -151,7 +156,7 @@ export function Navbar() {
         </div>
 
         {/* Secondary nav row (desktop) */}
-        <div className="hidden lg:block border-t border-neutral-800">
+        <div className="hidden lg:block border-t border-slate-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-11 gap-1">
             {navLinks.map(({ to, label, exact }) => (
               <NavLink
@@ -160,7 +165,7 @@ export function Navbar() {
                 end={exact}
                 className={({ isActive }) =>
                   `px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive ? 'text-[#DC2626]' : 'text-neutral-400 hover:text-white'
+                    isActive ? 'text-[#E63939]' : 'text-slate-300 hover:text-white'
                   }`
                 }
               >
@@ -172,25 +177,25 @@ export function Navbar() {
             <div ref={catsRef} className="relative">
               <button
                 onClick={() => setCatsOpen((v) => !v)}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white rounded-md transition-colors"
+                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white rounded-md transition-colors"
               >
                 Categories
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${catsOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {catsOpen && (
-                <div className="absolute left-0 top-full mt-1 w-72 bg-neutral-900 rounded-xl border border-neutral-800 p-2 z-50">
+                <div className="absolute left-0 top-full mt-1 w-72 bg-slate-800 rounded-xl border border-slate-700 p-2 z-50">
                   {CATEGORIES.map(({ slug, label, icon: Icon }) => (
                     <Link
                       key={slug}
                       to={`/shop?category=${slug}`}
                       onClick={() => setCatsOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-neutral-800 group transition-colors"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700 group transition-colors"
                     >
-                      <div className="w-8 h-8 bg-neutral-800 group-hover:bg-[#DC2626] rounded-lg flex items-center justify-center transition-colors">
-                        <Icon className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors" />
+                      <div className="w-8 h-8 bg-slate-700 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors">
+                        <Icon className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-sm font-medium text-neutral-200">{label}</span>
+                      <span className="text-sm font-medium text-slate-200">{label}</span>
                     </Link>
                   ))}
                 </div>
@@ -201,20 +206,20 @@ export function Navbar() {
 
         {/* Mobile drawer */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-neutral-800 bg-[#0a0a0a] px-4 py-4">
+          <div className="lg:hidden border-t border-slate-700 bg-[#0F172A] px-4 py-4">
             {/* Mobile search */}
             <form onSubmit={handleSearch} className="mb-4">
-              <div className="flex bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden">
+              <div className="flex bg-slate-800 border border-slate-600 rounded-lg overflow-hidden">
                 <input
                   type="search"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 px-4 py-2.5 text-sm text-white bg-transparent placeholder:text-neutral-500 focus:outline-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-white bg-transparent placeholder:text-slate-400 focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="bg-[#DC2626] px-5 flex items-center justify-center"
+                  className="bg-[#E63939] px-5 flex items-center justify-center"
                   aria-label="Search"
                 >
                   <Search className="w-4 h-4 text-white" />
@@ -229,14 +234,14 @@ export function Navbar() {
                 end={exact}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `block py-3 text-sm border-b border-neutral-800 ${isActive ? 'text-[#DC2626] font-semibold' : 'text-neutral-400'}`
+                  `block py-3 text-sm border-b border-slate-700 ${isActive ? 'text-[#E63939] font-semibold' : 'text-slate-300'}`
                 }
               >
                 {label}
               </NavLink>
             ))}
 
-            <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-neutral-600 font-semibold">
+            <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
               Categories
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -245,18 +250,18 @@ export function Navbar() {
                   key={slug}
                   to={`/shop?category=${slug}`}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 p-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-neutral-300 hover:bg-neutral-800 transition-colors"
+                  className="flex items-center gap-2 p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200 hover:bg-slate-700 transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-[#DC2626]" />
+                  <Icon className="w-4 h-4 text-[#E63939]" />
                   {label}
                 </Link>
               ))}
             </div>
 
             <Link
-              to="/bulk"
+              to="/wholesale"
               onClick={() => setMobileOpen(false)}
-              className="mt-4 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
+              className="mt-4 flex items-center justify-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
               Get a Quote

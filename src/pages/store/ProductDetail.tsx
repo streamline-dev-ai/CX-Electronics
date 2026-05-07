@@ -55,10 +55,10 @@ export function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="min-h-screen bg-[#0F172A]">
         <Navbar />
         <div className="flex items-center justify-center h-96">
-          <Loader2 className="w-8 h-8 animate-spin text-[#DC2626]" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#E63939]" />
         </div>
       </div>
     )
@@ -66,12 +66,12 @@ export function ProductDetail() {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="min-h-screen bg-[#0F172A]">
         <Navbar />
-        <div className="flex flex-col items-center justify-center h-96 text-neutral-400 gap-4">
+        <div className="flex flex-col items-center justify-center h-96 text-slate-400 gap-4">
           <Package className="w-12 h-12" />
           <p>Product not found</p>
-          <Link to="/shop" className="text-[#DC2626] text-sm font-bold hover:underline">
+          <Link to="/shop" className="text-[#E63939] text-sm font-bold hover:underline">
             ← Back to shop
           </Link>
         </div>
@@ -119,12 +119,12 @@ export function ProductDetail() {
   ].filter(Boolean) as { label: string; value: string }[]
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0F172A]">
       <SEO
-        title={`${product.name} | CXX Electronics`}
+        title={`${product.name} | CW Electronics`}
         description={product.description ? product.description.slice(0, 160) : `Buy ${product.name} at the best price in Johannesburg. Fast delivery across South Africa.`}
         image={images[0] || undefined}
-        url={`https://cxx-electronics.co.za/shop/${product.slug}`}
+        url={`https://cw-electronics.co.za/shop/${product.slug}`}
         type="product"
       />
       <Navbar />

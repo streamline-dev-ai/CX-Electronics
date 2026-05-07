@@ -20,7 +20,7 @@ import { Home } from './pages/store/Home'
 import { Shop } from './pages/store/Shop'
 import { ProductDetail } from './pages/store/ProductDetail'
 import { VariantProductDetail } from './pages/store/VariantProductDetail'
-import { BulkShop } from './pages/store/BulkShop'
+import { Wholesale } from './pages/store/Wholesale'
 import { BulkProductDetail } from './pages/store/BulkProductDetail'
 import { Deals } from './pages/store/Deals'
 import { About } from './pages/store/About'
@@ -62,7 +62,8 @@ export default function App() {
             <Route path="/shop" element={<Shop />} />
             <Route path="/shop/group/:groupSlug" element={<VariantProductDetail />} />
             <Route path="/shop/:slug" element={<ProductDetail />} />
-            <Route path="/bulk" element={<BulkShop />} />
+            <Route path="/wholesale" element={<Wholesale />} />
+            <Route path="/bulk" element={<Navigate to="/wholesale" replace />} />
             <Route path="/bulk/:slug" element={<BulkProductDetail />} />
             <Route path="/deals" element={<Deals />} />
             <Route path="/about" element={<About />} />

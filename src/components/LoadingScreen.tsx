@@ -72,39 +72,11 @@ export function LoadingScreen({ onDone }: Props) {
       <div className="relative z-10 flex flex-col items-center gap-8 px-6">
 
         {/* Logo */}
-        <div className="flex items-center gap-4">
-          {/* Lightning bolt */}
-          <svg
-            viewBox="0 0 40 56"
-            className="h-14 sm:h-16 drop-shadow-xl"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              d="M24 2L4 30H20L16 54L36 24H20L24 2Z"
-              fill="white"
-              stroke="rgba(255,255,255,0.25)"
-              strokeWidth="1"
-            />
-          </svg>
-
-          {/* Brand text */}
-          <div className="flex flex-col leading-none">
-            <span
-              className="font-extrabold tracking-tight text-white"
-              style={{ fontSize: 'clamp(2rem, 6vw, 3.25rem)', letterSpacing: '-0.02em' }}
-            >
-              CW
-            </span>
-            <span
-              className="font-semibold text-white/70 uppercase tracking-[0.22em]"
-              style={{ fontSize: 'clamp(0.65rem, 1.8vw, 0.85rem)', marginTop: '0.1em' }}
-            >
-              Electronics
-            </span>
-          </div>
-        </div>
+        <img
+          src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png"
+          alt="CW Electronics"
+          className="h-20 sm:h-24 w-auto drop-shadow-xl"
+        />
 
         {/* Spinner */}
         <div className="relative w-10 h-10 sm:w-11 sm:h-11">
