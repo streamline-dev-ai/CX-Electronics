@@ -181,7 +181,7 @@ export function Shop() {
               onClick={() => setPriceRange({})}
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 priceRange.min === undefined && priceRange.max === undefined
-                  ? 'bg-[#0F172A] text-white font-semibold'
+                  ? 'bg-[#1F2937] text-white font-semibold'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -196,7 +196,7 @@ export function Shop() {
                   onClick={() => setPriceRange({ min: p.min, max: p.max })}
                   className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                     active
-                      ? 'bg-[#0F172A] text-white font-semibold'
+                      ? 'bg-[#1F2937] text-white font-semibold'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -247,7 +247,7 @@ export function Shop() {
   )
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="Shop Electronics | CW Electronics Johannesburg"
         description="Browse chargers, CCTV, solar lights, routers, smartwatches & more. Retail & bulk pricing available. Fast delivery across South Africa."
@@ -299,7 +299,7 @@ export function Shop() {
 
       {/* Active filters */}
       {activeFilterCount > 0 && (
-        <div className="bg-white border-b border-gray-100">
+        <div className="bg-gray-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-1">
               Filters:
@@ -343,9 +343,9 @@ export function Shop() {
       )}
 
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-8">
+        <div className="flex gap-6">
           {/* Sidebar */}
-          <aside className="hidden md:block w-56 flex-shrink-0">
+          <aside className="hidden md:block w-56 flex-shrink-0 border-r border-gray-100 pr-6">
             <div className="sticky top-28">
               <div className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-5">
                 <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
@@ -358,7 +358,7 @@ export function Shop() {
           {/* Main */}
           <div className="flex-1 min-w-0">
             {/* Top bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-white rounded-xl px-4 py-3 border border-gray-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-white rounded-xl px-4 py-3 border border-gray-200 shadow-sm">
               {/* Count */}
               <p className="text-sm text-gray-600">
                 <span className="font-semibold text-gray-900">{totalCount}</span> products
@@ -422,11 +422,11 @@ export function Shop() {
             {loading ? (
               <div className={`grid ${gridClasses[gridCols]} gap-4`}>
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-white rounded-2xl animate-pulse border border-gray-100" />
+                  <div key={i} className="aspect-square bg-[#1F2937] rounded-2xl animate-pulse border border-white/10" />
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 px-6 bg-white rounded-2xl border border-dashed border-gray-200">
+              <div className="flex flex-col items-center justify-center py-20 px-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                 <div className="w-14 h-14 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center mb-3">
                   <Search className="w-6 h-6 text-gray-400" />
                 </div>

@@ -45,7 +45,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
     if (timerRef.current) clearInterval(timerRef.current)
     timerRef.current = setInterval(() => {
       setHoverImg((prev) => (prev + 1) % cardImages.length)
-    }, 1200) // Faster cycling
+    }, 2000)
   }
 
   function stopCycling() {
@@ -123,10 +123,10 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
       whileHover={{ y: -4 }}
     >
       <Link to={`${basePath}/${product.slug}`} className="group block h-full">
-        <div className="relative bg-white rounded-2xl border border-gray-100 group-hover:border-[#E63939]/40 group-hover:shadow-[0_12px_32px_-12px_rgba(230,57,57,0.35)] transition-all duration-300 overflow-hidden h-full flex flex-col">
+        <div className="relative bg-[#1F2937] rounded-2xl border border-white/10 group-hover:border-[#E63939]/50 group-hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div
-            className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden"
+            className="relative aspect-square bg-white overflow-hidden"
             onMouseEnter={startCycling}
             onMouseLeave={stopCycling}
           >
@@ -137,10 +137,10 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                     key={hoverImg}
                     src={cardImages[hoverImg]}
                     alt={name}
-                    initial={{ opacity: 0, scale: 1.02 }}
+                    initial={{ opacity: 0, scale: 1.03 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.55, ease: 'easeInOut' }}
                     className={`w-full h-full object-contain p-4 sm:p-5 transition-transform duration-500 ${
                       cardImages.length < 2 ? 'group-hover:scale-110' : ''
                     }`}
@@ -154,7 +154,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                       <span
                         key={i}
                         className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          i === hoverImg ? 'bg-[#E63939] w-3' : 'bg-gray-300'
+                          i === hoverImg ? 'bg-[#E63939] w-3' : 'bg-white/40'
                         }`}
                       />
                     ))}
@@ -163,7 +163,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Zap className="w-12 h-12 text-gray-200" />
+                <Zap className="w-12 h-12 text-gray-300" />
               </div>
             )}
 
@@ -195,7 +195,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
             {/* Wishlist */}
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.id) }}
-              className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-110 ${inWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+              className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center transition-all hover:scale-110 ${inWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
               aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
               <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#E63939] text-[#E63939]' : 'text-gray-400'}`} />
@@ -215,14 +215,14 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                 {product.categories.name}
               </p>
             )}
-            <p className={`font-semibold text-gray-900 ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
+            <p className={`font-semibold text-white ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
               {name}
             </p>
 
             <div className="mt-auto flex items-end justify-between gap-2">
               <div className="leading-tight">
                 {isBulkView && product.retail_price > price && (
-                  <p className="text-xs text-gray-400 line-through leading-none mb-0.5">
+                  <p className="text-xs text-gray-500 line-through leading-none mb-0.5">
                     R{product.retail_price.toFixed(2)}
                   </p>
                 )}
@@ -230,7 +230,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                   R{price.toFixed(2)}
                 </p>
                 {isBulkView && (
-                  <p className="text-[10px] text-gray-500 mt-1 font-medium">per unit</p>
+                  <p className="text-[10px] text-gray-400 mt-1 font-medium">per unit</p>
                 )}
               </div>
 
@@ -239,8 +239,8 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                 disabled={isOutOfStock}
                 className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-all ${
                   isOutOfStock
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-[#E63939] hover:bg-[#C82020] text-white group-hover:shadow-md group-hover:shadow-[#E63939]/30'
+                    ? 'bg-[#374151] text-gray-500 cursor-not-allowed'
+                    : 'bg-[#E63939] hover:bg-[#C82020] text-white group-hover:shadow-md group-hover:shadow-[#E63939]/40'
                 }`}
               >
                 <ShoppingCart className="w-3.5 h-3.5" />

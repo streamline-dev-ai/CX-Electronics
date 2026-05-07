@@ -4,7 +4,7 @@ import { Upload, X, ArrowLeft, Loader2, Plus, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useCategories } from '../../hooks/useCategories'
-import type { StockStatus, Variant } from '../../lib/supabase'
+import type { StockStatus, Variant, ProductVariantGroup } from '../../lib/supabase'
 
 interface FormState {
   name: string
@@ -21,6 +21,8 @@ interface FormState {
   images: string[]
   imageUrls: string[]
   variants: Variant[]
+  variant_group_id: string
+  variant_label: string
 }
 
 const INITIAL: FormState = {
@@ -28,6 +30,7 @@ const INITIAL: FormState = {
   category_id: '', retail_price: '', is_bulk_available: false,
   bulk_price: '', bulk_min_qty: '', active: true, featured: false,
   stock_status: 'in_stock', images: [], imageUrls: [], variants: [],
+  variant_group_id: '', variant_label: '',
 }
 
 function slugify(text: string): string {
@@ -48,6 +51,16 @@ export function ProductForm() {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [activeImage, setActiveImage] = useState(0)
+  const [variantGroups, setVariantGroups] = useState<ProductVariantGroup[]>([])
+
+  // Fetch variant groups for the dropdown
+  useEffect(() => {
+    supabase
+      .from('product_variant_groups')
+      .select('id, name, slug, created_at')
+      .order('name')
+      .then(({ data }) => setVariantGroups((data as ProductVariantGroup[]) ?? []))
+  }, [])
 
   useEffect(() => {
     if (!id) return
@@ -55,7 +68,7 @@ export function ProductForm() {
     async function load() {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, slug, description, category_id, retail_price, is_bulk_available, bulk_price, bulk_min_qty, active, featured, stock_status, images, thumbnail_url, variants')
+        .select('id, name, slug, description, category_id, retail_price, is_bulk_available, bulk_price, bulk_min_qty, active, featured, stock_status, images, thumbnail_url, variants, variant_group_id, variant_label')
         .eq('id', id)
         .single()
 
@@ -87,6 +100,8 @@ export function ProductForm() {
         images,
         imageUrls,
         variants: (data.variants as Variant[]) ?? [],
+        variant_group_id: data.variant_group_id ?? '',
+        variant_label: data.variant_label ?? '',
       })
       setLoading(false)
     }
@@ -215,6 +230,8 @@ export function ProductForm() {
       images: form.images,
       thumbnail_url: form.images[0] ?? null,
       variants: form.variants.filter((v) => v.name.trim() && v.options.length > 0),
+      variant_group_id: form.variant_group_id || null,
+      variant_label: form.variant_group_id && form.variant_label.trim() ? form.variant_label.trim() : null,
       updated_at: new Date().toISOString(),
     }
 
@@ -552,6 +569,40 @@ export function ProductForm() {
                 </p>
               ))}
             </div>
+          )}
+        </section>
+
+        {/* ── Variant Group (optional) ────────────────────── */}
+        <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">Variant Group</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Optional — link this product to a group so it appears alongside colour/size variants on one page</p>
+          </div>
+
+          <Field label="Variant Group">
+            <select
+              value={form.variant_group_id}
+              onChange={(e) => set('variant_group_id', e.target.value)}
+              className={input()}
+            >
+              <option value="">— None (standalone product) —</option>
+              {variantGroups.map((g) => (
+                <option key={g.id} value={g.id}>{g.name}</option>
+              ))}
+            </select>
+          </Field>
+
+          {form.variant_group_id && (
+            <Field label="Variant Label">
+              <input
+                type="text"
+                value={form.variant_label}
+                onChange={(e) => set('variant_label', e.target.value)}
+                className={input()}
+                placeholder="e.g. Black, Pink, 3.5 inch, Set of 4"
+              />
+              <p className="text-xs text-gray-400 mt-1">Shown on the variant selector button</p>
+            </Field>
           )}
         </section>
 
