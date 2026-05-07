@@ -1,18 +1,9 @@
 import type { OrderWithDetails, OrderStatus } from './supabase'
 
-const URLS: Record<string, string | undefined> = {
-  new_order:              import.meta.env.VITE_N8N_NEW_ORDER,
-  paid:                   import.meta.env.VITE_N8N_ORDER_PAID,
-  packed:                 import.meta.env.VITE_N8N_ORDER_PACKED,
-  out_for_delivery:       import.meta.env.VITE_N8N_OUT_FOR_DELIVERY,
-  delivered:              import.meta.env.VITE_N8N_DELIVERED,
-  ready_for_collection:   import.meta.env.VITE_N8N_READY_FOR_COLLECTION,
-  collected:              import.meta.env.VITE_N8N_COLLECTED,
-  cancelled:              import.meta.env.VITE_N8N_CANCELLED,
-}
+const N8N_NEW_ORDER     = import.meta.env.VITE_N8N_NEW_ORDER as string | undefined
+const N8N_STATUS_CHANGE = import.meta.env.VITE_N8N_STATUS_CHANGE as string | undefined
 
-async function send(key: string, payload: unknown): Promise<void> {
-  const url = URLS[key]
+async function send(url: string | undefined, payload: unknown): Promise<void> {
   if (!url) return
   try {
     await fetch(url, {
@@ -54,7 +45,7 @@ function basePayload(order: OrderWithDetails) {
 }
 
 export async function notifyNewOrder(order: OrderWithDetails): Promise<void> {
-  await send('new_order', { event: 'new_order', ...basePayload(order) })
+  await send(N8N_NEW_ORDER, { event: 'new_order', ...basePayload(order) })
 }
 
 export async function notifyStatusChange(
@@ -62,17 +53,12 @@ export async function notifyStatusChange(
   previousStatus: OrderStatus,
   newStatus: OrderStatus,
 ): Promise<void> {
-  const key = newStatus === 'paid' ? 'paid'
-    : newStatus === 'packed' ? 'packed'
-    : newStatus === 'out_for_delivery' ? 'out_for_delivery'
-    : newStatus === 'delivered' ? 'delivered'
-    : newStatus === 'ready_for_collection' ? 'ready_for_collection'
-    : newStatus === 'collected' ? 'collected'
-    : newStatus === 'cancelled' ? 'cancelled'
-    : null
-
-  if (!key) return
-  await send(key, {
+  const NOTIFY_STATUSES: OrderStatus[] = [
+    'paid', 'packed', 'out_for_delivery', 'delivered',
+    'ready_for_collection', 'collected', 'cancelled',
+  ]
+  if (!NOTIFY_STATUSES.includes(newStatus)) return
+  await send(N8N_STATUS_CHANGE, {
     event: 'order_status_change',
     previous_status: previousStatus,
     new_status: newStatus,

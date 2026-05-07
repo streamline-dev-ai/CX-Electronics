@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import { ArrowLeft, Loader2, Package, Truck, Store, CheckCircle2, XCircle, Clock, FileText } from 'lucide-react'
 import { getOrder, updateOrderStatus } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
 import type { OrderWithDetails, OrderStatus } from '../../lib/supabase'
@@ -147,6 +147,13 @@ export function AdminOrderDetail() {
             {new Date(order.created_at).toLocaleString('en-ZA')} · {order.order_type}
           </p>
         </div>
+        <Link
+          to={`/admin/orders/${order.id}/invoice`}
+          className="ml-auto mr-2 flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors print:hidden"
+        >
+          <FileText className="w-4 h-4" />
+          Invoice
+        </Link>
         <div className="ml-auto flex items-center gap-2">
           {/* Fulfillment badge */}
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${
