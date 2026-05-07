@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Search, Sliders, X, Package, ArrowRight, MessageCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Search, Sliders, X, Package, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
@@ -7,7 +7,6 @@ import SEO from '../../components/SEO'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useCart } from '../../context/CartContext'
-import { useLang } from '../../context/LangContext'
 import { useNavigate } from 'react-router-dom'
 
 const WHATSAPP_NUMBER = '27000000000' // TODO: replace with client's WhatsApp number
@@ -24,7 +23,6 @@ const PRICE_RANGES = [
 export function Wholesale() {
   const navigate = useNavigate()
   const { addItem } = useCart()
-  const { t } = useLang()
   const { categories } = useCategories()
 
   const [categorySlug, setCategorySlug] = useState('')
@@ -33,11 +31,11 @@ export function Wholesale() {
   const [sort, setSort] = useState<ProductSort>('featured')
   const [page, setPage] = useState(1)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const [quantities, setQuantities] = useState<Record<number, number>>({})
+  const [quantities, setQuantities] = useState<Record<string, number>>({})
 
   const priceRange = priceIdx !== null ? PRICE_RANGES[priceIdx] : null
 
-  const { products, loading, totalCount } = useProducts({
+  const { products, loading } = useProducts({
     bulkOnly: true,
     categorySlug: categorySlug || undefined,
     search: search || undefined,
@@ -63,11 +61,19 @@ export function Wholesale() {
       alert(`Minimum quantity is ${MIN_WHOLESALE_QTY} units`)
       return
     }
-    addItem(product.id, qty, true)
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.bulk_price ?? product.retail_price,
+      quantity: qty,
+      image: product.thumbnail_url ?? product.images?.[0] ?? '',
+      orderType: 'bulk',
+      bulkMinQty: product.bulk_min_qty ?? MIN_WHOLESALE_QTY,
+    })
     setQuantities((prev) => ({ ...prev, [product.id]: MIN_WHOLESALE_QTY }))
   }
 
-  function handleQuantityChange(productId: number, value: string) {
+  function handleQuantityChange(productId: string, value: string) {
     const num = parseInt(value) || MIN_WHOLESALE_QTY
     setQuantities((prev) => ({ ...prev, [productId]: num }))
   }
