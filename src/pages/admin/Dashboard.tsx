@@ -162,17 +162,17 @@ export function AdminDashboard() {
       .order('created_at', { ascending: true })
 
     const ordersData = orders ?? []
-    const orderIds = ordersData.map((o) => o.id)
+    const paidOrders = ordersData.filter((o) => o.payment_status === 'paid')
+    const paidOrderIds = paidOrders.map((o) => o.id)
 
-    const { data: items } = orderIds.length > 0
+    const { data: items } = paidOrderIds.length > 0
       ? await supabase
           .from('order_items')
           .select('product_name, quantity, line_total')
-          .in('order_id', orderIds)
+          .in('order_id', paidOrderIds)
       : { data: [] }
 
     const itemsData = items ?? []
-    const paidOrders = ordersData.filter((o) => o.payment_status === 'paid')
     const totalRevenue = paidOrders.reduce((s, o) => s + (o.total ?? 0), 0)
     const totalOrders = ordersData.length
     const avgOrderValue = totalOrders > 0 ? totalRevenue / Math.max(paidOrders.length, 1) : 0
