@@ -69,10 +69,10 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
       <td style="vertical-align:top;text-align:right;">
         <img
           src="${LOGO_URL}"
-          alt="CX Electronics"
+          alt="CW Electronics"
           style="height:48px;object-fit:contain;display:block;margin-left:auto;"
         />
-        <p style="margin:4px 0 0;font-size:11px;font-weight:700;color:#111827;text-align:right;letter-spacing:0.3px;">CX Electronics</p>
+        <p style="margin:4px 0 0;font-size:11px;font-weight:700;color:#111827;text-align:right;letter-spacing:0.3px;">CW Electronics</p>
       </td>
     </tr>
   </table>
@@ -156,7 +156,7 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
     <tr>
       <td style="vertical-align:bottom;">
         <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          CX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+          CW Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
           info@cw-electronics.co.za
         </p>
       </td>

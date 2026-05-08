@@ -84,8 +84,8 @@ export function AdminOrderInvoice() {
             <p className="text-sm text-gray-500 mt-0.5">Date: {date}</p>
           </div>
           <div className="text-right">
-            <img src={LOGO_URL} alt="CX Electronics" className="h-12 object-contain ml-auto block" />
-            <p className="text-xs font-bold text-gray-900 mt-1 tracking-wide">CX Electronics</p>
+            <img src={LOGO_URL} alt="CW Electronics" className="h-12 object-contain ml-auto block" />
+            <p className="text-xs font-bold text-gray-900 mt-1 tracking-wide">CW Electronics</p>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export function AdminOrderInvoice() {
         {/* Footer */}
         <div className="border-t border-gray-100 mt-10 pt-5 flex items-start justify-between">
           <p className="text-xs text-gray-400 leading-relaxed">
-            CX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+            CW Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
             info@cw-electronics.co.za
           </p>
           <p className="text-xs text-gray-400 text-right leading-relaxed">

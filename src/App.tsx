@@ -40,6 +40,7 @@ const ProductForm = lazy(() => import('./pages/admin/ProductForm').then((m) => (
 const AdminOrders = lazy(() => import('./pages/admin/Orders').then((m) => ({ default: m.AdminOrders })))
 const AdminOrderDetail  = lazy(() => import('./pages/admin/OrderDetail').then((m) => ({ default: m.AdminOrderDetail })))
 const AdminOrderInvoice = lazy(() => import('./pages/admin/OrderInvoice').then((m) => ({ default: m.AdminOrderInvoice })))
+const ReceiptDemo       = lazy(() => import('./pages/admin/ReceiptDemo').then((m) => ({ default: m.ReceiptDemo })))
 
 function AdminFallback() {
   return (
@@ -116,6 +117,7 @@ export default function App() {
             </Route>
 
             {/* Fallback */}
+            <Route path="/admin/receipt-demo" element={<Suspense fallback={<AdminFallback />}><ReceiptDemo /></Suspense>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
