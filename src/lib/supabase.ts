@@ -81,6 +81,7 @@ export interface Product {
 
 export interface ProductWithCategory extends Product {
   categories: Pick<Category, 'id' | 'name' | 'name_zh' | 'slug'> | null
+  product_variant_groups?: Pick<ProductVariantGroup, 'id' | 'name' | 'slug'> | null
 }
 
 export interface Customer {
@@ -104,6 +105,7 @@ export interface OrderItem {
   quantity: number
   unit_price: number
   line_total: number
+  thumbnail_url: string | null
   created_at: string
 }
 
@@ -139,7 +141,7 @@ export interface Order {
 
 export interface OrderWithDetails extends Order {
   customers: Pick<Customer, 'id' | 'name' | 'email' | 'phone'> | null
-  order_items: Pick<OrderItem, 'id' | 'product_name' | 'quantity' | 'unit_price' | 'line_total'>[]
+  order_items: Pick<OrderItem, 'id' | 'product_name' | 'quantity' | 'unit_price' | 'line_total' | 'thumbnail_url'>[]
   order_status_events?: OrderStatusEvent[]
 }
 

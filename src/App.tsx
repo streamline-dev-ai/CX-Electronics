@@ -28,6 +28,7 @@ import { Terms } from './pages/store/Terms'
 import { CartPage } from './pages/store/CartPage'
 import { Checkout } from './pages/store/Checkout'
 import { OrderConfirmation } from './pages/store/OrderConfirmation'
+import { PublicReceipt } from './pages/store/Receipt'
 import { RetailInvoice } from './pages/invoices/RetailInvoice'
 import { WholesaleInvoice } from './pages/invoices/WholesaleInvoice'
 
@@ -74,6 +75,7 @@ export default function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderConfirmation />} />
+            <Route path="/receipt/:id" element={<PublicReceipt />} />
             <Route path="/invoice/retail" element={<RetailInvoice />} />
             <Route path="/invoice/wholesale" element={<WholesaleInvoice />} />
 

@@ -1,41 +1,3 @@
-/**
- * CXX Electronics — n8n Webhook Triggers
- *
- * ARCHITECTURE:
- * Two webhook endpoints handle the full order lifecycle:
- *   VITE_N8N_NEW_ORDER      — fired when a new order is created (before payment)
- *   VITE_N8N_STATUS_CHANGE  — fired on every status transition by admin or payment gateway
- *
- * Each payload includes pre-rendered `customer_email_html` and/or `owner_email_html`
- * so n8n workflows only need to forward the HTML to their Send Email node — no
- * template logic required in n8n.
- *
- * n8n WORKFLOW SETUP:
- *
- * Workflow 1 — "CXX New Order" (VITE_N8N_NEW_ORDER):
- *   Webhook → Send Email to customer (customer_email_html)
- *   Triggered by: Checkout page on order creation
- *
- * Workflow 2 — "CXX Order Status Change" (VITE_N8N_STATUS_CHANGE):
- *   Webhook → Switch on `new_status`:
- *     "paid"                  → Send Email to customer (customer_email_html)
- *                             → Send Email to owner info@cw-electronics.co.za (owner_email_html)
- *                             → Attach receipt_html as PDF to customer email
- *     "packed" (delivery)     → Send Email to customer (customer_email_html)
- *     "packed" (collection)   → Send Email to customer (customer_email_html)
- *     "out_for_delivery"      → Send Email to customer (customer_email_html)
- *     other statuses          → no email (just log)
- *
- * PAYFAST ITN FLOW:
- *   1. PayFast sends ITN POST to: https://vsneqdjdkzbykkvvliju.supabase.co/functions/v1/payfast-itn
- *   2. Edge function verifies payment_status = 'COMPLETE'
- *   3. Edge function calls updateOrderStatus(orderId, 'paid', 'payment_gateway')
- *      which updates orders.status + inserts into order_status_events
- *   4. Edge function (or a Supabase webhook trigger) fires VITE_N8N_STATUS_CHANGE
- *      with new_status = 'paid'
- *   5. n8n sends orderConfirmedCustomer email + ownerNewOrder email with receipt attached
- */
-
 import type { OrderWithDetails, OrderStatus } from './supabase'
 import {
   orderPlacedCustomer,
@@ -69,7 +31,7 @@ function basePayload(order: OrderWithDetails) {
     fulfillment_type: order.fulfillment_type,
     status: order.status,
     timestamp: new Date().toISOString(),
-    store_name: 'CXX Electronics',
+    store_name: 'CW Electronics',
     store_email: 'info@cw-electronics.co.za',
     customer: {
       name: order.customers?.name ?? '',
@@ -81,6 +43,7 @@ function basePayload(order: OrderWithDetails) {
       quantity: i.quantity,
       unit_price: i.unit_price,
       line_total: i.line_total,
+      thumbnail_url: i.thumbnail_url ?? null,
     })),
     subtotal: order.subtotal,
     shipping_fee: order.shipping_fee,
@@ -95,10 +58,23 @@ function basePayload(order: OrderWithDetails) {
   }
 }
 
+const STATUS_SUBJECTS: Partial<Record<OrderStatus, string>> = {
+  paid:                 'Payment Confirmed',
+  packed:               'Order Packed',
+  out_for_delivery:     'Out for Delivery',
+  delivered:            'Order Delivered',
+  ready_for_collection: 'Ready for Collection',
+  collected:            'Order Collected',
+  cancelled:            'Order Cancelled',
+}
+
 export async function notifyNewOrder(order: OrderWithDetails): Promise<void> {
   await send(N8N_NEW_ORDER, {
     event: 'order_placed',
+    customer_email_subject: `Order Received — #${order.order_number}`,
     customer_email_html: orderPlacedCustomer(order),
+    owner_email_subject: `New Order — #${order.order_number} · R${order.total.toFixed(2)}`,
+    owner_email_html: ownerNewOrder(order),
     ...basePayload(order),
   })
 }
@@ -132,11 +108,15 @@ export async function notifyStatusChange(
     customerEmailHtml = outForDelivery(updatedOrder)
   }
 
+  const subjectLabel = STATUS_SUBJECTS[newStatus] ?? 'Order Update'
+
   await send(N8N_STATUS_CHANGE, {
     event: 'order_status_change',
     previous_status: previousStatus,
     new_status: newStatus,
+    customer_email_subject: customerEmailHtml ? `${subjectLabel} — #${order.order_number}` : null,
     customer_email_html: customerEmailHtml,
+    owner_email_subject: ownerEmailHtml ? `Order Paid — #${order.order_number} · R${order.total.toFixed(2)}` : null,
     owner_email_html: ownerEmailHtml,
     receipt_html: receiptHtml,
     ...basePayload(updatedOrder),
