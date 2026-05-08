@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import {
   ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star,
-  MessageCircle, Truck, Shield, RotateCcw, BadgeCheck, Zap, Heart,
+  Truck, Shield, RotateCcw, BadgeCheck, Zap, Heart,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
@@ -15,8 +15,6 @@ import { useProducts } from '../../hooks/useProducts'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { useWishlist } from '../../context/WishlistContext'
-
-const WHATSAPP_NUMBER = '27000000000'
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -84,10 +82,15 @@ export function ProductDetail() {
   const isOutOfStock = product.stock_status === 'out_of_stock'
   const images = product.images.length > 0 ? product.images : [product.thumbnail_url ?? '']
 
-  const bulkSavingsPct =
+  // Wholesale price: use db bulk_price if set, otherwise auto-calculate at 17.5% off retail
+  const wholesalePrice =
     product.is_bulk_available && product.bulk_price
-      ? Math.round((1 - product.bulk_price / product.retail_price) * 100)
-      : 0
+      ? product.bulk_price
+      : Math.round(product.retail_price * 0.825 * 100) / 100
+
+  const wholesaleMinQty = product.bulk_min_qty ?? 6
+
+  const wholesaleSavingsPct = Math.round((1 - wholesalePrice / product.retail_price) * 100)
 
   // Filter related, exclude current product
   const relatedProducts = related.filter((p) => p.id !== product.id).slice(0, 4)
@@ -103,9 +106,6 @@ export function ProductDetail() {
       orderType: 'retail',
     })
   }
-
-  const waMessage = `Bulk enquiry: ${product.name}${product.bulk_min_qty ? ` (min. ${product.bulk_min_qty} units)` : ''}. Bulk price: R${product.bulk_price?.toFixed(2) ?? 'TBD'}.`
-  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`
 
   // Build specs (use available + sensible defaults so the table never looks empty)
   const specs = [
@@ -244,8 +244,8 @@ export function ProductDetail() {
               </span>
             </div>
 
-            {/* Price block: Retail + Bulk side-by-side */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            {/* Price block: Retail + Wholesale side-by-side */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Retail */}
               <div className="bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl p-4">
                 <p className="text-[11px] uppercase tracking-widest text-[#000000]/50 font-semibold mb-1">Retail</p>
@@ -255,28 +255,39 @@ export function ProductDetail() {
                 <p className="text-[11px] text-[#000000]/50 mt-1">Single unit</p>
               </div>
 
-              {/* Bulk */}
-              {product.is_bulk_available && product.bulk_price ? (
-                <div className="relative bg-[#E63939] rounded-xl p-4 text-white">
-                  {bulkSavingsPct > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">
-                      Save {bulkSavingsPct}%
-                    </span>
-                  )}
-                  <p className="text-[11px] uppercase tracking-widest text-white/90 font-semibold mb-1">
-                    Wholesale ({product.bulk_min_qty}+)
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-bold leading-none">
-                    R{product.bulk_price.toFixed(2)}
-                  </p>
-                  <p className="text-[11px] text-white/90 mt-1">per unit</p>
+              {/* Wholesale — always shown with calculated price */}
+              <div className="relative bg-[#000000] rounded-xl p-4 text-white">
+                <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                  Save {wholesaleSavingsPct}%
+                </span>
+                <p className="text-[11px] uppercase tracking-widest text-white/70 font-semibold mb-1">
+                  Wholesale ({wholesaleMinQty}+ units)
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold leading-none">
+                  R{wholesalePrice.toFixed(2)}
+                </p>
+                <p className="text-[11px] text-white/70 mt-1">per unit</p>
+              </div>
+            </div>
+
+            {/* Volume encouragement bar */}
+            <div className="mb-6 bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl px-4 py-3 flex items-center gap-3">
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-[#000000] mb-1.5">
+                  Buy {wholesaleMinQty}+ units to unlock wholesale price — save {wholesaleSavingsPct}%
+                </p>
+                <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#E63939] rounded-full transition-all duration-500"
+                    style={{ width: `${Math.min(100, (qty / wholesaleMinQty) * 100)}%` }}
+                  />
                 </div>
-              ) : (
-                <div className="bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl p-4">
-                  <p className="text-[11px] uppercase tracking-widest text-[#000000]/50 font-semibold mb-1">Wholesale</p>
-                  <p className="text-base font-semibold text-[#000000]/70 leading-tight">Contact for quote</p>
-                </div>
-              )}
+                <p className="text-[11px] text-[#000000]/50 mt-1">
+                  {qty >= wholesaleMinQty
+                    ? 'Wholesale price unlocked! Contact us to order.'
+                    : `Add ${wholesaleMinQty - qty} more unit${wholesaleMinQty - qty === 1 ? '' : 's'} for wholesale pricing`}
+                </p>
+              </div>
             </div>
 
             {/* Variants */}
@@ -381,19 +392,6 @@ export function ProductDetail() {
               <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#E63939]' : ''}`} />
               {inWishlist ? 'Saved to Wishlist' : 'Save to Wishlist'}
             </button>
-
-            {/* Bulk Quote CTA */}
-            {product.is_bulk_available && (
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#000000]/80 text-white font-semibold py-3 rounded-lg transition-all text-sm sm:text-base mb-6"
-              >
-                <MessageCircle className="w-5 h-5 text-[#25D366]" />
-                Add to Bulk Quote · WhatsApp
-              </a>
-            )}
 
             {/* Trust strip */}
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-[#E5E7EB]">
