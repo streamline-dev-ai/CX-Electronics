@@ -121,21 +121,21 @@ function FeaturedCategories() {
             >
               <Link
                 to={`/shop?category=${slug}`}
-                className="group block bg-slate-900 rounded-xl border border-slate-800 hover:border-slate-700 transition-all overflow-hidden h-full shadow-md hover:shadow-lg"
+                className="group block bg-white rounded-xl border border-[#E5E7EB] hover:border-[#E63939] hover:shadow-lg transition-all overflow-hidden h-full"
               >
-                <div className="aspect-[16/10] bg-slate-800 overflow-hidden relative">
+                <div className="aspect-[16/10] bg-[#0F172A] overflow-hidden relative">
                   <img
                     src={img || '/placeholder.svg'}
                     alt={label}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                   <div className="absolute top-3 left-3 w-10 h-10 bg-[#E63939]/20 backdrop-blur-sm rounded-lg flex items-center justify-center border border-[#E63939]/40">
-                    <Icon className="w-5 h-5 text-[#E63939]" />
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
 
-                <div className="p-5 flex items-center justify-between">
+                <div className="p-5 flex items-center justify-between bg-white">
                   <div>
                     <h3 className="font-semibold text-[#0F172A] mb-0.5 text-base">{label}</h3>
                     <p className="text-xs text-[#0F172A]/60">{desc}</p>
