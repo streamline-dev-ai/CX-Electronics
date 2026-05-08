@@ -57,7 +57,7 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0F172A] border-b border-slate-700">
+      <header className="sticky top-0 z-40 bg-[#000000] border-b border-slate-700">
         {/* Main row */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-4 lg:gap-6">
           {/* Logo + brand name */}
@@ -105,7 +105,7 @@ export function Navbar() {
             >
               <Heart className={`w-5 h-5 ${wishlistIds.length > 0 ? 'fill-[#E63939] text-[#E63939]' : ''}`} />
               {wishlistIds.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E63939] text-white text-[9px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#E63939] text-white text-[9px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#000000]">
                   {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
                 </span>
               )}
@@ -129,7 +129,7 @@ export function Navbar() {
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden md:inline">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#0F172A]">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E63939] text-white text-[10px] font-semibold rounded-full flex items-center justify-center ring-2 ring-[#000000]">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}
@@ -206,7 +206,7 @@ export function Navbar() {
 
         {/* Mobile drawer */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-slate-700 bg-[#0F172A] px-4 py-4">
+          <div className="lg:hidden border-t border-slate-700 bg-[#000000] px-4 py-4">
             {/* Mobile search */}
             <form onSubmit={handleSearch} className="mb-4">
               <div className="flex bg-slate-800 border border-slate-600 rounded-lg overflow-hidden">

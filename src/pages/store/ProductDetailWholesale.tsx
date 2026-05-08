@@ -273,7 +273,7 @@ export function ProductDetailWholesale() {
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-neutral-800">
               {[
                 { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide SA' },
-                { icon: Shield, label: 'Warranty', sub: '12 months' },
+                { icon: Shield, label: 'Quality Tested', sub: 'Verified products' },
                 { icon: RotateCcw, label: 'Easy Returns', sub: '7-day policy' },
                 { icon: BadgeCheck, label: 'Quality', sub: 'Direct importer' },
               ].map(({ icon: Icon, label, sub }) => (

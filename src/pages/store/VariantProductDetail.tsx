@@ -95,6 +95,17 @@ export function VariantProductDetail() {
 
   const pricesVary = variants.length > 1 && variants.some((v) => v.retail_price !== variants[0].retail_price)
 
+  // Wholesale price: db bulk_price or auto-calculate at 17.5% off retail
+  const wholesalePrice = activeVariant
+    ? (activeVariant.is_bulk_available && activeVariant.bulk_price
+        ? activeVariant.bulk_price
+        : Math.round(activeVariant.retail_price * 0.825 * 100) / 100)
+    : 0
+  const wholesaleMinQty = activeVariant?.bulk_min_qty ?? 6
+  const wholesaleSavingsPct = activeVariant
+    ? Math.round((1 - wholesalePrice / activeVariant.retail_price) * 100)
+    : 0
+
   const { products: related } = useProducts({
     categorySlug: activeVariant?.categories?.slug,
     pageSize: 8,
@@ -154,7 +165,7 @@ export function VariantProductDetail() {
     activeVariant.categories && { label: 'Category', value: activeVariant.categories.name },
     activeVariant.variant_label && { label: 'Variant', value: activeVariant.variant_label },
     { label: 'Stock', value: activeVariant.stock_status === 'in_stock' ? 'Available' : activeVariant.stock_status === 'on_order' ? 'On Order' : 'Out of Stock' },
-    { label: 'Warranty', value: '12 Months' },
+    { label: 'Quality', value: 'Tested & Verified' },
     { label: 'Shipping', value: 'Same-day in Gauteng · 2-4 days nationwide' },
   ].filter(Boolean) as { label: string; value: string }[]
 
@@ -187,7 +198,7 @@ export function VariantProductDetail() {
           transition={{ duration: 0.4 }}
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
         >
-          {/* ── Gallery ──────────────────────────────────────── */}
+          {/* ── Gallery ──────────────���─��─────────────────────── */}
           <div className="lg:col-span-7">
             <div className="grid grid-cols-12 gap-3">
               {/* Thumbnails */}
@@ -293,17 +304,50 @@ export function VariantProductDetail() {
               </span>
             </div>
 
-            {/* Price */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6">
-              <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-1">
-                {pricesVary ? 'From' : 'Retail'}
+            {/* Price block: Retail + Wholesale */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl p-4">
+                <p className="text-[11px] uppercase tracking-widest text-[#000000]/50 font-semibold mb-1">
+                  {pricesVary ? 'From' : 'Retail'}
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold text-[#000000] leading-none">
+                  R{activeVariant.retail_price.toFixed(2)}
+                </p>
+                {pricesVary && (
+                  <p className="text-[11px] text-[#000000]/50 mt-1">Price varies by variant</p>
+                )}
+              </div>
+
+              <div className="relative bg-[#000000] rounded-xl p-4 text-white">
+                <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                  Save {wholesaleSavingsPct}%
+                </span>
+                <p className="text-[11px] uppercase tracking-widest text-white/70 font-semibold mb-1">
+                  Wholesale ({wholesaleMinQty}+ units)
+                </p>
+                <p className="text-2xl sm:text-3xl font-bold leading-none">
+                  R{wholesalePrice.toFixed(2)}
+                </p>
+                <p className="text-[11px] text-white/70 mt-1">per unit</p>
+              </div>
+            </div>
+
+            {/* Volume bar */}
+            <div className="mb-6 bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl px-4 py-3">
+              <p className="text-xs font-semibold text-[#000000] mb-1.5">
+                Buy {wholesaleMinQty}+ units to unlock wholesale — save {wholesaleSavingsPct}%
               </p>
-              <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-none">
-                R{activeVariant.retail_price.toFixed(2)}
+              <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#E63939] rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, (qty / wholesaleMinQty) * 100)}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-[#000000]/50 mt-1">
+                {qty >= wholesaleMinQty
+                  ? 'Wholesale price unlocked! Contact us to order.'
+                  : `Add ${wholesaleMinQty - qty} more unit${wholesaleMinQty - qty === 1 ? '' : 's'} for wholesale pricing`}
               </p>
-              {pricesVary && (
-                <p className="text-[11px] text-gray-400 mt-1">Price varies by variant</p>
-              )}
             </div>
 
             {/* Variant selector */}
@@ -391,7 +435,7 @@ export function VariantProductDetail() {
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-gray-200">
               {[
                 { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide SA' },
-                { icon: Shield, label: '12-Month Warranty', sub: 'On all products' },
+                { icon: Shield, label: 'Quality Tested', sub: 'Verified products' },
                 { icon: RotateCcw, label: 'Easy Returns', sub: '7-day policy' },
                 { icon: BadgeCheck, label: 'Quality Tested', sub: 'Direct importer' },
               ].map(({ icon: Icon, label, sub }) => (

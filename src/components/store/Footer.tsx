@@ -13,7 +13,7 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#0F172A] text-white border-t border-slate-700">
+    <footer className="bg-[#000000] text-white border-t border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
@@ -56,7 +56,7 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm text-slate-400">
               <li><Link to="/" className="hover:text-[#E63939] transition-colors">{t('home')}</Link></li>
               <li><Link to="/shop" className="hover:text-[#E63939] transition-colors">{t('shop')}</Link></li>
-              <li><Link to="/bulk" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
+              <li><Link to="/wholesale" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
               <li><Link to="/about" className="hover:text-[#E63939] transition-colors">About &amp; Contact</Link></li>
               <li><Link to="/terms" className="hover:text-[#E63939] transition-colors">Terms &amp; Returns Policy</Link></li>
               <li><Link to="/shop?category=chargers" className="hover:text-[#E63939] transition-colors">Chargers &amp; Cables</Link></li>

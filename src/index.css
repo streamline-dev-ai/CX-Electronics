@@ -9,12 +9,13 @@
 
   html {
     scroll-behavior: smooth;
+    background-color: #FFFFFF;
   }
 
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    color: #111827;
-    background-color: #0F172A;
+    color: #000000;
+    background-color: #FFFFFF;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

@@ -137,7 +137,7 @@ export function Shop() {
     <div className="space-y-7">
       {/* Categories */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
           {t('categories')}
         </h3>
         <ul className="space-y-1">
@@ -146,8 +146,8 @@ export function Shop() {
               onClick={() => setCategory('')}
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 !categorySlug
-                  ? 'bg-[#DC2626] text-white font-semibold'
-                  : 'text-neutral-300 hover:bg-neutral-800'
+                  ? 'bg-[#E63939] text-white font-semibold'
+                  : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
               }`}
             >
               All Products
@@ -159,8 +159,8 @@ export function Shop() {
                 onClick={() => setCategory(c.slug)}
                 className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                   categorySlug === c.slug
-                    ? 'bg-[#DC2626] text-white font-semibold'
-                    : 'text-neutral-300 hover:bg-neutral-800'
+                    ? 'bg-[#E63939] text-white font-semibold'
+                    : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
                 }`}
               >
                 {c.name}
@@ -172,7 +172,7 @@ export function Shop() {
 
       {/* Price */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
           Price Range
         </h3>
         <ul className="space-y-1">
@@ -181,8 +181,8 @@ export function Shop() {
               onClick={() => setPriceRange({})}
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 priceRange.min === undefined && priceRange.max === undefined
-                  ? 'bg-neutral-700 text-white font-semibold'
-                  : 'text-neutral-300 hover:bg-neutral-800'
+                  ? 'bg-[#000000] text-white font-semibold'
+                  : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
               }`}
             >
               Any price
@@ -196,8 +196,8 @@ export function Shop() {
                   onClick={() => setPriceRange({ min: p.min, max: p.max })}
                   className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                     active
-                      ? 'bg-neutral-700 text-white font-semibold'
-                      : 'text-neutral-300 hover:bg-neutral-800'
+                      ? 'bg-[#000000] text-white font-semibold'
+                      : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
                   }`}
                 >
                   {p.label}
@@ -210,27 +210,27 @@ export function Shop() {
 
       {/* Toggles */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
           Availability
         </h3>
         <div className="space-y-2">
-          <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-800 cursor-pointer">
+          <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#F5F5F5] cursor-pointer">
             <input
               type="checkbox"
               checked={inStockOnly}
               onChange={(e) => setInStockOnly(e.target.checked)}
-              className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-[#DC2626] focus:ring-[#DC2626]"
+              className="w-4 h-4 rounded border-[#E5E7EB] text-[#E63939] focus:ring-[#E63939]"
             />
-            <span className="text-sm text-neutral-300">In stock only</span>
+            <span className="text-sm text-[#000000]">In stock only</span>
           </label>
-          <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-800 cursor-pointer">
+          <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#F5F5F5] cursor-pointer">
             <input
               type="checkbox"
               checked={bulkOnly}
               onChange={(e) => setBulkOnly(e.target.checked)}
-              className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-[#DC2626] focus:ring-[#DC2626]"
+              className="w-4 h-4 rounded border-[#E5E7EB] text-[#E63939] focus:ring-[#E63939]"
             />
-            <span className="text-sm text-neutral-300">Bulk eligible</span>
+            <span className="text-sm text-[#000000]">Bulk eligible</span>
           </label>
         </div>
       </section>
@@ -238,7 +238,7 @@ export function Shop() {
       {activeFilterCount > 0 && (
         <button
           onClick={clearAll}
-          className="w-full text-sm font-medium text-[#DC2626] hover:text-[#B91C1C] py-2"
+          className="w-full text-sm font-medium text-[#E63939] hover:text-[#C82020] py-2"
         >
           Clear all filters
         </button>
@@ -247,7 +247,7 @@ export function Shop() {
   )
 
   return (
-    <div className="min-h-screen bg-[#0F172A] flex flex-col">
+    <div className="min-h-screen bg-[#FFFFFF] flex flex-col">
       <SEO
         title="Shop Electronics | CW Electronics Johannesburg"
         description="Browse chargers, CCTV, solar lights, routers, smartwatches & more. Retail & bulk pricing available. Fast delivery across South Africa."
@@ -256,34 +256,34 @@ export function Shop() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative bg-[#1E293B] text-white border-b border-slate-700">
+      <section className="relative bg-[#000000] text-white border-b border-[#E5E7EB]">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold text-[#DC2626] uppercase tracking-widest mb-2">
+            <p className="text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-2">
               All Products
             </p>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-balance text-white">
               {activeCategoryName ? activeCategoryName : 'Shop Electronics'}
             </h1>
-            <p className="text-neutral-400 mt-2 text-sm md:text-base max-w-xl">
+            <p className="text-white/60 mt-2 text-sm md:text-base max-w-xl">
               CCTV, solar, chargers, routers, smartwatches and more — wholesale &amp; retail.
             </p>
 
             {/* Search */}
             <form onSubmit={applySearch} className="mt-5 flex max-w-lg">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                 <input
                   type="search"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search products..."
-                  className="w-full bg-neutral-900 text-white placeholder:text-neutral-500 pl-11 pr-4 py-3 rounded-l-lg border border-neutral-700 border-r-0 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-transparent text-sm"
+                  className="w-full bg-white/10 text-white placeholder:text-white/40 pl-11 pr-4 py-3 rounded-l-lg border border-white/20 border-r-0 focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent text-sm"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold px-5 py-3 rounded-r-lg transition-colors text-sm"
+                className="bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-3 rounded-r-lg transition-colors text-sm"
               >
                 Search
               </button>
@@ -294,9 +294,9 @@ export function Shop() {
 
       {/* Active filters */}
       {activeFilterCount > 0 && (
-        <div className="bg-[#0a0a0a] border-b border-neutral-800">
+        <div className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-neutral-500 uppercase tracking-wider mr-1">
+            <span className="text-xs font-medium text-[#000000]/50 uppercase tracking-wider mr-1">
               Filters:
             </span>
             {activeCategoryName && (
@@ -329,7 +329,7 @@ export function Shop() {
             {bulkOnly && <FilterChip label="Bulk" onRemove={() => setBulkOnly(false)} />}
             <button
               onClick={clearAll}
-              className="ml-auto text-xs font-semibold text-[#DC2626] hover:text-[#B91C1C]"
+              className="ml-auto text-xs font-semibold text-[#E63939] hover:text-[#C82020]"
             >
               Clear all
             </button>
@@ -342,8 +342,8 @@ export function Shop() {
           {/* Sidebar */}
           <aside className="hidden md:block w-56 flex-shrink-0">
             <div className="sticky top-28">
-              <div className="flex items-center gap-2 text-sm font-semibold text-white mb-5">
-                <SlidersHorizontal className="w-4 h-4 text-[#DC2626]" />
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#000000] mb-5">
+                <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
                 Filters
               </div>
               {FiltersPanel}
@@ -353,15 +353,15 @@ export function Shop() {
           {/* Main */}
           <div className="flex-1 min-w-0">
             {/* Top bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-neutral-900 rounded-xl px-4 py-3 border border-neutral-800">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-[#F9FAFB] rounded-xl px-4 py-3 border border-[#E5E7EB]">
               {/* Count */}
-              <p className="text-sm text-neutral-400">
-                <span className="font-semibold text-white">{totalCount}</span> products
+              <p className="text-sm text-[#000000]/60">
+                <span className="font-semibold text-[#000000]">{totalCount}</span> products
               </p>
 
               <div className="flex items-center gap-2 sm:gap-3">
                 {/* Grid toggle - desktop only */}
-                <div className="hidden sm:flex items-center gap-1 border border-neutral-700 rounded-lg p-1">
+                <div className="hidden sm:flex items-center gap-1 border border-[#E5E7EB] rounded-lg p-1">
                   {([1, 2, 3, 4] as GridColumns[]).map((cols) => {
                     const Icon = cols === 1 ? List : cols === 2 ? Grid2X2 : cols === 3 ? Grid3X3 : LayoutGrid
                     return (
@@ -370,8 +370,8 @@ export function Shop() {
                         onClick={() => setGridCols(cols)}
                         className={`p-1.5 rounded-md transition-colors ${
                           gridCols === cols
-                            ? 'bg-[#DC2626] text-white'
-                            : 'text-neutral-500 hover:text-white'
+                            ? 'bg-[#E63939] text-white'
+                            : 'text-[#000000]/40 hover:text-[#000000]'
                         }`}
                         aria-label={`${cols} column${cols > 1 ? 's' : ''} view`}
                       >
@@ -384,12 +384,12 @@ export function Shop() {
                 {/* Mobile filter */}
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="md:hidden flex items-center gap-2 text-sm font-medium text-white border border-neutral-700 px-3 py-2 rounded-lg"
+                  className="md:hidden flex items-center gap-2 text-sm font-medium text-[#000000] border border-[#E5E7EB] px-3 py-2 rounded-lg"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                   Filters
                   {activeFilterCount > 0 && (
-                    <span className="bg-[#DC2626] text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+                    <span className="bg-[#E63939] text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
                       {activeFilterCount}
                     </span>
                   )}
@@ -400,7 +400,7 @@ export function Shop() {
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value as ProductSort)}
-                    className="appearance-none bg-neutral-900 border border-neutral-700 text-sm font-medium text-white pl-3 pr-9 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:border-transparent cursor-pointer"
+                    className="appearance-none bg-white border border-[#E5E7EB] text-sm font-medium text-[#000000] pl-3 pr-9 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent cursor-pointer"
                   >
                     {SORT_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -408,7 +408,7 @@ export function Shop() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#000000]/40 pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -417,20 +417,20 @@ export function Shop() {
             {loading ? (
               <div className={`grid ${gridClasses[gridCols]} gap-4`}>
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-neutral-900 rounded-xl animate-pulse border border-neutral-800" />
+                  <div key={i} className="aspect-square bg-[#F5F5F5] rounded-xl animate-pulse border border-[#E5E7EB]" />
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 px-6 bg-neutral-900 rounded-xl border border-dashed border-neutral-700">
-                <div className="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center mb-3">
-                  <Search className="w-6 h-6 text-neutral-500" />
+              <div className="flex flex-col items-center justify-center py-20 px-6 bg-[#F9FAFB] rounded-xl border border-dashed border-[#E5E7EB]">
+                <div className="w-14 h-14 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center mb-3">
+                  <Search className="w-6 h-6 text-[#000000]/30" />
                 </div>
-                <p className="text-base font-semibold text-white">No products found</p>
-                <p className="text-sm text-neutral-500 mt-1">Try adjusting your filters</p>
+                <p className="text-base font-semibold text-[#000000]">No products found</p>
+                <p className="text-sm text-[#000000]/50 mt-1">Try adjusting your filters</p>
                 {activeFilterCount > 0 && (
                   <button
                     onClick={clearAll}
-                    className="mt-4 bg-[#DC2626] hover:bg-[#B91C1C] text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
+                    className="mt-4 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
                   >
                     Clear filters
                   </button>
@@ -453,8 +453,8 @@ export function Shop() {
                       disabled={page === 1}
                       className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                         page === 1
-                          ? 'text-neutral-600 cursor-not-allowed'
-                          : 'text-neutral-300 hover:bg-neutral-800'
+                          ? 'text-[#000000]/20 cursor-not-allowed'
+                          : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
                       }`}
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -465,7 +465,7 @@ export function Shop() {
                     <div className="flex items-center gap-1">
                       {pageNumbers.map((p, i) =>
                         p === 'ellipsis' ? (
-                          <span key={`ellipsis-${i}`} className="px-2 text-neutral-600">
+                          <span key={`ellipsis-${i}`} className="px-2 text-[#000000]/30">
                             ...
                           </span>
                         ) : (
@@ -474,8 +474,8 @@ export function Shop() {
                             onClick={() => setPage(p)}
                             className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
                               page === p
-                                ? 'bg-[#DC2626] text-white'
-                                : 'text-neutral-300 hover:bg-neutral-800'
+                                ? 'bg-[#E63939] text-white'
+                                : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
                             }`}
                           >
                             {p}
@@ -490,8 +490,8 @@ export function Shop() {
                       disabled={page === totalPages}
                       className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                         page === totalPages
-                          ? 'text-neutral-600 cursor-not-allowed'
-                          : 'text-neutral-300 hover:bg-neutral-800'
+                          ? 'text-[#000000]/20 cursor-not-allowed'
+                          : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
                       }`}
                     >
                       <span className="hidden sm:inline">Next</span>
@@ -503,21 +503,21 @@ export function Shop() {
             )}
 
             {/* WhatsApp Enquiry Banner */}
-            <div className="mt-10 bg-neutral-900 border border-neutral-800 rounded-xl p-6 sm:p-8">
+            <div className="mt-10 bg-[#000000] border border-[#000000] rounded-xl p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-white font-semibold text-base sm:text-lg">
                     Need bigger quantities, custom orders, or a product you don&apos;t see here?
                   </h3>
-                  <p className="text-neutral-400 text-sm mt-1">
+                  <p className="text-white/60 text-sm mt-1">
                     Get in touch — we&apos;ll source it or give you a bulk quote.
                   </p>
                 </div>
                 <a
-                  href="https://wa.me/27000000000?text=Hi%20CXX%2C%20I%27d%20like%20to%20enquire%20about%20a%20product."
+                  href="https://wa.me/27000000000?text=Hi%20CW%2C%20I%27d%20like%20to%20enquire%20about%20a%20product."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm whitespace-nowrap"
+                  className="inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm whitespace-nowrap"
                 >
                   Enquire on WhatsApp
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -535,15 +535,15 @@ export function Shop() {
             className="absolute inset-0 bg-black/70"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[90vw] bg-[#0a0a0a] shadow-xl overflow-y-auto">
-            <div className="sticky top-0 bg-[#0a0a0a] border-b border-neutral-800 px-5 py-4 flex items-center justify-between">
-              <h2 className="font-semibold text-white flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-[#DC2626]" />
+          <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[90vw] bg-white shadow-xl overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-[#E5E7EB] px-5 py-4 flex items-center justify-between">
+              <h2 className="font-semibold text-[#000000] flex items-center gap-2">
+                <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
                 Filters
               </h2>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="p-1 text-neutral-400 hover:text-white"
+                className="p-1 text-[#000000]/40 hover:text-[#000000]"
                 aria-label="Close filters"
               >
                 <X className="w-5 h-5" />
@@ -553,7 +553,7 @@ export function Shop() {
             <div className="sticky bottom-0 bg-[#0a0a0a] border-t border-neutral-800 px-5 py-4">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold py-3 rounded-lg transition-colors"
+                className="w-full bg-[#E63939] hover:bg-[#C82020] text-white font-semibold py-3 rounded-lg transition-colors"
               >
                 Show {totalCount} products
               </button>
@@ -569,11 +569,11 @@ export function Shop() {
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 text-neutral-200 text-xs font-medium pl-3 pr-2 py-1.5 rounded-full">
+    <span className="inline-flex items-center gap-1.5 bg-white border border-[#E5E7EB] text-[#000000] text-xs font-medium pl-3 pr-2 py-1.5 rounded-full">
       {label}
       <button
         onClick={onRemove}
-        className="text-neutral-400 hover:text-[#DC2626] transition-colors"
+        className="text-[#000000]/40 hover:text-[#E63939] transition-colors"
         aria-label={`Remove ${label} filter`}
       >
         <X className="w-3.5 h-3.5" />

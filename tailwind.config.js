@@ -4,27 +4,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        // CW Electronics brand system — Red & Slate Dark
+        // CW Electronics — Strict premium palette (Red, Navy, White only)
         cw: {
-          dark: '#0F172A',          // primary dark background (softer than pure black)
-          'dark-alt': '#1E293B',    // alternate dark sections
-          red: '#E63939',           // primary red accent / CTAs
-          'red-hover': '#C82020',   // red hover
-          'red-light': '#FEE9E9',   // light red tint bg
-          bg: '#F9FAFB',            // subtle page section bg
-          text: '#111827',          // primary text
-          muted: '#6B7280',         // secondary text
+          dark: '#000000',          // Primary dark background
+          red: '#E63939',           // Primary accent red
+          'red-hover': '#C82020',   // Red hover state
+          text: '#000000',          // Text on light backgrounds
+          border: '#E5E7EB',        // Subtle borders and dividers
         },
-        // Keep old cxx aliases for backwards compat
+        // Backwards compatibility aliases
         cxx: {
-          navy: '#0F172A',
+          navy: '#000000',
           blue: '#E63939',
           'blue-hover': '#C82020',
-          'blue-light': '#FEE9E9',
-          bg: '#F9FAFB',
-          red: '#E63939',
-          text: '#111827',
-          muted: '#6B7280',
+          text: '#000000',
         },
       },
       fontFamily: {

@@ -139,7 +139,7 @@ export function RetailInvoice() {
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-gray-900">Thank you for your purchase!</p>
-              <p className="text-xs text-gray-400 mt-0.5">12-month warranty on all products</p>
+              <p className="text-xs text-gray-400 mt-0.5">All products tested and verified for quality</p>
             </div>
           </div>
 
