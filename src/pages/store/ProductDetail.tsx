@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { ProductCard } from '../../components/store/ProductCard'
+import { AddedToCartDrawer } from '../../components/store/AddedToCartDrawer'
+import { FrequentlyBoughtTogether } from '../../components/store/FrequentlyBoughtTogether'
+import { ExitIntentPopup } from '../../components/store/ExitIntentPopup'
 import SEO from '../../components/SEO'
 import { useProduct } from '../../hooks/useProduct'
 import { useProducts } from '../../hooks/useProducts'
@@ -28,6 +31,7 @@ export function ProductDetail() {
   const [activeImage, setActiveImage] = useState(0)
   const [tab, setTab] = useState<'description' | 'specs'>('description')
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
+  const [showAddedDrawer, setShowAddedDrawer] = useState(false)
 
   // Redirect to group page if this product is part of a variant group
   useEffect(() => {
@@ -99,12 +103,14 @@ export function ProductDetail() {
     if (isOutOfStock) return
     addItem({
       productId: product!.id,
-      name: product!.name,
+      name,
       price: product!.retail_price,
       quantity: qty,
-      image: product!.thumbnail_url ?? '',
+      image: images[0],
       orderType: 'retail',
     })
+    setShowAddedDrawer(true)
+    setQty(1)
   }
 
   // Build specs (use available + sensible defaults so the table never looks empty)
@@ -464,6 +470,12 @@ export function ProductDetail() {
           </div>
         </div>
 
+        {/* ── Frequently Bought Together ────────────────────────────── */}
+        <FrequentlyBoughtTogether 
+          currentProductId={product.id}
+          categorySlug={product.categories?.slug}
+        />
+
         {/* ── Related Products ────────────────────────────── */}
         {relatedProducts.length > 0 && (
           <section className="mt-12 lg:mt-16">
@@ -493,6 +505,14 @@ export function ProductDetail() {
       </div>
 
       <Footer />
+
+      {/* Upsell & Conversion Components */}
+      <AddedToCartDrawer 
+        productId={product.id}
+        isOpen={showAddedDrawer}
+        onClose={() => setShowAddedDrawer(false)}
+      />
+      <ExitIntentPopup />
     </div>
   )
 }

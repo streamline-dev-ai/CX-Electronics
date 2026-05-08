@@ -8,6 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { ProductCard } from '../../components/store/ProductCard'
+import { AddedToCartDrawer } from '../../components/store/AddedToCartDrawer'
+import { FrequentlyBoughtTogether } from '../../components/store/FrequentlyBoughtTogether'
+import { ExitIntentPopup } from '../../components/store/ExitIntentPopup'
 import { supabase, getProductImageUrl, type ProductWithCategory, type ProductVariantGroup } from '../../lib/supabase'
 import { useProducts } from '../../hooks/useProducts'
 import { useCart } from '../../context/CartContext'
@@ -37,6 +40,7 @@ export function VariantProductDetail() {
   const [error, setError] = useState<string | null>(null)
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState<'description' | 'specs'>('description')
+  const [showAddedDrawer, setShowAddedDrawer] = useState(false)
   const { addItem } = useCart()
   const { toggle, has } = useWishlist()
 
@@ -117,15 +121,17 @@ export function VariantProductDetail() {
     .slice(0, 4)
 
   function handleAddToCart() {
-    if (!activeVariant || activeVariant.stock_status === 'out_of_stock') return
+    if (isOutOfStock || !activeVariant) return
     addItem({
       productId: activeVariant.id,
-      name: `${group?.name ?? activeVariant.name}${activeVariant.variant_label ? ` — ${activeVariant.variant_label}` : ''}`,
+      name: group!.name,
       price: activeVariant.retail_price,
       quantity: qty,
       image: activeVariant.thumbnail_url ?? '',
       orderType: 'retail',
     })
+    setShowAddedDrawer(true)
+    setQty(1)
   }
 
   function prevImage() {
@@ -520,9 +526,29 @@ export function VariantProductDetail() {
             </div>
           </section>
         )}
+
+        {/* ── Frequently Bought Together ────────────────────────────── */}
+        {activeVariant && (
+          <FrequentlyBoughtTogether 
+            currentProductId={activeVariant.id}
+            categorySlug={activeVariant.categories?.slug}
+          />
+        )}
       </div>
 
       <Footer />
+
+      {/* Upsell & Conversion Components */}
+      {activeVariant && (
+        <>
+          <AddedToCartDrawer 
+            productId={activeVariant.id}
+            isOpen={showAddedDrawer}
+            onClose={() => setShowAddedDrawer(false)}
+          />
+          <ExitIntentPopup />
+        </>
+      )}
     </div>
   )
 }
