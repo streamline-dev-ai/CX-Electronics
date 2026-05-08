@@ -154,7 +154,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                       <span
                         key={i}
                         className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                          i === hoverImg ? 'bg-[#E63939] w-3' : 'bg-[#0F172A]/30'
+                          i === hoverImg ? 'bg-[#E63939] w-3' : 'bg-[#000000]/30'
                         }`}
                       />
                     ))}
@@ -163,14 +163,14 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Zap className="w-12 h-12 text-[#0F172A]/20" />
+                <Zap className="w-12 h-12 text-[#000000]/20" />
               </div>
             )}
 
             {/* Badges */}
             <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
               {isOutOfStock && (
-                <span className="text-[10px] bg-[#0F172A] text-white px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
+                <span className="text-[10px] bg-[#000000] text-white px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider">
                   {t('outOfStock')}
                 </span>
               )}
@@ -180,7 +180,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                 </span>
               )}
                 {!isBulkView && product.is_bulk_available && product.bulk_price && (
-                <span className="text-[10px] bg-[#0F172A]/90 text-white px-2 py-0.5 rounded-md font-semibold">
+                <span className="text-[10px] bg-[#000000]/90 text-white px-2 py-0.5 rounded-md font-semibold">
                   Wholesale from R{product.bulk_price.toFixed(0)}
                 </span>
               )}
@@ -198,7 +198,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white border border-[#E5E7EB] rounded-full flex items-center justify-center transition-all hover:scale-110 shadow-sm ${inWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
               aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#E63939] text-[#E63939]' : 'text-[#0F172A]/40'}`} />
+              <Heart className={`w-4 h-4 ${inWishlist ? 'fill-[#E63939] text-[#E63939]' : 'text-[#000000]/40'}`} />
             </button>
 
             {savingsPct > 0 && (
@@ -211,18 +211,18 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
           {/* Info */}
           <div className="p-3 sm:p-4 flex flex-col flex-1 bg-white">
             {product.categories && (
-              <p className="text-[10px] sm:text-[11px] text-[#0F172A]/50 mb-1 truncate uppercase tracking-wider font-medium">
+              <p className="text-[10px] sm:text-[11px] text-[#000000]/50 mb-1 truncate uppercase tracking-wider font-medium">
                 {product.categories.name}
               </p>
             )}
-            <p className={`font-semibold text-[#0F172A] ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
+            <p className={`font-semibold text-[#000000] ${textSize} leading-snug line-clamp-2 mb-3 min-h-[2.5rem]`}>
               {name}
             </p>
 
             <div className="mt-auto flex items-end justify-between gap-2">
               <div className="leading-tight">
                 {isBulkView && product.retail_price > price && (
-                  <p className="text-xs text-[#0F172A]/40 line-through leading-none mb-0.5">
+                  <p className="text-xs text-[#000000]/40 line-through leading-none mb-0.5">
                     R{product.retail_price.toFixed(2)}
                   </p>
                 )}
@@ -230,7 +230,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                   R{price.toFixed(2)}
                 </p>
                 {isBulkView && (
-                  <p className="text-[10px] text-[#0F172A]/50 mt-1 font-medium">per unit</p>
+                  <p className="text-[10px] text-[#000000]/50 mt-1 font-medium">per unit</p>
                 )}
               </div>
 
@@ -239,7 +239,7 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
                 disabled={isOutOfStock}
                 className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all ${
                   isOutOfStock
-                    ? 'bg-[#F5F5F5] text-[#0F172A]/40 cursor-not-allowed'
+                    ? 'bg-[#F5F5F5] text-[#000000]/40 cursor-not-allowed'
                     : 'bg-[#E63939] hover:bg-[#C82020] text-white'
                 }`}
               >

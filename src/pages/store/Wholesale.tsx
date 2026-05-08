@@ -99,7 +99,7 @@ export function Wholesale() {
             <div className="inline-flex items-center gap-2 bg-[#E63939]/10 border border-[#E63939]/30 rounded-full px-4 py-1.5 text-xs text-[#E63939] font-bold mb-4 uppercase tracking-widest">
               Bulk Pricing
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] leading-tight mb-3 text-balance">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#000000] leading-tight mb-3 text-balance">
               Wholesale
             </h1>
             <p className="text-slate-600 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl text-pretty">
@@ -120,7 +120,7 @@ export function Wholesale() {
             <div className="sticky top-28 space-y-6">
               {/* Categories */}
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#0F172A] mb-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#000000] mb-4">
                   Categories
                 </h3>
                 <div className="space-y-2">
@@ -152,7 +152,7 @@ export function Wholesale() {
 
               {/* Price */}
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#0F172A] mb-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#000000] mb-4">
                   Price Range
                 </h3>
                 <div className="space-y-2">
@@ -160,7 +160,7 @@ export function Wholesale() {
                     onClick={() => { setPriceIdx(null); setPage(1) }}
                     className={`w-full text-left text-sm px-4 py-2.5 rounded-lg transition-colors ${
                       priceIdx === null
-                        ? 'bg-slate-200 text-[#0F172A] font-semibold'
+                        ? 'bg-slate-200 text-[#000000] font-semibold'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -172,7 +172,7 @@ export function Wholesale() {
                       onClick={() => { setPriceIdx(idx); setPage(1) }}
                       className={`w-full text-left text-sm px-4 py-2.5 rounded-lg transition-colors ${
                         priceIdx === idx
-                          ? 'bg-slate-200 text-[#0F172A] font-semibold'
+                          ? 'bg-slate-200 text-[#000000] font-semibold'
                           : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -200,7 +200,7 @@ export function Wholesale() {
               {/* Mobile filter button */}
               <button
                 onClick={() => setMobileFiltersOpen(true)}
-                className="lg:hidden flex items-center gap-2 text-sm font-medium text-[#0F172A] border border-slate-300 px-3 py-2 rounded-lg hover:bg-white"
+                className="lg:hidden flex items-center gap-2 text-sm font-medium text-[#000000] border border-slate-300 px-3 py-2 rounded-lg hover:bg-white"
               >
                 <Sliders className="w-4 h-4" />
                 Filters
@@ -213,14 +213,14 @@ export function Wholesale() {
 
               {/* Product count */}
               <p className="text-sm text-slate-600">
-                <span className="font-semibold text-[#0F172A]">{products.length}</span> products
+                <span className="font-semibold text-[#000000]">{products.length}</span> products
               </p>
 
               {/* Sort */}
               <select
                 value={sort}
                 onChange={(e) => { setSort(e.target.value as ProductSort); setPage(1) }}
-                className="text-sm border border-slate-300 rounded-lg px-3 py-2 font-medium text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#E63939]/30 bg-white hover:border-slate-400"
+                className="text-sm border border-slate-300 rounded-lg px-3 py-2 font-medium text-[#000000] focus:outline-none focus:ring-2 focus:ring-[#E63939]/30 bg-white hover:border-slate-400"
               >
                 <option value="featured">Best Selling</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -241,7 +241,7 @@ export function Wholesale() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search wholesale products..."
-                  className="w-full bg-white text-[#0F172A] placeholder:text-slate-400 pl-11 pr-4 py-3 rounded-l-lg border border-slate-300 border-r-0 focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent text-sm"
+                  className="w-full bg-white text-[#000000] placeholder:text-slate-400 pl-11 pr-4 py-3 rounded-l-lg border border-slate-300 border-r-0 focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent text-sm"
                 />
               </div>
               <button
@@ -312,7 +312,7 @@ export function Wholesale() {
                         )}
 
                         {/* Name */}
-                        <h3 className="font-semibold text-[#0F172A] text-sm mb-3 line-clamp-2 min-h-[2.5rem]">
+                        <h3 className="font-semibold text-[#000000] text-sm mb-3 line-clamp-2 min-h-[2.5rem]">
                           {product.name}
                         </h3>
 
@@ -331,7 +331,7 @@ export function Wholesale() {
 
                         {/* Quantity Input */}
                         <div className="mb-4">
-                          <label className="block text-xs font-medium text-[#0F172A] mb-2">
+                          <label className="block text-xs font-medium text-[#000000] mb-2">
                             Quantity
                           </label>
                           <input
@@ -339,7 +339,7 @@ export function Wholesale() {
                             min={MIN_WHOLESALE_QTY}
                             value={qty}
                             onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent"
+                            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium text-[#000000] focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent"
                           />
                         </div>
 
@@ -377,7 +377,7 @@ export function Wholesale() {
             <div className="mt-12 bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-[#0F172A] font-semibold text-base sm:text-lg mb-1">
+                  <h3 className="text-[#000000] font-semibold text-base sm:text-lg mb-1">
                     Need larger quantities or a product not listed?
                   </h3>
                   <p className="text-slate-600 text-sm">
@@ -414,7 +414,7 @@ export function Wholesale() {
             className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto"
           >
             <div className="sticky top-0 bg-white border-b border-slate-200 p-4 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-[#0F172A]">Filters</h3>
+              <h3 className="font-bold text-lg text-[#000000]">Filters</h3>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
                 className="p-1 rounded-lg hover:bg-slate-100"
@@ -426,7 +426,7 @@ export function Wholesale() {
             <div className="p-4 space-y-6">
               {/* Categories */}
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#0F172A] mb-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#000000] mb-3">
                   Categories
                 </h4>
                 <div className="space-y-2">
@@ -458,7 +458,7 @@ export function Wholesale() {
 
               {/* Price */}
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#0F172A] mb-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#000000] mb-3">
                   Price Range
                 </h4>
                 <div className="space-y-2">
@@ -466,7 +466,7 @@ export function Wholesale() {
                     onClick={() => { setPriceIdx(null); setPage(1); setMobileFiltersOpen(false) }}
                     className={`w-full text-left text-sm px-4 py-2.5 rounded-lg transition-colors ${
                       priceIdx === null
-                        ? 'bg-slate-200 text-[#0F172A] font-semibold'
+                        ? 'bg-slate-200 text-[#000000] font-semibold'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -478,7 +478,7 @@ export function Wholesale() {
                       onClick={() => { setPriceIdx(idx); setPage(1); setMobileFiltersOpen(false) }}
                       className={`w-full text-left text-sm px-4 py-2.5 rounded-lg transition-colors ${
                         priceIdx === idx
-                          ? 'bg-slate-200 text-[#0F172A] font-semibold'
+                          ? 'bg-slate-200 text-[#000000] font-semibold'
                           : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >

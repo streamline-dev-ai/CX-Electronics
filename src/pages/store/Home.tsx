@@ -2,14 +2,16 @@ import { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Wifi, Shield, Watch, Sun, Plug, Smartphone,
-  ArrowRight, ShoppingCart,
-  Truck, Tag, BadgeCheck, MapPin, Star, TrendingUp,
-  Phone, MessageCircle, Sparkles,
+  ArrowRight,
+  Truck, Tag, BadgeCheck, MapPin, TrendingUp,
+  Phone, MessageCircle, Sparkles, Loader2,
 } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { TopBanner, HeroSection, BenefitCards, RedCTASection } from '../../components/store/HeroSection'
+import { ProductCard } from '../../components/store/ProductCard'
+import { useProducts } from '../../hooks/useProducts'
 import SEO from '../../components/SEO'
 
 // ── Branded contact constants ─────────────────────────────────
@@ -29,17 +31,7 @@ const CATEGORIES = [
   { slug: 'accessories', label: 'Phone & Laptop Accessories', icon: Smartphone, desc: 'Cases, Stands, Adapters', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Phone_Laptop_Accessories_y5kvpa.jpg' },
 ]
 
-// ── Best Sellers — realistic SA electronics ─────────────────
-const BEST_SELLERS = [
-  { id: 'bs1', name: '4MP Dual-Lens IP CCTV Camera (PoE)',  price: 899,  bulk: 749,  image: '/products/cctv-camera-1.jpg',     tag: 'Best Seller', rating: 4.9, sold: '420+' },
-  { id: 'bs2', name: '8-Channel NVR Kit + 4 Cameras',        price: 4499, bulk: 3999, image: '/products/nvr-kit-1.jpg',         tag: '-12%',        rating: 4.8, sold: '180+' },
-  { id: 'bs3', name: '100W Solar LED Street Lamp (IP65)',    price: 699,  bulk: 549,  image: '/products/solar-light-1.jpg',     tag: 'Hot',         rating: 4.7, sold: '650+' },
-  { id: 'bs4', name: 'WiFi 6 AX3000 Dual-Band Router',       price: 1299,             image: '/products/ax3000-router-1.jpg',   tag: 'New',         rating: 4.7, sold: '95+' },
-  { id: 'bs5', name: '65W GaN USB-C PD Wall Charger',        price: 249,  bulk: 179,  image: '/products/65w-charger-1.jpg',                           rating: 4.8, sold: '910+' },
-  { id: 'bs6', name: '30,000mAh Power Bank with PD',         price: 599,  bulk: 449,  image: '/products/powerbank-30k-1.jpg',                         rating: 4.6, sold: '320+' },
-  { id: 'bs7', name: '1080p PTZ Indoor Dome Camera',         price: 1099, bulk: 899,  image: '/products/ptz-camera-1.jpg',      tag: '-18%',         rating: 4.7, sold: '210+' },
-  { id: 'bs8', name: 'AMOLED Smartwatch X1 (Health Track)',  price: 599,  bulk: 449,  image: '/products/smartwatch-x1-1.jpg',                         rating: 4.5, sold: '500+' },
-]
+
 
 // ── Trust badges ─────────────────────────────────────────────
 const TRUST = [
@@ -100,10 +92,10 @@ function FeaturedCategories() {
           <p className="text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-2">
             Browse By Category
           </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] text-balance tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#000000] text-balance tracking-tight">
             Featured Categories
           </h2>
-          <p className="text-[#0F172A]/70 mt-3 max-w-xl mx-auto text-pretty">
+          <p className="text-[#000000]/70 mt-3 max-w-xl mx-auto text-pretty">
             From CCTV to chargers — explore the categories driving our biggest sales.
           </p>
         </motion.div>
@@ -123,7 +115,7 @@ function FeaturedCategories() {
                 to={`/shop?category=${slug}`}
                 className="group block bg-white rounded-xl border border-[#E5E7EB] hover:border-[#E63939] hover:shadow-lg transition-all overflow-hidden h-full"
               >
-                <div className="aspect-[16/10] bg-[#0F172A] overflow-hidden relative">
+                <div className="aspect-[16/10] bg-[#000000] overflow-hidden relative">
                   <img
                     src={img || '/placeholder.svg'}
                     alt={label}
@@ -137,8 +129,8 @@ function FeaturedCategories() {
 
                 <div className="p-5 flex items-center justify-between bg-white">
                   <div>
-                    <h3 className="font-semibold text-[#0F172A] mb-0.5 text-base">{label}</h3>
-                    <p className="text-xs text-[#0F172A]/60">{desc}</p>
+                    <h3 className="font-semibold text-[#000000] mb-0.5 text-base">{label}</h3>
+                    <p className="text-xs text-[#000000]/60">{desc}</p>
                   </div>
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#E63939] group-hover:gap-2 transition-all">
                     Shop
@@ -167,7 +159,7 @@ function FeaturedCategories() {
           </Link>
             <Link
               to="/shop?view=categories"
-              className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#0F172A] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
+              className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#000000] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
             >
             View All Categories
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -231,7 +223,7 @@ function AnimatedStat({
 // ═══════════════════════════════════════════════════════════════
 function StatsBand() {
   return (
-    <section className="py-14 bg-[#0F172A] border-y border-white/5">
+    <section className="py-14 bg-[#000000] border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {STATS.map((s, i) => (
@@ -245,9 +237,14 @@ function StatsBand() {
 
 
 // ═══════════════════════════════════════════════════════════════
-// BEST SELLERS — dark theme product grid
+// BEST SELLERS — real products from database
 // ═══════════════════════════════════════════════════════════════
 function BestSellers() {
+  const { products, loading } = useProducts({
+    pageSize: 8,
+    sort: 'featured',
+  })
+
   return (
     <section className="py-16 sm:py-24 bg-[#FFFFFF]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -263,10 +260,10 @@ function BestSellers() {
               <TrendingUp className="w-3.5 h-3.5" />
               Top Picks
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#000000] tracking-tight">
               Best Sellers
             </h2>
-            <p className="text-[#0F172A]/70 mt-2 max-w-md text-sm">
+            <p className="text-[#000000]/70 mt-2 max-w-md text-sm">
               Real products. Real installer prices. Stocked in Crown Mines.
             </p>
           </div>
@@ -278,85 +275,30 @@ function BestSellers() {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {BEST_SELLERS.map((p, i) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ delay: (i % 4) * 0.06, duration: 0.5, ease: EASE }}
-              whileHover={{ y: -4 }}
-              className="group bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all overflow-hidden flex flex-col will-change-transform"
-            >
-              <div className="aspect-square bg-slate-50 relative overflow-hidden">
-                <img
-                  src={p.image || '/placeholder.svg'}
-                  alt={p.name}
-                  className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
-                {p.tag && (
-                  <span className="absolute top-3 left-3 bg-[#E63939] text-white text-[10px] font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">
-                    {p.tag}
-                  </span>
-                )}
-                {p.bulk && (
-                  <span className="absolute top-3 right-3 bg-[#0F172A]/90 text-white text-[10px] font-semibold px-2 py-1 rounded-md backdrop-blur-sm">
-                    Wholesale R{p.bulk}
-                  </span>
-                )}
-
-                {/* Hover quick-add overlay */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <button
-                    type="button"
-                    className="w-full bg-white text-[#E63939] text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 hover:bg-[#E63939] hover:text-white transition-colors"
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    Quick Add
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 flex flex-col flex-1 bg-white">
-                {/* Rating */}
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="w-3.5 h-3.5 fill-[#FFB400] text-[#FFB400]" />
-                  <span className="text-xs font-semibold text-[#0F172A]">{p.rating}</span>
-                  <span className="text-xs text-[#0F172A]/60">({p.sold} sold)</span>
-                </div>
-
-                <h3 className="font-semibold text-sm text-[#0F172A] mb-3 line-clamp-2 min-h-[2.5rem]">
-                  {p.name}
-                </h3>
-
-                <div className="mt-auto flex items-end justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] text-[#0F172A]/60 uppercase tracking-wider leading-none">
-                      Retail
-                    </p>
-                    <p className="text-xl font-bold text-[#E63939] leading-tight">
-                      R{p.price.toLocaleString()}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 bg-[#E63939] hover:bg-[#C82020] text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
-                    aria-label={`Add ${p.name} to cart`}
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Add</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#E63939]" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            {products.map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: (i % 4) * 0.06, duration: 0.5, ease: EASE }}
+              >
+                <ProductCard product={product} basePath="/shop" />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-12 text-center">
           <Link
             to="/shop"
-            className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#0F172A] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
+            className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#000000] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
           >
             View All Products
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -372,7 +314,7 @@ function BestSellers() {
 // ═══════════════════════════════════════════════════════════════
 function LocationSection() {
   return (
-    <section className="py-16 sm:py-24 bg-[#0F172A]">
+    <section className="py-16 sm:py-24 bg-[#000000]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -415,7 +357,7 @@ function LocationSection() {
           </div>
 
           {/* Address card */}
-          <div className="bg-[#0F172A] text-white rounded-xl border border-[#E5E7EB] p-7 flex flex-col">
+          <div className="bg-[#000000] text-white rounded-xl border border-[#E5E7EB] p-7 flex flex-col">
             <div className="w-12 h-12 bg-[#E63939]/10 rounded-lg flex items-center justify-center mb-5 border border-[#E63939]/20">
               <MapPin className="w-6 h-6 text-[#E63939]" />
             </div>
@@ -484,7 +426,7 @@ function LocationSection() {
 // ═══════════════════════════════════════════════════════════════
 function WhyChooseCW() {
   return (
-    <section className="py-20 bg-[#0F172A] relative overflow-hidden">
+    <section className="py-20 bg-[#000000] relative overflow-hidden">
       {/* Subtle glow */}
       <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#E63939]/5 rounded-full blur-[120px] pointer-events-none" />
 

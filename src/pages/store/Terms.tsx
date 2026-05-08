@@ -58,7 +58,7 @@ function Note({ children }: { children: React.ReactNode }) {
 
 export function Terms() {
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <div className="min-h-screen bg-[#000000]">
       <SEO
         title="Terms & Returns Policy | CW Electronics"
         description="Our terms of service, payment options, 7-day return policy, wholesale terms, and POPIA privacy compliance. CW Electronics, Johannesburg."

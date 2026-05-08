@@ -75,7 +75,7 @@ export function HeroSection() {
   const slide = HERO_SLIDES[currentSlide]
 
   return (
-    <section className="relative bg-[#0F172A] overflow-hidden">
+    <section className="relative bg-[#000000] overflow-hidden">
       {/* Background images with smooth transitions */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
@@ -90,8 +90,8 @@ export function HeroSection() {
             className="w-full h-full object-cover"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/85 to-[#0F172A]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-[#0F172A]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#000000] via-[#000000]/85 to-[#000000]/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-[#000000]/40" />
       </div>
 
       {/* Subtle grid pattern */}
@@ -237,7 +237,7 @@ const BENEFITS = [
 
 export function BenefitCards() {
   return (
-    <section className="bg-[#0F172A] border-t border-slate-700/50">
+    <section className="bg-[#000000] border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {BENEFITS.map(({ icon: Icon, title, description }, index) => (
@@ -247,7 +247,7 @@ export function BenefitCards() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="group bg-slate-800/50 border border-slate-700 hover:border-slate-600 rounded-xl p-5 sm:p-6 transition-all duration-300"
+              className="group bg-white/5 border border-white/10 hover:border-white/20 rounded-xl p-5 sm:p-6 transition-all duration-300"
             >
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#E63939]/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-[#E63939]/20 transition-colors">
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E63939]" />
@@ -255,7 +255,7 @@ export function BenefitCards() {
               <h3 className="text-white font-semibold text-sm sm:text-base mb-1">
                 {title}
               </h3>
-              <p className="text-slate-400 text-xs sm:text-sm">
+              <p className="text-white/60 text-xs sm:text-sm">
                 {description}
               </p>
             </motion.div>
@@ -295,7 +295,7 @@ export function RedCTASection() {
             </Link>
             <Link
               to="/wholesale"
-              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0F172A] hover:bg-slate-900 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#000000]/80 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
             >
               Browse Wholesale Deals
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

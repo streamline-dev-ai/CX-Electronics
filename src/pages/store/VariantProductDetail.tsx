@@ -154,7 +154,7 @@ export function VariantProductDetail() {
     activeVariant.categories && { label: 'Category', value: activeVariant.categories.name },
     activeVariant.variant_label && { label: 'Variant', value: activeVariant.variant_label },
     { label: 'Stock', value: activeVariant.stock_status === 'in_stock' ? 'Available' : activeVariant.stock_status === 'on_order' ? 'On Order' : 'Out of Stock' },
-    { label: 'Warranty', value: '12 Months' },
+    { label: 'Quality', value: 'Tested & Verified' },
     { label: 'Shipping', value: 'Same-day in Gauteng · 2-4 days nationwide' },
   ].filter(Boolean) as { label: string; value: string }[]
 
@@ -187,7 +187,7 @@ export function VariantProductDetail() {
           transition={{ duration: 0.4 }}
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
         >
-          {/* ── Gallery ──────────────────────────────────────── */}
+          {/* ── Gallery ────────────────��─────────────────────── */}
           <div className="lg:col-span-7">
             <div className="grid grid-cols-12 gap-3">
               {/* Thumbnails */}
@@ -391,7 +391,7 @@ export function VariantProductDetail() {
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-gray-200">
               {[
                 { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide SA' },
-                { icon: Shield, label: '12-Month Warranty', sub: 'On all products' },
+                { icon: Shield, label: 'Quality Tested', sub: 'Verified products' },
                 { icon: RotateCcw, label: 'Easy Returns', sub: '7-day policy' },
                 { icon: BadgeCheck, label: 'Quality Tested', sub: 'Direct importer' },
               ].map(({ icon: Icon, label, sub }) => (
