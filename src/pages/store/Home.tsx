@@ -63,7 +63,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 // ─────────────────────────────────────────────────────────────
 export function Home() {
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <div className="min-h-screen bg-[#FFFFFF]">
       <SEO
         title="CW Electronics — Wholesale & Retail Electronics | Crown Mines JHB"
         description="Direct importer of chargers, CCTV, solar, routers, smartwatches & accessories in Johannesburg. Trade pricing for resellers. Free Gauteng delivery over R2,000."
@@ -100,10 +100,10 @@ function FeaturedCategories() {
           <p className="text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-2">
             Browse By Category
           </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 text-balance tracking-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] text-balance tracking-tight">
             Featured Categories
           </h2>
-          <p className="text-slate-600 mt-3 max-w-xl mx-auto text-pretty">
+          <p className="text-[#0F172A]/70 mt-3 max-w-xl mx-auto text-pretty">
             From CCTV to chargers — explore the categories driving our biggest sales.
           </p>
         </motion.div>
@@ -137,8 +137,8 @@ function FeaturedCategories() {
 
                 <div className="p-5 flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-white mb-0.5 text-base">{label}</h3>
-                    <p className="text-xs text-slate-400">{desc}</p>
+                    <h3 className="font-semibold text-[#0F172A] mb-0.5 text-base">{label}</h3>
+                    <p className="text-xs text-[#0F172A]/60">{desc}</p>
                   </div>
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#E63939] group-hover:gap-2 transition-all">
                     Shop
@@ -165,10 +165,10 @@ function FeaturedCategories() {
             Shop All Products
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
-          <Link
-            to="/shop?view=categories"
-            className="group inline-flex items-center gap-2 border-2 border-slate-300 text-slate-900 hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
-          >
+            <Link
+              to="/shop?view=categories"
+              className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#0F172A] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
+            >
             View All Categories
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -219,7 +219,7 @@ function AnimatedStat({
         </span>
         <span className="text-[#E63939]">{stat.suffix}</span>
       </p>
-      <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold mt-2">
+      <p className="text-xs text-[#FFFFFF]/70 uppercase tracking-widest font-semibold mt-2">
         {stat.label}
       </p>
     </motion.div>
@@ -263,10 +263,10 @@ function BestSellers() {
               <TrendingUp className="w-3.5 h-3.5" />
               Top Picks
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0F172A] tracking-tight">
               Best Sellers
             </h2>
-            <p className="text-slate-600 mt-2 max-w-md text-sm">
+            <p className="text-[#0F172A]/70 mt-2 max-w-md text-sm">
               Real products. Real installer prices. Stocked in Crown Mines.
             </p>
           </div>
@@ -301,7 +301,7 @@ function BestSellers() {
                   </span>
                 )}
                 {p.bulk && (
-                  <span className="absolute top-3 right-3 bg-slate-900/90 text-white text-[10px] font-semibold px-2 py-1 rounded-md backdrop-blur-sm">
+                  <span className="absolute top-3 right-3 bg-[#0F172A]/90 text-white text-[10px] font-semibold px-2 py-1 rounded-md backdrop-blur-sm">
                     Wholesale R{p.bulk}
                   </span>
                 )}
@@ -322,17 +322,17 @@ function BestSellers() {
                 {/* Rating */}
                 <div className="flex items-center gap-1 mb-2">
                   <Star className="w-3.5 h-3.5 fill-[#FFB400] text-[#FFB400]" />
-                  <span className="text-xs font-semibold text-slate-900">{p.rating}</span>
-                  <span className="text-xs text-slate-500">({p.sold} sold)</span>
+                  <span className="text-xs font-semibold text-[#0F172A]">{p.rating}</span>
+                  <span className="text-xs text-[#0F172A]/60">({p.sold} sold)</span>
                 </div>
 
-                <h3 className="font-semibold text-sm text-slate-900 mb-3 line-clamp-2 min-h-[2.5rem]">
+                <h3 className="font-semibold text-sm text-[#0F172A] mb-3 line-clamp-2 min-h-[2.5rem]">
                   {p.name}
                 </h3>
 
                 <div className="mt-auto flex items-end justify-between gap-2">
                   <div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider leading-none">
+                    <p className="text-[10px] text-[#0F172A]/60 uppercase tracking-wider leading-none">
                       Retail
                     </p>
                     <p className="text-xl font-bold text-[#E63939] leading-tight">
@@ -356,7 +356,7 @@ function BestSellers() {
         <div className="mt-12 text-center">
           <Link
             to="/shop"
-            className="group inline-flex items-center gap-2 border-2 border-slate-300 text-slate-900 hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
+            className="group inline-flex items-center gap-2 border-2 border-[#E5E7EB] text-[#0F172A] hover:border-[#E63939] hover:text-[#E63939] font-semibold px-8 py-3.5 rounded-lg transition-all text-sm"
           >
             View All Products
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -387,7 +387,7 @@ function LocationSection() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-balance tracking-tight">
             Find Us at China Mart
           </h2>
-          <p className="text-neutral-400 mt-3 text-pretty leading-relaxed">
+          <p className="text-[#FFFFFF]/70 mt-3 text-pretty leading-relaxed">
             Come see our full range in person. We&apos;re at China Mart, Crown Mines —
             ready to help installers, retailers, and walk-in customers.
           </p>
@@ -401,7 +401,7 @@ function LocationSection() {
           className="grid lg:grid-cols-3 gap-5"
         >
           {/* Map */}
-          <div className="lg:col-span-2 rounded-xl overflow-hidden border border-neutral-800 bg-neutral-900 aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
+          <div className="lg:col-span-2 rounded-xl overflow-hidden border border-[#E5E7EB] bg-[#F5F5F5] aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
             <iframe
               title="CW Electronics Location — China Mart, Crown Mines, Johannesburg"
               src={MAP_EMBED}
@@ -415,26 +415,26 @@ function LocationSection() {
           </div>
 
           {/* Address card */}
-          <div className="bg-neutral-900 text-white rounded-xl border border-neutral-800 p-7 flex flex-col">
+          <div className="bg-[#0F172A] text-white rounded-xl border border-[#E5E7EB] p-7 flex flex-col">
             <div className="w-12 h-12 bg-[#E63939]/10 rounded-lg flex items-center justify-center mb-5 border border-[#E63939]/20">
               <MapPin className="w-6 h-6 text-[#E63939]" />
             </div>
             <h3 className="text-xl font-bold mb-2">Our Showroom</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed mb-1">
+            <p className="text-[#FFFFFF]/70 text-sm leading-relaxed mb-1">
               China Mart, Shop C15
             </p>
-            <p className="text-neutral-400 text-sm leading-relaxed mb-1">
+            <p className="text-[#FFFFFF]/70 text-sm leading-relaxed mb-1">
               3 Press Avenue
             </p>
-            <p className="text-neutral-400 text-sm leading-relaxed mb-5">
+            <p className="text-[#FFFFFF]/70 text-sm leading-relaxed mb-5">
               Crown Mines, Johannesburg, 2092
             </p>
 
-            <div className="space-y-3 text-sm border-t border-neutral-800 pt-5 mb-6">
+            <div className="space-y-3 text-sm border-t border-[#E5E7EB] pt-5 mb-6">
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
-                  <div className="text-slate-400 text-xs">Call</div>
+                  <div className="text-[#FFFFFF]/60 text-xs">Call</div>
                   <a href="tel:+27000000000" className="font-semibold text-white hover:text-[#E63939] transition-colors">
                     +27 00 000 0000
                   </a>
@@ -443,21 +443,21 @@ function LocationSection() {
               <div className="flex items-start gap-3">
                 <MessageCircle className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
-                  <div className="text-neutral-500 text-xs">WhatsApp</div>
+                  <div className="text-[#FFFFFF]/60 text-xs">WhatsApp</div>
                   <a
                     href={`https://wa.me/${WHATSAPP_NUMBER}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-semibold hover:text-[#DC2626] transition-colors"
+                    className="font-semibold hover:text-[#E63939] transition-colors"
                   >
                     Chat with us
                   </a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Sparkles className="w-4 h-4 mt-0.5 text-[#DC2626] flex-shrink-0" />
+                <Sparkles className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
-                  <div className="text-neutral-500 text-xs">Trading Hours</div>
+                  <div className="text-[#FFFFFF]/60 text-xs">Trading Hours</div>
                   <div className="font-semibold">Mon–Sat: 09:00 – 17:00</div>
                 </div>
               </div>
@@ -467,7 +467,7 @@ function LocationSection() {
               href={DIRECTIONS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto inline-flex items-center justify-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold px-5 py-3 rounded-lg transition-colors text-sm"
+              className="mt-auto inline-flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-3 rounded-lg transition-colors text-sm"
             >
               <MapPin className="w-4 h-4" />
               Get Directions
@@ -484,9 +484,9 @@ function LocationSection() {
 // ═══════════════════════════════════════════════════════════════
 function WhyChooseCW() {
   return (
-    <section className="py-20 bg-[#1E293B] relative overflow-hidden">
+    <section className="py-20 bg-[#0F172A] relative overflow-hidden">
       {/* Subtle glow */}
-      <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#DC2626]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-[#E63939]/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">

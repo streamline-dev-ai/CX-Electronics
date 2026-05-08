@@ -123,10 +123,10 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
       whileHover={{ y: -3 }}
     >
       <Link to={`${basePath}/${product.slug}`} className="group block h-full">
-        <div className="relative bg-slate-800 rounded-xl border border-slate-700 hover:border-slate-600 transition-all duration-300 overflow-hidden h-full flex flex-col">
+        <div className="relative bg-[#FFFFFF] rounded-xl border border-[#E5E7EB] hover:border-[#E63939] hover:shadow-md transition-all duration-300 overflow-hidden h-full flex flex-col">
           {/* Image */}
           <div
-            className="relative aspect-square bg-slate-700 overflow-hidden"
+            className="relative aspect-square bg-[#F5F5F5] overflow-hidden"
             onMouseEnter={startCycling}
             onMouseLeave={stopCycling}
           >

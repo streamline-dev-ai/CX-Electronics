@@ -146,8 +146,8 @@ export function Shop() {
               onClick={() => setCategory('')}
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 !categorySlug
-                  ? 'bg-[#DC2626] text-white font-semibold'
-                  : 'text-neutral-300 hover:bg-neutral-800'
+                  ? 'bg-[#E63939] text-white font-semibold'
+                  : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
               }`}
             >
               All Products
