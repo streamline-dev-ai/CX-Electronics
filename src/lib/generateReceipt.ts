@@ -1,6 +1,6 @@
 import type { OrderWithDetails } from './supabase'
 
-const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
+const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png'
 
 // Opens the printable invoice page in a new tab — the browser's Print → Save as PDF
 // gives the customer a clean A4 receipt without any extra PDF library.
@@ -69,9 +69,10 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
       <td style="vertical-align:top;text-align:right;">
         <img
           src="${LOGO_URL}"
-          alt="CXX Electronics"
-          style="height:48px;object-fit:contain;"
+          alt="CX Electronics"
+          style="height:48px;object-fit:contain;display:block;margin-left:auto;"
         />
+        <p style="margin:4px 0 0;font-size:11px;font-weight:700;color:#111827;text-align:right;letter-spacing:0.3px;">CX Electronics</p>
       </td>
     </tr>
   </table>
@@ -155,14 +156,13 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
     <tr>
       <td style="vertical-align:bottom;">
         <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          CXX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
-          info@cw-electronics.co.za · VAT Reg No: Pending registration
+          CX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+          info@cw-electronics.co.za
         </p>
       </td>
       <td style="vertical-align:bottom;text-align:right;">
         <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          Thank you for your purchase.<br />
-          12-month warranty on all products.
+          Thank you for your purchase.
         </p>
       </td>
     </tr>

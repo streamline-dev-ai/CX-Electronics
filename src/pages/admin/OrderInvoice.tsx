@@ -5,7 +5,7 @@ import { getOrder } from '../../hooks/useOrders'
 import type { OrderWithDetails } from '../../lib/supabase'
 
 const VAT_RATE = 0.15
-const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
+const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png'
 
 export function AdminOrderInvoice() {
   const { id } = useParams<{ id: string }>()
@@ -83,7 +83,10 @@ export function AdminOrderInvoice() {
             <p className="text-sm text-gray-500 mt-2">Receipt #: {order.order_number}</p>
             <p className="text-sm text-gray-500 mt-0.5">Date: {date}</p>
           </div>
-          <img src={LOGO_URL} alt="CXX Electronics" className="h-12 object-contain" />
+          <div className="text-right">
+            <img src={LOGO_URL} alt="CX Electronics" className="h-12 object-contain ml-auto block" />
+            <p className="text-xs font-bold text-gray-900 mt-1 tracking-wide">CX Electronics</p>
+          </div>
         </div>
 
         <hr className="border-gray-200 my-7" />
@@ -169,12 +172,11 @@ export function AdminOrderInvoice() {
         {/* Footer */}
         <div className="border-t border-gray-100 mt-10 pt-5 flex items-start justify-between">
           <p className="text-xs text-gray-400 leading-relaxed">
-            CXX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
-            info@cw-electronics.co.za · VAT Reg No: Pending registration
+            CX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+            info@cw-electronics.co.za
           </p>
           <p className="text-xs text-gray-400 text-right leading-relaxed">
-            Thank you for your purchase.<br />
-            12-month warranty on all products.
+            Thank you for your purchase.
           </p>
         </div>
 
