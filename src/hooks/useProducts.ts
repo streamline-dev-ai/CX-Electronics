@@ -57,7 +57,7 @@ export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
       let query = supabase
         .from('products')
         .select(
-          'id, name, name_zh, slug, description, description_zh, category_id, retail_price, bulk_price, bulk_min_qty, is_bulk_available, images, thumbnail_url, active, featured, stock_status, created_at, updated_at, categories!inner(id, name, name_zh, slug)',
+          'id, name, name_zh, slug, description, description_zh, category_id, retail_price, bulk_price, bulk_min_qty, is_bulk_available, images, thumbnail_url, active, featured, stock_status, variant_group_id, variant_label, product_variant_groups(id, name, slug), created_at, updated_at, categories!inner(id, name, name_zh, slug)',
           { count: 'exact' },
         )
         .eq('active', true)
@@ -108,9 +108,21 @@ export function useProducts(opts: UseProductsOptions = {}): UseProductsResult {
         ...p,
         thumbnail_url: p.thumbnail_url ? getProductImageUrl(p.thumbnail_url, 400) : null,
         categories: Array.isArray(p.categories) ? p.categories[0] ?? null : p.categories,
+        product_variant_groups: Array.isArray(p.product_variant_groups)
+          ? p.product_variant_groups[0] ?? null
+          : p.product_variant_groups ?? null,
       })) as ProductWithCategory[]
 
-      setProducts(resolved)
+      // Deduplicate: show only the first product per variant group
+      const seenGroups = new Set<string>()
+      const deduped = resolved.filter((p) => {
+        if (!p.variant_group_id) return true
+        if (seenGroups.has(p.variant_group_id)) return false
+        seenGroups.add(p.variant_group_id)
+        return true
+      })
+
+      setProducts(deduped)
       setTotalCount(count ?? 0)
       setError(null)
       setLoading(false)

@@ -9,6 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { ProductCard } from '../../components/store/ProductCard'
+import { ProductCardLight } from '../../components/store/ProductCardLight'
+import { ProductSpecifications } from '../../components/store/ProductSpecifications'
+import { FrequentlyBoughtTogether } from '../../components/store/FrequentlyBoughtTogether'
 import SEO from '../../components/SEO'
 import { useProduct } from '../../hooks/useProduct'
 import { useProducts } from '../../hooks/useProducts'
@@ -94,29 +97,72 @@ export function ProductDetail() {
 
   function handleAddToCart() {
     if (isOutOfStock) return
+    const useWholesale = product!.is_bulk_available && product!.bulk_price && qty >= (product!.bulk_min_qty ?? Infinity)
+    const activePrice = useWholesale ? product!.bulk_price! : product!.retail_price
     addItem({
       productId: product!.id,
       name: product!.name,
-      price: product!.retail_price,
+      price: activePrice,
       quantity: qty,
       image: product!.thumbnail_url ?? '',
-      orderType: 'retail',
+      orderType: useWholesale ? 'bulk' : 'retail',
+      categorySlug: product!.categories?.slug,
     })
   }
 
   const waMessage = `Bulk enquiry: ${product.name}${product.bulk_min_qty ? ` (min. ${product.bulk_min_qty} units)` : ''}. Bulk price: R${product.bulk_price?.toFixed(2) ?? 'TBD'}.`
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`
 
-  // Build specs (use available + sensible defaults so the table never looks empty)
-  const specs = [
+  // Build fallback specs for products that don't yet have specifications JSONB
+  const fallbackSpecs = [
     product.categories && { label: 'Category', value: product.categories.name },
     { label: 'SKU', value: product.slug.toUpperCase().slice(0, 12) },
     { label: 'Stock', value: product.stock_status === 'in_stock' ? 'Available' : product.stock_status === 'on_order' ? 'On Order' : 'Out of Stock' },
-    product.is_bulk_available && { label: 'Bulk Available', value: 'Yes' },
-    product.bulk_min_qty && { label: 'Min Bulk Qty', value: `${product.bulk_min_qty} units` },
+    product.is_bulk_available && { label: 'Wholesale Available', value: 'Yes' },
+    product.bulk_min_qty && { label: 'Min Wholesale Qty', value: `${product.bulk_min_qty} units` },
     { label: 'Warranty', value: '12 Months' },
     { label: 'Shipping', value: 'Same-day in Gauteng · 2-4 days nationwide' },
   ].filter(Boolean) as { label: string; value: string }[]
+
+  // Render description text with paragraph + bullet-point support
+  function renderDescription(text: string) {
+    const blocks = text.split(/\n\n+/)
+    return (
+      <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+        {blocks.map((block, i) => {
+          const lines = block.split('\n').filter(Boolean)
+          const hasLabel = lines[0]?.startsWith('**') && lines[0]?.endsWith('**')
+          const hasBullets = lines.some((l) => l.trim().startsWith('•'))
+
+          if (hasBullets || hasLabel) {
+            return (
+              <div key={i} className="space-y-1.5">
+                {lines.map((line, j) => {
+                  if (line.startsWith('**') && line.endsWith('**')) {
+                    return (
+                      <p key={j} className="font-bold text-gray-800 text-xs uppercase tracking-widest mt-3 mb-1">
+                        {line.replace(/\*\*/g, '')}
+                      </p>
+                    )
+                  }
+                  if (line.trim().startsWith('•')) {
+                    return (
+                      <div key={j} className="flex gap-2.5 items-start pl-1">
+                        <span className="text-[#E63939] font-bold mt-px flex-shrink-0 text-base leading-none">·</span>
+                        <span>{line.replace(/^[\s•]+/, '')}</span>
+                      </div>
+                    )
+                  }
+                  return line.trim() ? <p key={j}>{line}</p> : null
+                })}
+              </div>
+            )
+          }
+          return <p key={i}>{block}</p>
+        })}
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -264,7 +310,7 @@ export function ProductDetail() {
                     </span>
                   )}
                   <p className="text-[11px] uppercase tracking-widest text-white/80 font-bold mb-1">
-                    Bulk ({product.bulk_min_qty}+)
+                    Wholesale ({product.bulk_min_qty}+ units)
                   </p>
                   <p className="text-2xl sm:text-3xl font-extrabold leading-none">
                     R{product.bulk_price.toFixed(2)}
@@ -273,11 +319,38 @@ export function ProductDetail() {
                 </div>
               ) : (
                 <div className="bg-gray-100 rounded-2xl p-4">
-                  <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-1">Bulk</p>
+                  <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-1">Wholesale</p>
                   <p className="text-base font-bold text-gray-700 leading-tight">Contact for quote</p>
                 </div>
               )}
             </div>
+
+            {/* Wholesale progress bar */}
+            {product.is_bulk_available && product.bulk_price && product.bulk_min_qty && (
+              <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
+                {qty >= product.bulk_min_qty ? (
+                  <p className="text-sm font-bold text-emerald-600">
+                    ✓ Wholesale price unlocked — save {bulkSavingsPct}%
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-gray-800 mb-2">
+                      Buy {product.bulk_min_qty}+ units to unlock wholesale price —{' '}
+                      <span className="text-[#E63939] font-bold">save {bulkSavingsPct}%</span>
+                    </p>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1.5">
+                      <div
+                        className="bg-[#E63939] h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min((qty / product.bulk_min_qty) * 100, 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Add {product.bulk_min_qty - qty} more unit{product.bulk_min_qty - qty !== 1 ? 's' : ''} for wholesale pricing
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
@@ -358,7 +431,11 @@ export function ProductDetail() {
                   className="flex-1 flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm sm:text-base"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  Add to Cart · R{(product.retail_price * qty).toFixed(2)}
+                  Add to Cart · R{(
+                    (product.is_bulk_available && product.bulk_price && qty >= (product.bulk_min_qty ?? Infinity)
+                      ? product.bulk_price
+                      : product.retail_price) * qty
+                  ).toFixed(2)}
                 </motion.button>
               </div>
             )}
@@ -391,7 +468,7 @@ export function ProductDetail() {
                 className="flex items-center justify-center gap-2 bg-[#111827] hover:bg-[#0a1018] text-white font-bold py-3 rounded-xl transition-all border border-[#111827] hover:border-[#E63939] text-sm sm:text-base mb-6"
               >
                 <MessageCircle className="w-5 h-5 text-[#25D366]" />
-                Add to Bulk Quote · WhatsApp
+                Wholesale Enquiry · WhatsApp
               </a>
             )}
 
@@ -399,9 +476,9 @@ export function ProductDetail() {
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-gray-200">
               {[
                 { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide SA' },
-                { icon: Shield, label: '12-Month Warranty', sub: 'On all products' },
+                { icon: Shield, label: 'Quality Tested', sub: 'Verified products' },
                 { icon: RotateCcw, label: 'Easy Returns', sub: '7-day policy' },
-                { icon: BadgeCheck, label: 'Quality Tested', sub: 'Direct importer' },
+                { icon: BadgeCheck, label: 'Direct Importer', sub: 'Best prices' },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex items-center gap-2.5">
                   <div className="w-9 h-9 bg-[#FEE9E9] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -417,7 +494,15 @@ export function ProductDetail() {
           </div>
         </motion.div>
 
-        {/* ── Tabs: Description + Specs ───────────────────── */}
+        <FrequentlyBoughtTogether
+          currentProductId={product.id}
+          categorySlug={product.categories?.slug}
+          currentProductName={product.name}
+          currentProductPrice={product.retail_price}
+          currentProductImage={product.thumbnail_url ?? ''}
+        />
+
+        {/* ── Tabs: Description + Specifications ─────────── */}
         <div className="mt-12 lg:mt-16 bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="border-b border-gray-100 flex">
             {([
@@ -444,24 +529,31 @@ export function ProductDetail() {
 
           <div className="p-6 sm:p-8">
             {tab === 'description' ? (
-              <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+              <div className="max-w-none">
                 {description ? (
-                  <p>{description}</p>
+                  renderDescription(description)
                 ) : (
-                  <p className="text-gray-400 italic">No description available for this product yet.</p>
+                  <p className="text-sm text-gray-400 italic">No description available for this product yet.</p>
                 )}
               </div>
             ) : (
-              <table className="w-full">
-                <tbody>
-                  {specs.map((row, i) => (
-                    <tr key={row.label} className={i % 2 === 0 ? 'bg-gray-50' : ''}>
-                      <td className="px-4 py-3 text-sm font-bold text-gray-900 w-1/3">{row.label}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{row.value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              /* Use rich accordion if specifications exist, otherwise fallback table */
+              product.specifications && product.specifications.length > 0 ? (
+                <div className="-mx-6 sm:-mx-8 -mb-6 sm:-mb-8">
+                  <ProductSpecifications sections={product.specifications} />
+                </div>
+              ) : (
+                <table className="w-full">
+                  <tbody>
+                    {fallbackSpecs.map((row, i) => (
+                      <tr key={row.label} className={i % 2 === 0 ? 'bg-gray-50' : ''}>
+                        <td className="px-4 py-3 text-sm font-bold text-gray-900 w-1/3">{row.label}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{row.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
             )}
           </div>
         </div>
@@ -487,7 +579,7 @@ export function ProductDetail() {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} basePath="/shop" />
+                <ProductCardLight key={p.id} product={p} basePath="/shop" />
               ))}
             </div>
           </section>

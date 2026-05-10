@@ -48,6 +48,16 @@ export interface Variant {
   options: string[]
 }
 
+export interface SpecItem {
+  label: string
+  value: string
+}
+
+export interface SpecSection {
+  title: string
+  items: SpecItem[]
+}
+
 export interface ProductVariantGroup {
   id: string
   name: string
@@ -75,6 +85,7 @@ export interface Product {
   variants: Variant[] | null
   variant_group_id: string | null
   variant_label: string | null
+  specifications: SpecSection[] | null
   created_at: string
   updated_at: string
 }

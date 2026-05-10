@@ -2,14 +2,16 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Zap, Wifi, Shield, Watch, Sun, Plug, Smartphone,
-  ArrowRight, ChevronLeft, ChevronRight, ShoppingCart,
-  Truck, Tag, BadgeCheck, MapPin, Star, TrendingUp,
+  ArrowRight, ChevronLeft, ChevronRight,
+  Clock, Tag, BadgeCheck, RotateCcw, MapPin, TrendingUp,
   Phone, MessageCircle, Sparkles,
 } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
+import { useProducts } from '../../hooks/useProducts'
+import { ProductCardLight } from '../../components/store/ProductCardLight'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27000000000'
@@ -60,24 +62,12 @@ const CATEGORIES = [
   { slug: 'accessories', label: 'Phone & Laptop Accessories', icon: Smartphone, desc: 'Cases, Stands, Adapters', img: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777483174/Phone_Laptop_Accessories_y5kvpa.jpg' },
 ]
 
-// ── Best Sellers — realistic SA electronics ─────────────────
-const BEST_SELLERS = [
-  { id: 'bs1', name: '4MP Dual-Lens IP CCTV Camera (PoE)',  price: 899,  bulk: 749,  image: '/products/cctv-camera-1.jpg',     tag: 'Best Seller', rating: 4.9, sold: '420+' },
-  { id: 'bs2', name: '8-Channel NVR Kit + 4 Cameras',        price: 4499, bulk: 3999, image: '/products/nvr-kit-1.jpg',         tag: '-12%',        rating: 4.8, sold: '180+' },
-  { id: 'bs3', name: '100W Solar LED Street Lamp (IP65)',    price: 699,  bulk: 549,  image: '/products/solar-light-1.jpg',     tag: 'Hot',         rating: 4.7, sold: '650+' },
-  { id: 'bs4', name: 'WiFi 6 AX3000 Dual-Band Router',       price: 1299,             image: '/products/ax3000-router-1.jpg',   tag: 'New',         rating: 4.7, sold: '95+' },
-  { id: 'bs5', name: '65W GaN USB-C PD Wall Charger',        price: 249,  bulk: 179,  image: '/products/65w-charger-1.jpg',                           rating: 4.8, sold: '910+' },
-  { id: 'bs6', name: '30,000mAh Power Bank with PD',         price: 599,  bulk: 449,  image: '/products/powerbank-30k-1.jpg',                         rating: 4.6, sold: '320+' },
-  { id: 'bs7', name: '1080p PTZ Indoor Dome Camera',         price: 1099, bulk: 899,  image: '/products/ptz-camera-1.jpg',      tag: '-18%',         rating: 4.7, sold: '210+' },
-  { id: 'bs8', name: 'AMOLED Smartwatch X1 (Health Track)',  price: 599,  bulk: 449,  image: '/products/smartwatch-x1-1.jpg',                         rating: 4.5, sold: '500+' },
-]
-
 // ── Trust badges ─────────────────────────────────────────────
 const TRUST = [
-  { icon: Truck,      title: 'Free JHB Delivery',  sub: 'On orders over R2,000' },
-  { icon: Tag,        title: 'Trade Pricing',      sub: 'Discounts from 10+ units' },
-  { icon: BadgeCheck, title: 'Quality Guaranteed', sub: 'Tested with warranty' },
-  { icon: MapPin,     title: 'Click & Collect',    sub: 'China Mart, Crown Mines' },
+  { icon: Clock,      title: 'Same-Day Collection', sub: 'China Mart, Crown Mines' },
+  { icon: Tag,        title: 'Trade Pricing',        sub: 'From 6+ units' },
+  { icon: BadgeCheck, title: 'Direct Importer',      sub: 'Best prices, no middlemen' },
+  { icon: RotateCcw,  title: '7-Day Return Policy',  sub: 'Photo required · customer pays return' },
 ]
 
 // ── Stats ────────────────────────────────────────────────────
@@ -484,9 +474,11 @@ function AnimatedStat({
 }
 
 // ═══════════════════════════════════════════════════════════════
-// BEST SELLERS — realistic SA electronics products
+// BEST SELLERS — real featured products from Supabase
 // ═══════════════════════════════════════════════════════════════
 function BestSellers() {
+  const { products, loading } = useProducts({ sort: 'featured', pageSize: 8 })
+
   return (
     <section className="py-16 sm:py-24 bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -518,78 +510,16 @@ function BestSellers() {
         </motion.div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {BEST_SELLERS.map((p, i) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ delay: (i % 4) * 0.06, duration: 0.5, ease: EASE }}
-              whileHover={{ y: -4 }}
-              className="group bg-white rounded-2xl border border-gray-100 hover:border-[#E63939]/40 hover:shadow-2xl hover:shadow-[#E63939]/10 transition-all overflow-hidden flex flex-col will-change-transform"
-            >
-              <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                <img
-                  src={p.image || '/placeholder.svg'}
-                  alt={p.name}
-                  className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700 ease-out"
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white animate-pulse rounded-2xl aspect-square"
                 />
-                {p.tag && (
-                  <span className="absolute top-3 left-3 bg-[#E63939] text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider shadow-md">
-                    {p.tag}
-                  </span>
-                )}
-                {p.bulk && (
-                  <span className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-md">
-                    Bulk R{p.bulk}
-                  </span>
-                )}
-
-                {/* Hover quick-add overlay */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <button
-                    type="button"
-                    className="w-full bg-white text-[#E63939] text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-1.5 hover:bg-[#E63939] hover:text-white transition-colors"
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    Quick Add
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-4 flex flex-col flex-1">
-                {/* Rating */}
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="w-3.5 h-3.5 fill-[#FFB400] text-[#FFB400]" />
-                  <span className="text-xs font-bold text-gray-700">{p.rating}</span>
-                  <span className="text-xs text-gray-400">({p.sold} sold)</span>
-                </div>
-
-                <h3 className="font-semibold text-sm text-gray-900 mb-3 line-clamp-2 min-h-[2.5rem]">
-                  {p.name}
-                </h3>
-
-                <div className="mt-auto flex items-end justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wider leading-none">
-                      Retail
-                    </p>
-                    <p className="text-xl font-extrabold text-[#E63939] leading-tight">
-                      R{p.price.toLocaleString()}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 bg-[#E63939] hover:bg-[#C82020] text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:shadow-lg hover:shadow-[#E63939]/30 hover:-translate-y-0.5"
-                    aria-label={`Add ${p.name} to cart`}
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Add</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              ))
+            : products.map((p) => (
+                <ProductCardLight key={p.id} product={p} basePath="/shop" />
+              ))}
         </div>
 
         <div className="mt-12 text-center">
@@ -829,29 +759,25 @@ function FinalCTA() {
         >
           <Sparkles className="w-10 h-10 text-white mx-auto mb-4" />
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 text-balance tracking-tight">
-            Ready to grow your security business?
+            Ready to get the best prices on electronics?
           </h2>
           <p className="text-white/85 text-lg max-w-2xl mx-auto mb-8 text-pretty">
-            Join hundreds of South African installers and retailers buying
-            smarter from CW Electronics. Get trade pricing today.
+            Direct importer • Wholesale &amp; retail • Stocked in Johannesburg • Fast delivery
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={WA_RESELLER}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 bg-white text-[#E63939] font-bold px-8 py-4 rounded-xl transition-all shadow-2xl shadow-black/20 text-sm hover:-translate-y-0.5"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Get Trade Pricing
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 bg-black hover:bg-black/85 text-white font-bold px-8 py-4 rounded-xl transition-all text-sm"
+              className="group inline-flex items-center gap-2 bg-white text-[#E63939] font-bold px-8 py-4 rounded-xl transition-all shadow-2xl shadow-black/20 text-sm hover:-translate-y-0.5"
             >
-              Browse Products
+              Shop Retail Now
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/deals"
+              className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold px-8 py-4 rounded-xl transition-all text-sm"
+            >
+              Browse Wholesale Deals
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

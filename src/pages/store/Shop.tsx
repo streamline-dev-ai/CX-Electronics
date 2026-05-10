@@ -8,6 +8,7 @@ import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
 import { ProductCard } from '../../components/store/ProductCard'
+import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useLang } from '../../context/LangContext'
@@ -41,6 +42,7 @@ export function Shop() {
   const [bulkOnly, setBulkOnly] = useState(false)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [gridCols, setGridCols] = useState<GridColumns>(4)
+  const [cardTheme, setCardTheme] = useState<'dark' | 'light'>('light')
 
   const { t } = useLang()
   const { categories } = useCategories()
@@ -365,6 +367,30 @@ export function Shop() {
               </p>
 
               <div className="flex items-center gap-2 sm:gap-3">
+                {/* Card theme toggle */}
+                <div className="hidden sm:flex items-center gap-0.5 border border-gray-200 rounded-lg p-1 bg-white">
+                  <button
+                    onClick={() => setCardTheme('dark')}
+                    className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
+                      cardTheme === 'dark'
+                        ? 'bg-[#0F172A] text-white'
+                        : 'text-gray-400 hover:text-gray-700'
+                    }`}
+                  >
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => setCardTheme('light')}
+                    className={`px-2.5 py-1 rounded text-xs font-bold transition-colors ${
+                      cardTheme === 'light'
+                        ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                        : 'text-gray-400 hover:text-gray-700'
+                    }`}
+                  >
+                    Light
+                  </button>
+                </div>
+
                 {/* Grid toggle - desktop only */}
                 <div className="hidden sm:flex items-center gap-1 border border-gray-200 rounded-lg p-1">
                   {([1, 2, 3, 4] as GridColumns[]).map((cols) => {
@@ -419,14 +445,24 @@ export function Shop() {
             </div>
 
             {/* Product grid */}
+            <div className={`rounded-2xl transition-colors duration-300 ${cardTheme === 'dark' ? 'bg-[#0F172A] p-4 -mx-2' : ''}`}>
             {loading ? (
               <div className={`grid ${gridClasses[gridCols]} gap-4`}>
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-[#1F2937] rounded-2xl animate-pulse border border-white/10" />
+                  <div
+                    key={i}
+                    className={`aspect-square rounded-2xl animate-pulse border ${
+                      cardTheme === 'dark'
+                        ? 'bg-[#1F2937] border-white/10'
+                        : 'bg-gray-100 border-gray-200'
+                    }`}
+                  />
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 px-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <div className={`flex flex-col items-center justify-center py-20 px-6 rounded-2xl border border-dashed ${
+                cardTheme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
+              }`}>
                 <div className="w-14 h-14 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center mb-3">
                   <Search className="w-6 h-6 text-gray-400" />
                 </div>
@@ -444,9 +480,13 @@ export function Shop() {
             ) : (
               <>
                 <div className={`grid ${gridClasses[gridCols]} gap-4`}>
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} basePath="/shop" columns={gridCols} />
-                  ))}
+                  {products.map((product) =>
+                    cardTheme === 'light' ? (
+                      <ProductCardLight key={product.id} product={product} basePath="/shop" columns={gridCols} />
+                    ) : (
+                      <ProductCard key={product.id} product={product} basePath="/shop" columns={gridCols} />
+                    )
+                  )}
                 </div>
 
                 {/* Pagination */}
@@ -506,6 +546,7 @@ export function Shop() {
                 )}
               </>
             )}
+            </div>
           </div>
         </div>
       </div>
