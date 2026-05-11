@@ -253,7 +253,7 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
               >
                 <ShoppingCart className="w-3.5 h-3.5 flex-shrink-0" />
                 <span>
-                  {isOutOfStock ? 'Out of Stock' : isBulkView ? 'Get Quote' : 'Add to Cart'}
+                  {isOutOfStock ? 'Out of Stock' : isBulkView ? `Add ${wholesaleMinQty}+` : 'Add to Cart'}
                 </span>
               </button>
             </div>

@@ -42,7 +42,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem: (item) => {
           const { categorySlug, ...cartItem } = item
           cartStore.addItem(cartItem)
-          setIsOpen(true)
           setLastAdded({
             name: item.name,
             price: item.price,

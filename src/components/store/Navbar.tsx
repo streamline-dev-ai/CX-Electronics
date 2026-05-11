@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
-  ShoppingCart, Menu, X, Zap, Search, Heart, User, ChevronDown,
-  Plug, Shield, Wifi, Watch, Sun, Smartphone,
+  ShoppingCart, Menu, X, Search, Heart, User, ChevronDown, MessageCircle,
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
+import { useCategories } from '../../hooks/useCategories'
 import { CartDrawer } from './CartDrawer'
+import { getCategoryIcon } from '../../lib/categoryIcons'
 
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
@@ -16,14 +17,8 @@ const navLinks = [
   { to: '/about', label: 'About' },
 ]
 
-const CATEGORIES = [
-  { slug: 'chargers',     label: 'Chargers & Cables',       icon: Plug },
-  { slug: 'cctv',        label: 'CCTV & Security',          icon: Shield },
-  { slug: 'routers',     label: 'Routers & Networking',     icon: Wifi },
-  { slug: 'smartwatches',label: 'Smartwatches',             icon: Watch },
-  { slug: 'solar',       label: 'Solar Lamps',              icon: Sun },
-  { slug: 'accessories', label: 'Phone Accessories',        icon: Smartphone },
-]
+const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi CW Electronics — I'd like to chat about a product.")}`
 
 // CW Electronics logo URL
 const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
@@ -31,11 +26,18 @@ const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/
 export function Navbar() {
   const { itemCount, openCart } = useCart()
   const { ids: wishlistIds } = useWishlist()
+  const { categories } = useCategories()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [catsOpen, setCatsOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const catsRef = useRef<HTMLDivElement>(null)
+
+  const navCategories = categories.map((c) => ({
+    slug: c.slug,
+    label: c.name,
+    icon: getCategoryIcon(c.slug),
+  }))
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -135,14 +137,16 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Get a Quote */}
-            <Link
-              to="/wholesale"
+            {/* Contact Us (WhatsApp) */}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden lg:inline-flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
             >
-              <Zap className="w-3.5 h-3.5 fill-white" />
-              Get a Quote
-            </Link>
+              <MessageCircle className="w-3.5 h-3.5" />
+              Contact Us
+            </a>
 
             {/* Mobile toggle */}
             <button
@@ -184,20 +188,24 @@ export function Navbar() {
               </button>
 
               {catsOpen && (
-                <div className="absolute left-0 top-full mt-1 w-72 bg-slate-800 rounded-xl border border-slate-700 p-2 z-50">
-                  {CATEGORIES.map(({ slug, label, icon: Icon }) => (
-                    <Link
-                      key={slug}
-                      to={`/shop?category=${slug}`}
-                      onClick={() => setCatsOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700 group transition-colors"
-                    >
-                      <div className="w-8 h-8 bg-slate-700 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors">
-                        <Icon className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
-                      </div>
-                      <span className="text-sm font-medium text-slate-200">{label}</span>
-                    </Link>
-                  ))}
+                <div className="absolute left-0 top-full mt-1 w-72 max-h-[70vh] overflow-y-auto bg-slate-800 rounded-xl border border-slate-700 p-2 z-50 shadow-2xl">
+                  {navCategories.length === 0 ? (
+                    <p className="px-3 py-2 text-sm text-slate-400">Loading categories…</p>
+                  ) : (
+                    navCategories.map(({ slug, label, icon: Icon }) => (
+                      <Link
+                        key={slug}
+                        to={`/shop?category=${slug}`}
+                        onClick={() => setCatsOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-700 group transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-slate-700 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors">
+                          <Icon className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
+                        </div>
+                        <span className="text-sm font-medium text-slate-200">{label}</span>
+                      </Link>
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -244,8 +252,8 @@ export function Navbar() {
             <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
               Categories
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              {CATEGORIES.map(({ slug, label, icon: Icon }) => (
+            <div className="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto">
+              {navCategories.map(({ slug, label, icon: Icon }) => (
                 <Link
                   key={slug}
                   to={`/shop?category=${slug}`}
@@ -253,19 +261,21 @@ export function Navbar() {
                   className="flex items-center gap-2 p-2.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200 hover:bg-slate-700 transition-colors"
                 >
                   <Icon className="w-4 h-4 text-[#E63939]" />
-                  {label}
+                  <span className="truncate">{label}</span>
                 </Link>
               ))}
             </div>
 
-            <Link
-              to="/wholesale"
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMobileOpen(false)}
               className="mt-4 flex items-center justify-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
             >
-              <Zap className="w-3.5 h-3.5 fill-white" />
-              Get a Quote
-            </Link>
+              <MessageCircle className="w-3.5 h-3.5" />
+              Contact Us on WhatsApp
+            </a>
           </div>
         )}
       </header>

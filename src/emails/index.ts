@@ -244,7 +244,7 @@ export function orderPackedCollection(order: OrderWithDetails): string {
         <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Collection Details</p>
         <p style="margin:0;font-size:15px;font-weight:700;color:#111827;">Dragon City Mall, Shop 14</p>
         <p style="margin:4px 0 0;font-size:14px;color:#374151;">Fordsburg, Johannesburg</p>
-        <p style="margin:4px 0 0;font-size:13px;color:#64748B;">Mon–Sat 09:00–18:00</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#64748B;">Mon–Sat 09:00–15:00</p>
         ${order.collection_name ? `<p style="margin:10px 0 0;font-size:13px;color:#64748B;">Collector: <strong>${order.collection_name}</strong></p>` : ''}
       </div>
       <div style="background:#FEF9C3;border:1px solid #FDE68A;padding:14px 20px;margin-bottom:24px;">

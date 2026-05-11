@@ -12,6 +12,7 @@ import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
 import { useProducts } from '../../hooks/useProducts'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
+import { CategoryGrid } from '../../components/store/CategoryGrid'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27000000000'
@@ -29,7 +30,7 @@ const HERO_SLIDES = [
     titleAccent: 'with CCTV & Security',
     sub: 'Direct importer pricing on 4MP cameras, NVR kits & access control. Trade discounts for installers and resellers.',
     primary: { label: 'Shop CCTV', href: '/shop?category=cctv' },
-    secondary: { label: 'Get Trade Pricing', href: '/bulk' },
+    secondary: { label: 'See Wholesale Rates', href: '/wholesale' },
   },
   {
     image: 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/n2kIN_lmgy9y.jpg',
@@ -94,6 +95,11 @@ export function Home() {
       <HeroCarousel />
       <TrustBar />
       <FeaturedCategories />
+      <CategoryGrid
+        eyebrow="Browse Everything"
+        heading="Shop by Category"
+        subtitle="Every product line we carry — find exactly what you need."
+      />
       <StatsBand />
       <BestSellers />
       <LocationSection />
@@ -627,7 +633,7 @@ function LocationSection() {
                 <Sparkles className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
                   <div className="text-white/60 text-xs">Trading Hours</div>
-                  <div className="font-semibold">Mon–Sat: 09:00 – 17:00</div>
+                  <div className="font-semibold">Mon–Sat: 09:00 – 15:00</div>
                 </div>
               </div>
             </div>
@@ -687,13 +693,15 @@ function WhyChooseCW() {
               prices — backed by quality testing and fast nationwide delivery.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link
-                to="/deals"
+              <a
+                href="https://wa.me/27000000000?text=Hi%20CW%20%E2%80%94%20I%27d%20like%20to%20chat%20about%20wholesale%20pricing."
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm hover:-translate-y-0.5"
               >
-                Get a Bulk Quote
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+                <MessageCircle className="w-4 h-4" />
+                Talk to Us on WhatsApp
+              </a>
               <a
                 href="tel:+27000000000"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-md"

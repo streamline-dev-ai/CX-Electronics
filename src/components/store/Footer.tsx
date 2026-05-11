@@ -100,25 +100,28 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#E63939]" />
-                <span>Mon-Sat: 09:00 - 17:00<br />Sun: Closed</span>
+                <span>Mon-Sat: 09:00 - 15:00<br />Sun: Closed</span>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter / Quote CTA */}
+          {/* Newsletter / Contact CTA */}
           <div>
             <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
-              Wholesale Inquiry
+              Can't Find Something?
             </h3>
             <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-              Looking for bulk pricing? Get a custom quote from our trade desk.
+              Want a product you don't see here? Send us a message and we'll source it for you.
             </p>
-            <Link
-              to="/bulk"
+            <a
+              href="https://wa.me/27000000000?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27m%20looking%20for%20a%20product%20I%20don%27t%20see%20on%20your%20site."
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm w-full"
             >
-              Request a Quote
-            </Link>
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp Us
+            </a>
 
             <div className="mt-6">
               <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-2">

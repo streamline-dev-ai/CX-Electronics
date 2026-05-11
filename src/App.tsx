@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/admin/ProtectedRoute'
 import { ScrollToTop } from './components/ScrollToTop'
 import { AddToCartDrawer } from './components/store/AddToCartDrawer'
 import { ExitIntentPopup } from './components/store/ExitIntentPopup'
+import { CartFAB } from './components/store/CartFAB'
 import { PWAPrompt } from './components/PWAPrompt'
 
 // Customer account — lazy loaded
@@ -68,6 +69,7 @@ export default function App() {
           <ScrollToTop />
           <AddToCartDrawer />
           <ExitIntentPopup />
+          <CartFAB />
           <PWAPrompt />
           <Routes>
             {/* ── Public store ─────────────────────────────────── */}

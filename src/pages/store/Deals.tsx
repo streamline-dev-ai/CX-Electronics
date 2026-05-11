@@ -202,7 +202,7 @@ function Hero() {
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-sm"
             >
               <MessageCircle className="w-4 h-4" />
-              WhatsApp a Quote
+              Want Custom Pricing? Message Us
             </a>
           </div>
 
@@ -310,7 +310,7 @@ function FeaturedOffers() {
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-all text-sm group-hover:shadow-lg group-hover:shadow-[#E63939]/30"
                   >
-                    Request Bulk Quote
+                    Message Us for Bulk Pricing
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </a>
                 </div>
@@ -534,7 +534,7 @@ function FinalCTA() {
               className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1FB855] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-black/30 text-sm hover:-translate-y-0.5"
             >
               <MessageCircle className="w-4 h-4" />
-              WhatsApp Quote
+              Message Us for Custom Pricing
             </a>
             <a
               href="tel:+27123456789"

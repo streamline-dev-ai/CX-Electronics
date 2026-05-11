@@ -316,7 +316,7 @@ export function About() {
                   <Clock className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                   <div>
                     <div className="font-semibold">Mon – Sat</div>
-                    <div className="text-white/60">09:00 – 17:00</div>
+                    <div className="text-white/60">09:00 – 15:00</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -570,7 +570,7 @@ export function About() {
                       Business Hours
                     </div>
                     <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
-                      Mon – Sat: 09:00 – 17:00
+                      Mon – Sat: 09:00 – 15:00
                       <br />
                       <span className="text-gray-500">Sunday: Closed</span>
                     </div>
@@ -600,13 +600,15 @@ export function About() {
                   Browse Shop
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link
-                  to="/bulk"
+                <a
+                  href="https://wa.me/27000000000?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27d%20like%20to%20chat."
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm shadow-lg shadow-[#E63939]/30"
                 >
-                  <Zap className="w-4 h-4 fill-white" />
-                  Request a Quote
-                </Link>
+                  <MessageCircle className="w-4 h-4" />
+                  Contact Us on WhatsApp
+                </a>
               </div>
             </div>
           </div>
@@ -615,17 +617,6 @@ export function About() {
 
       <Footer />
 
-      {/* Floating WhatsApp button */}
-      <a
-        href={`https://wa.me/${WHATSAPP_NUMBER}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        className="fixed bottom-5 right-5 z-50 w-14 h-14 bg-[#22c55e] hover:bg-[#16a34a] text-white rounded-full shadow-2xl shadow-[#22c55e]/40 flex items-center justify-center transition-all hover:scale-110"
-      >
-        <MessageCircle className="w-6 h-6" />
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#E63939] rounded-full ring-2 ring-white animate-pulse" />
-      </a>
     </div>
   )
 }

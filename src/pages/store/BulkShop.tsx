@@ -119,7 +119,7 @@ export function BulkShop() {
                 className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bc59] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#25D366]/30 text-sm hover:scale-[1.02]"
               >
                 <MessageCircle className="w-4 h-4" />
-                WhatsApp for Price List
+                Want a Bulk Price List? WhatsApp Us
               </a>
               <a
                 href="#products"

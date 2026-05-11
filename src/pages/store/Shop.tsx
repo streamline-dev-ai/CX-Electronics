@@ -8,6 +8,7 @@ import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
+import { CategoryGrid } from '../../components/store/CategoryGrid'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useLang } from '../../context/LangContext'
@@ -357,6 +358,9 @@ export function Shop() {
 
           {/* Main */}
           <div className="flex-1 min-w-0">
+            {/* Category chips */}
+            <CategoryGrid variant="chips" heading="Browse by Category" />
+
             {/* Top bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-[#F9FAFB] rounded-xl px-4 py-3 border border-[#E5E7EB]">
               {/* Count */}
