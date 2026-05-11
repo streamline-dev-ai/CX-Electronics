@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
         subtotal, shipping_fee, total,
         shipping_address, collection_name, collection_phone,
         customers ( name, email, phone ),
-        order_items ( product_name, quantity, unit_price, line_total )
+        order_items ( product_name, quantity, unit_price, line_total, thumbnail_url )
       `)
       .eq('order_number', mPaymentId)
       .single()
