@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft, Loader2, Truck, Store, CheckCircle2, XCircle,
-  FileText, Download, Bell, User, MapPin, Package,
+  FileText, Download, Bell, User, MapPin, Package, Trash2,
 } from 'lucide-react'
-import { getOrder, updateOrderStatus } from '../../hooks/useOrders'
+import { getOrder, updateOrderStatus, deleteOrder } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
 import type { OrderWithDetails, OrderStatus } from '../../lib/supabase'
 
@@ -83,6 +83,20 @@ export function AdminOrderDetail() {
     setNotifying(false)
   }
 
+  async function handleDelete() {
+    if (!order) return
+    const ok = window.confirm(`Delete ${order.order_number}? This cannot be undone.`)
+    if (!ok) return
+    setUpdating(true)
+    const { error } = await deleteOrder(order.id)
+    if (error) {
+      showToast(`Failed: ${error}`, false)
+      setUpdating(false)
+      return
+    }
+    navigate('/admin/orders')
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-40">
@@ -142,6 +156,14 @@ export function AdminOrderDetail() {
           <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-600'}`}>
             {fmt(order.status)}
           </span>
+          <button
+            onClick={handleDelete}
+            disabled={updating}
+            title="Delete order"
+            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
 

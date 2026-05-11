@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Package, ShoppingCart, TrendingUp, BarChart2, Calendar, AlertTriangle } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, BarChart2, Calendar, AlertTriangle, Trash2, Loader2, FlaskConical } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
 import { supabase } from '../../lib/supabase'
 import { useAdminMode } from '../../hooks/useAdminMode'
+import { deleteDemoOrders } from '../../hooks/useOrders'
 
 type DateFilter = 'today' | '7d' | '30d' | '90d' | 'all' | 'custom'
 
@@ -207,8 +208,50 @@ export function AdminDashboard() {
     }
   }, [loadData])
 
+  const [clearingDemo, setClearingDemo] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  async function handleClearAllDemo() {
+    const ok = window.confirm('Delete ALL demo orders? This permanently removes every order whose number starts with "DEMO-". Cannot be undone.')
+    if (!ok) return
+    setClearingDemo(true)
+    const { count, error } = await deleteDemoOrders()
+    setClearingDemo(false)
+    if (error) setToast(`Failed: ${error}`)
+    else {
+      setToast(`Cleared ${count} demo order${count === 1 ? '' : 's'} — analytics will refresh.`)
+      loadData()
+    }
+    setTimeout(() => setToast(null), 3500)
+  }
+
   return (
     <div className="space-y-6">
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl">
+          {toast}
+        </div>
+      )}
+
+      {/* Demo-mode banner */}
+      {isDemo && (
+        <div className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2">
+            <FlaskConical className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <p className="text-sm text-amber-800">
+              <span className="font-semibold">Demo mode</span> — showing only orders that came through the fake checkout. Real orders are hidden.
+            </p>
+          </div>
+          <button
+            onClick={handleClearAllDemo}
+            disabled={clearingDemo}
+            className="flex items-center gap-1.5 text-xs font-semibold text-red-700 bg-white hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60 flex-shrink-0"
+          >
+            {clearingDemo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            Clear all demo data
+          </button>
+        </div>
+      )}
 
       {/* Header + filter row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
