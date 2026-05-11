@@ -22,6 +22,7 @@ interface CustomerAuthContextType {
   signUp: (email: string, password: string, name: string, remember?: boolean) => Promise<SignUpResult>
   signOut: () => Promise<void>
   updateName: (name: string) => Promise<string | null>
+  resendConfirmation: (email: string) => Promise<string | null>
 }
 
 const CustomerAuthContext = createContext<CustomerAuthContextType | null>(null)
@@ -100,8 +101,19 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     return null
   }
 
+  async function resendConfirmation(email: string): Promise<string | null> {
+    const { error } = await customerSupabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/account/login`,
+      },
+    })
+    return error ? error.message : null
+  }
+
   return (
-    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateName }}>
+    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateName, resendConfirmation }}>
       {children}
     </CustomerAuthContext.Provider>
   )
