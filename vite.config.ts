@@ -28,7 +28,9 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         scope: '/',
-        start_url: '/',
+        // Installed PWA opens directly into the admin dashboard.
+        // If not signed in, ProtectedRoute bounces to /admin/login.
+        start_url: '/admin/dashboard',
         lang: 'en-ZA',
         categories: ['shopping', 'business'],
         icons: [

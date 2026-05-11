@@ -1,7 +1,21 @@
-// TEMPORARY: admin auth is disabled while we sort out login issues.
-// To restore protection, replace this file with the original allow-list version
-// (see git history — commit before this one).
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
+import { isAdminEmail } from '../../lib/adminEmails'
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-2 border-cxx-blue border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user || !isAdminEmail(user.email)) {
+    return <Navigate to="/admin/login" replace />
+  }
+
   return <>{children}</>
 }

@@ -1,10 +1,14 @@
 import { useEffect, useState, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { ShoppingCart } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../context/CartContext'
 
+const HIDDEN_PREFIXES = ['/admin', '/checkout', '/account', '/invoice', '/receipt', '/order']
+
 export function CartFAB() {
   const { itemCount, openCart } = useCart()
+  const { pathname } = useLocation()
   const [shake, setShake] = useState(0)
   const [pop, setPop] = useState(0)
   const prevCount = useRef(itemCount)
@@ -16,6 +20,10 @@ export function CartFAB() {
     }
     prevCount.current = itemCount
   }, [itemCount])
+
+  if (HIDDEN_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + '/'))) {
+    return null
+  }
 
   return (
     <motion.button

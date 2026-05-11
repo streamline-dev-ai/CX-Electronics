@@ -13,7 +13,7 @@ import { AddressAutocomplete, type ParsedAddress } from '../../components/store/
 // Checkout currently runs in fake-payment mode while PayFast is being activated.
 // Every order is auto-marked as paid and dropped straight into /order/:id.
 
-type DeliveryMethod = 'collection' | 'economic' | 'express'
+type DeliveryMethod = 'collection' | 'economic' | 'nextday' | 'express'
 
 const DELIVERY_OPTIONS: {
   key: DeliveryMethod
@@ -40,11 +40,19 @@ const DELIVERY_OPTIONS: {
     icon: Truck,
   },
   {
+    key: 'nextday',
+    label: 'Next Day Delivery',
+    sub: 'Major cities · Order before 12pm',
+    eta: 'Next business day',
+    price: 150,
+    icon: Truck,
+  },
+  {
     key: 'express',
     label: 'Overnight Delivery',
     sub: 'Major cities · Order before 12pm',
-    eta: 'Next business day',
-    price: 140,
+    eta: 'Same / next business day',
+    price: 300,
     icon: Zap,
   },
 ]

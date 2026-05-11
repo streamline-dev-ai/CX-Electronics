@@ -12,6 +12,7 @@ export interface CustomerUser {
 
 interface SignUpResult {
   error: string | null
+  needsConfirmation: boolean
 }
 
 interface CustomerAuthContextType {
@@ -21,6 +22,7 @@ interface CustomerAuthContextType {
   signUp: (email: string, password: string, name: string, remember?: boolean) => Promise<SignUpResult>
   signOut: () => Promise<void>
   updateName: (name: string) => Promise<string | null>
+  resendConfirmation: (email: string) => Promise<string | null>
 }
 
 const CustomerAuthContext = createContext<CustomerAuthContextType | null>(null)
@@ -56,28 +58,31 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await customerSupabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/account/login`,
+      },
     })
 
-    if (error) return { error: error.message }
+    if (error) return { error: error.message, needsConfirmation: false }
 
     // Fire welcome email — fire-and-forget
     notifySignup(name, email).catch(() => {})
 
-    // Auto-confirm trigger sets email_confirmed_at server-side. If the initial
-    // signUp didn't return a session, sign them in directly so they land logged in.
-    if (data.user && !data.session) {
-      await customerSupabase.auth.signInWithPassword({ email, password })
-    }
-
-    return { error: null }
+    // No session yet → Supabase is waiting for email confirmation.
+    const needsConfirmation = !!data.user && !data.session
+    return { error: null, needsConfirmation }
   }
 
   async function signIn(email: string, password: string, remember = true): Promise<string | null> {
     setRememberMe(remember)
     const { error } = await customerSupabase.auth.signInWithPassword({ email, password })
     if (error) {
-      if (error.message.toLowerCase().includes('invalid login credentials')) {
+      const msg = error.message.toLowerCase()
+      if (msg.includes('email not confirmed')) {
+        return 'Please check your inbox and confirm your email before signing in.'
+      }
+      if (msg.includes('invalid login credentials')) {
         return 'Incorrect email or password.'
       }
       return error.message
@@ -97,8 +102,19 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     return null
   }
 
+  async function resendConfirmation(email: string): Promise<string | null> {
+    const { error } = await customerSupabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/account/login`,
+      },
+    })
+    return error ? error.message : null
+  }
+
   return (
-    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateName }}>
+    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateName, resendConfirmation }}>
       {children}
     </CustomerAuthContext.Provider>
   )

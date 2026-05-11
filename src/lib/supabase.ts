@@ -67,7 +67,7 @@ export type OrderStatus =
 export type FulfillmentType = 'delivery' | 'collection'
 export type PaymentStatus = 'unpaid' | 'paid' | 'refunded'
 export type OrderType = 'retail' | 'bulk'
-export type PaymentMethod = 'payfast' | 'ozow' | 'eft'
+export type PaymentMethod = 'payfast' | 'ozow' | 'eft' | 'demo'
 
 export interface Category {
   id: string
