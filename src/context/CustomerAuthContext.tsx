@@ -1,4 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import type { User } from '@supabase/supabase-js'
+import { customerSupabase } from '../lib/customerAuth'
+import { notifySignup } from '../lib/webhooks'
 
 export interface CustomerUser {
   id: string
@@ -7,84 +10,96 @@ export interface CustomerUser {
   created_at: string
 }
 
-interface StoredAccount extends CustomerUser {
-  password: string
+interface SignUpResult {
+  error: string | null
+  needsConfirmation: boolean
 }
 
 interface CustomerAuthContextType {
   user: CustomerUser | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<string | null>
-  signUp: (email: string, password: string, name: string) => Promise<string | null>
+  signUp: (email: string, password: string, name: string) => Promise<SignUpResult>
   signOut: () => Promise<void>
-}
-
-const SESSION_KEY = 'cxx-customer-session'
-const ACCOUNTS_KEY = 'cxx-customer-accounts'
-
-function getAccounts(): StoredAccount[] {
-  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) ?? '[]') } catch { return [] }
-}
-
-function saveAccounts(accounts: StoredAccount[]) {
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts))
-}
-
-function getSession(): CustomerUser | null {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY) ?? 'null') } catch { return null }
+  updateName: (name: string) => Promise<string | null>
 }
 
 const CustomerAuthContext = createContext<CustomerAuthContextType | null>(null)
+
+function toCustomerUser(user: User): CustomerUser {
+  return {
+    id: user.id,
+    email: user.email ?? '',
+    name: (user.user_metadata?.name as string) ?? user.email ?? '',
+    created_at: user.created_at,
+  }
+}
 
 export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CustomerUser | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setUser(getSession())
-    setLoading(false)
+    customerSupabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ? toCustomerUser(session.user) : null)
+      setLoading(false)
+    })
+
+    const { data: { subscription } } = customerSupabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ? toCustomerUser(session.user) : null)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  async function signUp(email: string, password: string, name: string): Promise<string | null> {
-    const accounts = getAccounts()
-    if (accounts.find((a) => a.email.toLowerCase() === email.toLowerCase())) {
-      return 'An account with this email already exists'
-    }
-    const newUser: CustomerUser = {
-      id: crypto.randomUUID(),
+  async function signUp(email: string, password: string, name: string): Promise<SignUpResult> {
+    const { data, error } = await customerSupabase.auth.signUp({
       email,
-      name,
-      created_at: new Date().toISOString(),
-    }
-    saveAccounts([...accounts, { ...newUser, password }])
-    localStorage.setItem(SESSION_KEY, JSON.stringify(newUser))
-    setUser(newUser)
-    return null
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/account/login`,
+      },
+    })
+
+    if (error) return { error: error.message, needsConfirmation: false }
+
+    // Fire welcome email — fire-and-forget
+    notifySignup(name, email).catch(() => {})
+
+    // If session is null but user exists, Supabase requires email confirmation
+    const needsConfirmation = !!data.user && !data.session
+    return { error: null, needsConfirmation }
   }
 
   async function signIn(email: string, password: string): Promise<string | null> {
-    const accounts = getAccounts()
-    const account = accounts.find((a) => a.email.toLowerCase() === email.toLowerCase())
-    if (!account) return 'No account found with this email'
-    if (account.password !== password) return 'Incorrect password'
-    const session: CustomerUser = {
-      id: account.id,
-      email: account.email,
-      name: account.name,
-      created_at: account.created_at,
+    const { error } = await customerSupabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        return 'Please check your inbox and confirm your email before signing in.'
+      }
+      if (error.message.toLowerCase().includes('invalid login credentials')) {
+        return 'Incorrect email or password.'
+      }
+      return error.message
     }
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    setUser(session)
     return null
   }
 
-  async function signOut() {
-    localStorage.removeItem(SESSION_KEY)
+  async function signOut(): Promise<void> {
+    await customerSupabase.auth.signOut()
     setUser(null)
   }
 
+  async function updateName(name: string): Promise<string | null> {
+    const { error } = await customerSupabase.auth.updateUser({ data: { name } })
+    if (error) return error.message
+    setUser((prev) => prev ? { ...prev, name } : prev)
+    return null
+  }
+
   return (
-    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <CustomerAuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateName }}>
       {children}
     </CustomerAuthContext.Provider>
   )

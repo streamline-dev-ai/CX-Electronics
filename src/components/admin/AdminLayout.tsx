@@ -19,7 +19,7 @@ export function AdminLayout() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar â€” desktop */}
-      <aside className="hidden md:flex flex-col w-56 bg-cxx-navy text-white fixed inset-y-0 left-0">
+      <aside className="hidden md:flex print:hidden flex-col w-56 bg-cxx-navy text-white fixed inset-y-0 left-0">
         {/* Logo */}
         <div className="flex items-center gap-2 px-5 py-5 border-b border-white/10"><img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-5 w-auto" /><span className="font-bold text-sm">CW Admin</span></div>
 
@@ -58,9 +58,9 @@ export function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-56 flex flex-col min-h-screen">
+      <main className="flex-1 md:ml-56 print:ml-0 flex flex-col min-h-screen">
         {/* Mobile top bar */}
-        <header className="md:hidden flex items-center justify-between bg-cxx-navy text-white px-4 py-3"><div className="flex items-center gap-2"><img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-5 w-auto" /><span className="font-bold text-sm">CW Admin</span></div></header>
+        <header className="md:hidden print:hidden flex items-center justify-between bg-cxx-navy text-white px-4 py-3"><div className="flex items-center gap-2"><img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-5 w-auto" /><span className="font-bold text-sm">CW Admin</span></div></header>
 
         {/* Page content */}
         <div className="flex-1 p-4 md:p-6">
@@ -68,7 +68,7 @@ export function AdminLayout() {
         </div>
 
         {/* Mobile bottom nav */}
-        <nav className="md:hidden flex bg-cxx-navy border-t border-white/10">
+        <nav className="md:hidden print:hidden flex bg-cxx-navy border-t border-white/10">
           {navLinks.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}

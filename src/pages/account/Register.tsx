@@ -1,41 +1,57 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { Zap, Loader2 } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Zap, Loader2, Mail } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 export function AccountRegister() {
   const { signUp } = useCustomerAuth()
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [state, setState] = useState<'idle' | 'loading' | 'confirm'>('idle')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (password !== confirm) { setError('Passwords do not match'); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
-    setLoading(true)
+    setState('loading')
     setError(null)
-    const err = await signUp(email, password, name)
-    if (err) { setError(err); setLoading(false) }
-    else setSuccess(true)
+
+    const { error: err, needsConfirmation } = await signUp(email, password, name)
+    if (err) {
+      setError(err)
+      setState('idle')
+      return
+    }
+
+    if (needsConfirmation) {
+      setState('confirm')
+    } else {
+      // Email confirmation disabled — user is logged in immediately
+      navigate('/account', { replace: true })
+    }
   }
 
-  if (success) {
+  if (state === 'confirm') {
     return (
       <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-900/40 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">✓</span>
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 bg-blue-900/40 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-7 h-7 text-blue-400" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Account created!</h2>
-          <p className="text-white/50 text-sm mb-6">Check your email to confirm, then sign in.</p>
+          <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
+          <p className="text-white/50 text-sm mb-2">
+            We sent a confirmation link to <span className="text-white font-medium">{email}</span>.
+          </p>
+          <p className="text-white/40 text-sm mb-6">
+            Click the link in the email to confirm your account, then sign in.
+          </p>
           <Link to="/account/login"
             className="inline-block bg-[#E63939] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#C82020] transition-colors">
-            Sign in
+            Go to Sign In
           </Link>
         </div>
       </div>
@@ -76,10 +92,10 @@ export function AccountRegister() {
                 placeholder={placeholder} />
             </div>
           ))}
-          <button type="submit" disabled={loading}
+          <button type="submit" disabled={state === 'loading'}
             className="w-full flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-60">
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {loading ? 'Creating account...' : 'Create account'}
+            {state === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
+            {state === 'loading' ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 

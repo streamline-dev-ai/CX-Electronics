@@ -8,7 +8,7 @@ const ORDER_SELECT = `
   shipping_address, notes, payment_method, payment_status, payment_reference,
   created_at, updated_at,
   customers ( id, name, email, phone ),
-  order_items ( id, product_name, quantity, unit_price, line_total )
+  order_items ( id, product_name, quantity, unit_price, line_total, thumbnail_url )
 `
 
 const ORDER_DETAIL_SELECT = ORDER_SELECT + `,

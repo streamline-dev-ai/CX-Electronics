@@ -6,6 +6,8 @@ import { CustomerAuthProvider } from './context/CustomerAuthContext'
 import { WishlistProvider } from './context/WishlistContext'
 import { ProtectedRoute } from './components/admin/ProtectedRoute'
 import { ScrollToTop } from './components/ScrollToTop'
+import { AddToCartDrawer } from './components/store/AddToCartDrawer'
+import { ExitIntentPopup } from './components/store/ExitIntentPopup'
 
 // Customer account — lazy loaded
 const AccountLogin    = lazy(() => import('./pages/account/Login').then((m) => ({ default: m.AccountLogin })))
@@ -28,6 +30,7 @@ import { Terms } from './pages/store/Terms'
 import { CartPage } from './pages/store/CartPage'
 import { Checkout } from './pages/store/Checkout'
 import { OrderConfirmation } from './pages/store/OrderConfirmation'
+import { PublicReceipt } from './pages/store/Receipt'
 import { RetailInvoice } from './pages/invoices/RetailInvoice'
 import { WholesaleInvoice } from './pages/invoices/WholesaleInvoice'
 
@@ -40,6 +43,7 @@ const ProductForm = lazy(() => import('./pages/admin/ProductForm').then((m) => (
 const AdminOrders = lazy(() => import('./pages/admin/Orders').then((m) => ({ default: m.AdminOrders })))
 const AdminOrderDetail  = lazy(() => import('./pages/admin/OrderDetail').then((m) => ({ default: m.AdminOrderDetail })))
 const AdminOrderInvoice = lazy(() => import('./pages/admin/OrderInvoice').then((m) => ({ default: m.AdminOrderInvoice })))
+const ReceiptDemo       = lazy(() => import('./pages/admin/ReceiptDemo').then((m) => ({ default: m.ReceiptDemo })))
 
 function AdminFallback() {
   return (
@@ -57,6 +61,8 @@ export default function App() {
       <CartProvider>
         <BrowserRouter>
           <ScrollToTop />
+          <AddToCartDrawer />
+          <ExitIntentPopup />
           <Routes>
             {/* ── Public store ─────────────────────────────────── */}
             <Route path="/" element={<Home />} />
@@ -74,6 +80,7 @@ export default function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderConfirmation />} />
+            <Route path="/receipt/:id" element={<PublicReceipt />} />
             <Route path="/invoice/retail" element={<RetailInvoice />} />
             <Route path="/invoice/wholesale" element={<WholesaleInvoice />} />
 
@@ -117,6 +124,7 @@ export default function App() {
             </Route>
 
             {/* Fallback */}
+            <Route path="/admin/receipt-demo" element={<Suspense fallback={<AdminFallback />}><ReceiptDemo /></Suspense>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
