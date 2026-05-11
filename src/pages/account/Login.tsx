@@ -1,21 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Zap, Loader2, Check, AlertTriangle, MailCheck } from 'lucide-react'
+import { Zap, Loader2, Check } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
-// Parse Supabase auth errors that arrive in the URL hash, e.g.
-// #error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired
-function parseHashError(hash: string): { code: string | null; message: string | null } {
-  if (!hash || hash.length < 2) return { code: null, message: null }
-  const params = new URLSearchParams(hash.replace(/^#/, ''))
-  if (!params.get('error')) return { code: null, message: null }
-  const description = params.get('error_description')
-  const message = description ? decodeURIComponent(description.replace(/\+/g, ' ')) : params.get('error')
-  return { code: params.get('error_code'), message }
-}
-
 export function AccountLogin() {
-  const { signIn, resendConfirmation } = useCustomerAuth()
+  const { signIn } = useCustomerAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string })?.from ?? '/account'
@@ -24,21 +13,7 @@ export function AccountLogin() {
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [linkError, setLinkError] = useState<{ code: string | null; message: string } | null>(null)
-  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
-  const [resendMessage, setResendMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-
-  // Detect Supabase confirmation errors in the URL hash and clear the hash afterwards.
-  useEffect(() => {
-    const parsed = parseHashError(window.location.hash)
-    if (parsed.message) {
-      setLinkError({ code: parsed.code, message: parsed.message })
-      // Strip the hash so a refresh doesn't keep showing it.
-      const url = window.location.pathname + window.location.search
-      window.history.replaceState(null, '', url)
-    }
-  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -48,26 +23,6 @@ export function AccountLogin() {
     if (err) { setError(err); setLoading(false) }
     else navigate(from, { replace: true })
   }
-
-  async function handleResend() {
-    if (!email.trim()) {
-      setResendState('error')
-      setResendMessage('Enter your email above first, then click resend.')
-      return
-    }
-    setResendState('loading')
-    setResendMessage(null)
-    const err = await resendConfirmation(email.trim())
-    if (err) {
-      setResendState('error')
-      setResendMessage(err)
-    } else {
-      setResendState('sent')
-      setResendMessage(`A new confirmation link was sent to ${email}.`)
-    }
-  }
-
-  const isExpiredLink = linkError?.code === 'otp_expired' || /expired|invalid/i.test(linkError?.message ?? '')
 
   return (
     <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4 py-8">
@@ -85,40 +40,6 @@ export function AccountLogin() {
             <Link to="/account/register" className="text-[#E63939] hover:underline font-medium">Create account</Link>
           </p>
         </div>
-
-        {/* Email-link error banner (e.g. otp_expired) */}
-        {linkError && (
-          <div className="mb-4 bg-amber-900/30 border border-amber-500/30 rounded-2xl p-4 space-y-3">
-            <div className="flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-bold text-amber-300">
-                  {isExpiredLink ? 'Confirmation link expired' : 'Confirmation problem'}
-                </p>
-                <p className="text-xs text-amber-200/80 mt-0.5 leading-snug">
-                  {isExpiredLink
-                    ? 'Your email link has expired or was already used. Enter your email below and we’ll send a fresh one.'
-                    : linkError.message}
-                </p>
-              </div>
-            </div>
-            {resendMessage && (
-              <p className={`text-xs flex items-center gap-1.5 ${resendState === 'sent' ? 'text-green-400' : 'text-red-300'}`}>
-                {resendState === 'sent' && <MailCheck className="w-3.5 h-3.5" />}
-                {resendMessage}
-              </p>
-            )}
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resendState === 'loading' || resendState === 'sent'}
-              className="w-full flex items-center justify-center gap-2 bg-amber-500/20 hover:bg-amber-500/30 disabled:opacity-50 text-amber-200 font-semibold text-xs py-2 rounded-lg transition-colors"
-            >
-              {resendState === 'loading' && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              {resendState === 'sent' ? 'Email sent — check your inbox' : 'Resend confirmation email'}
-            </button>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
           {error && (
