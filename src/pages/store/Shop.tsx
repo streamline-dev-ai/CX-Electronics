@@ -7,7 +7,7 @@ import {
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
-import { ProductCard } from '../../components/store/ProductCard'
+import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useLang } from '../../context/LangContext'
@@ -137,7 +137,7 @@ export function Shop() {
     <div className="space-y-7">
       {/* Categories */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#0F172A]/50 mb-3">
           {t('categories')}
         </h3>
         <ul className="space-y-1">
@@ -147,7 +147,7 @@ export function Shop() {
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 !categorySlug
                   ? 'bg-[#E63939] text-white font-semibold'
-                  : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                  : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
               }`}
             >
               All Products
@@ -160,7 +160,7 @@ export function Shop() {
                 className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                   categorySlug === c.slug
                     ? 'bg-[#E63939] text-white font-semibold'
-                    : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                    : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
                 }`}
               >
                 {c.name}
@@ -172,7 +172,7 @@ export function Shop() {
 
       {/* Price */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#0F172A]/50 mb-3">
           Price Range
         </h3>
         <ul className="space-y-1">
@@ -181,8 +181,8 @@ export function Shop() {
               onClick={() => setPriceRange({})}
               className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                 priceRange.min === undefined && priceRange.max === undefined
-                  ? 'bg-[#000000] text-white font-semibold'
-                  : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                  ? 'bg-[#0F172A] text-white font-semibold'
+                  : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
               }`}
             >
               Any price
@@ -196,8 +196,8 @@ export function Shop() {
                   onClick={() => setPriceRange({ min: p.min, max: p.max })}
                   className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors ${
                     active
-                      ? 'bg-[#000000] text-white font-semibold'
-                      : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                      ? 'bg-[#0F172A] text-white font-semibold'
+                      : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
                   }`}
                 >
                   {p.label}
@@ -210,7 +210,7 @@ export function Shop() {
 
       {/* Toggles */}
       <section>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#000000]/50 mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#0F172A]/50 mb-3">
           Availability
         </h3>
         <div className="space-y-2">
@@ -221,7 +221,7 @@ export function Shop() {
               onChange={(e) => setInStockOnly(e.target.checked)}
               className="w-4 h-4 rounded border-[#E5E7EB] text-[#E63939] focus:ring-[#E63939]"
             />
-            <span className="text-sm text-[#000000]">In stock only</span>
+            <span className="text-sm text-[#0F172A]">In stock only</span>
           </label>
           <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#F5F5F5] cursor-pointer">
             <input
@@ -230,7 +230,7 @@ export function Shop() {
               onChange={(e) => setBulkOnly(e.target.checked)}
               className="w-4 h-4 rounded border-[#E5E7EB] text-[#E63939] focus:ring-[#E63939]"
             />
-            <span className="text-sm text-[#000000]">Bulk eligible</span>
+            <span className="text-sm text-[#0F172A]">Bulk eligible</span>
           </label>
         </div>
       </section>
@@ -249,14 +249,19 @@ export function Shop() {
   return (
     <div className="min-h-screen bg-[#FFFFFF] flex flex-col">
       <SEO
-        title="Shop Electronics | CW Electronics Johannesburg"
-        description="Browse chargers, CCTV, solar lights, routers, smartwatches & more. Retail & bulk pricing available. Fast delivery across South Africa."
-        url="https://cw-electronics.co.za/shop"
+        title="Shop Electronics in Johannesburg"
+        description="Browse chargers, CCTV cameras, solar lights, routers, smartwatches & more from CW Electronics. Retail & bulk pricing available. Fast delivery across South Africa."
+        url="/shop"
+        keywords="electronics shop Johannesburg, buy CCTV South Africa, solar inverters online, wholesale chargers, electronics importer"
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Shop', url: '/shop' },
+        ]}
       />
       <Navbar />
 
       {/* Hero */}
-      <section className="relative bg-[#000000] text-white border-b border-[#E5E7EB]">
+      <section className="relative bg-[#0F172A] text-white border-b border-[#E5E7EB]">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold text-[#E63939] uppercase tracking-widest mb-2">
@@ -296,7 +301,7 @@ export function Shop() {
       {activeFilterCount > 0 && (
         <div className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-[#000000]/50 uppercase tracking-wider mr-1">
+            <span className="text-xs font-medium text-[#0F172A]/50 uppercase tracking-wider mr-1">
               Filters:
             </span>
             {activeCategoryName && (
@@ -342,7 +347,7 @@ export function Shop() {
           {/* Sidebar */}
           <aside className="hidden md:block w-56 flex-shrink-0">
             <div className="sticky top-28">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#000000] mb-5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A] mb-5">
                 <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
                 Filters
               </div>
@@ -355,8 +360,8 @@ export function Shop() {
             {/* Top bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-[#F9FAFB] rounded-xl px-4 py-3 border border-[#E5E7EB]">
               {/* Count */}
-              <p className="text-sm text-[#000000]/60">
-                <span className="font-semibold text-[#000000]">{totalCount}</span> products
+              <p className="text-sm text-[#0F172A]/60">
+                <span className="font-semibold text-[#0F172A]">{totalCount}</span> products
               </p>
 
               <div className="flex items-center gap-2 sm:gap-3">
@@ -371,7 +376,7 @@ export function Shop() {
                         className={`p-1.5 rounded-md transition-colors ${
                           gridCols === cols
                             ? 'bg-[#E63939] text-white'
-                            : 'text-[#000000]/40 hover:text-[#000000]'
+                            : 'text-[#0F172A]/40 hover:text-[#0F172A]'
                         }`}
                         aria-label={`${cols} column${cols > 1 ? 's' : ''} view`}
                       >
@@ -384,7 +389,7 @@ export function Shop() {
                 {/* Mobile filter */}
                 <button
                   onClick={() => setMobileFiltersOpen(true)}
-                  className="md:hidden flex items-center gap-2 text-sm font-medium text-[#000000] border border-[#E5E7EB] px-3 py-2 rounded-lg"
+                  className="md:hidden flex items-center gap-2 text-sm font-medium text-[#0F172A] border border-[#E5E7EB] px-3 py-2 rounded-lg"
                 >
                   <SlidersHorizontal className="w-4 h-4" />
                   Filters
@@ -400,7 +405,7 @@ export function Shop() {
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value as ProductSort)}
-                    className="appearance-none bg-white border border-[#E5E7EB] text-sm font-medium text-[#000000] pl-3 pr-9 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent cursor-pointer"
+                    className="appearance-none bg-white border border-[#E5E7EB] text-sm font-medium text-[#0F172A] pl-3 pr-9 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent cursor-pointer"
                   >
                     {SORT_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -408,7 +413,7 @@ export function Shop() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#000000]/40 pointer-events-none" />
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0F172A]/40 pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -423,10 +428,10 @@ export function Shop() {
             ) : products.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 px-6 bg-[#F9FAFB] rounded-xl border border-dashed border-[#E5E7EB]">
                 <div className="w-14 h-14 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center mb-3">
-                  <Search className="w-6 h-6 text-[#000000]/30" />
+                  <Search className="w-6 h-6 text-[#0F172A]/30" />
                 </div>
-                <p className="text-base font-semibold text-[#000000]">No products found</p>
-                <p className="text-sm text-[#000000]/50 mt-1">Try adjusting your filters</p>
+                <p className="text-base font-semibold text-[#0F172A]">No products found</p>
+                <p className="text-sm text-[#0F172A]/50 mt-1">Try adjusting your filters</p>
                 {activeFilterCount > 0 && (
                   <button
                     onClick={clearAll}
@@ -440,7 +445,7 @@ export function Shop() {
               <>
                 <div className={`grid ${gridClasses[gridCols]} gap-4`}>
                   {products.map((product) => (
-                    <ProductCard key={product.id} product={product} basePath="/shop" columns={gridCols} />
+                    <ProductCardLight key={product.id} product={product} basePath="/shop" columns={gridCols} />
                   ))}
                 </div>
 
@@ -453,8 +458,8 @@ export function Shop() {
                       disabled={page === 1}
                       className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                         page === 1
-                          ? 'text-[#000000]/20 cursor-not-allowed'
-                          : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                          ? 'text-[#0F172A]/20 cursor-not-allowed'
+                          : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
                       }`}
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -465,7 +470,7 @@ export function Shop() {
                     <div className="flex items-center gap-1">
                       {pageNumbers.map((p, i) =>
                         p === 'ellipsis' ? (
-                          <span key={`ellipsis-${i}`} className="px-2 text-[#000000]/30">
+                          <span key={`ellipsis-${i}`} className="px-2 text-[#0F172A]/30">
                             ...
                           </span>
                         ) : (
@@ -475,7 +480,7 @@ export function Shop() {
                             className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
                               page === p
                                 ? 'bg-[#E63939] text-white'
-                                : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                                : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
                             }`}
                           >
                             {p}
@@ -490,8 +495,8 @@ export function Shop() {
                       disabled={page === totalPages}
                       className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                         page === totalPages
-                          ? 'text-[#000000]/20 cursor-not-allowed'
-                          : 'text-[#000000]/70 hover:bg-[#F5F5F5]'
+                          ? 'text-[#0F172A]/20 cursor-not-allowed'
+                          : 'text-[#0F172A]/70 hover:bg-[#F5F5F5]'
                       }`}
                     >
                       <span className="hidden sm:inline">Next</span>
@@ -503,7 +508,7 @@ export function Shop() {
             )}
 
             {/* WhatsApp Enquiry Banner */}
-            <div className="mt-10 bg-[#000000] border border-[#000000] rounded-xl p-6 sm:p-8">
+            <div className="mt-10 bg-[#0F172A] border border-[#0F172A] rounded-xl p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-white font-semibold text-base sm:text-lg">
@@ -537,20 +542,20 @@ export function Shop() {
           />
           <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[90vw] bg-white shadow-xl overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-[#E5E7EB] px-5 py-4 flex items-center justify-between">
-              <h2 className="font-semibold text-[#000000] flex items-center gap-2">
+              <h2 className="font-semibold text-[#0F172A] flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
                 Filters
               </h2>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="p-1 text-[#000000]/40 hover:text-[#000000]"
+                className="p-1 text-[#0F172A]/40 hover:text-[#0F172A]"
                 aria-label="Close filters"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="px-5 py-5">{FiltersPanel}</div>
-            <div className="sticky bottom-0 bg-[#0a0a0a] border-t border-neutral-800 px-5 py-4">
+            <div className="sticky bottom-0 bg-[#0F172A] border-t border-neutral-800 px-5 py-4">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
                 className="w-full bg-[#E63939] hover:bg-[#C82020] text-white font-semibold py-3 rounded-lg transition-colors"
@@ -569,11 +574,11 @@ export function Shop() {
 
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1.5 bg-white border border-[#E5E7EB] text-[#000000] text-xs font-medium pl-3 pr-2 py-1.5 rounded-full">
+    <span className="inline-flex items-center gap-1.5 bg-white border border-[#E5E7EB] text-[#0F172A] text-xs font-medium pl-3 pr-2 py-1.5 rounded-full">
       {label}
       <button
         onClick={onRemove}
-        className="text-[#000000]/40 hover:text-[#E63939] transition-colors"
+        className="text-[#0F172A]/40 hover:text-[#E63939] transition-colors"
         aria-label={`Remove ${label} filter`}
       >
         <X className="w-3.5 h-3.5" />

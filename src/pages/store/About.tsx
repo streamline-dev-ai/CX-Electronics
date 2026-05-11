@@ -81,7 +81,7 @@ export function About() {
 
       <main className="flex-1">
         {/* ─── Hero ─────────────────────────────────── */}
-        <section className="relative bg-black overflow-hidden">
+        <section className="relative bg-[#0F172A] overflow-hidden">
           {/* Subtle red glow */}
           <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-[#E63939]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] bg-[#E63939]/10 rounded-full blur-3xl pointer-events-none" />
@@ -163,13 +163,13 @@ export function About() {
               <span className="inline-block text-[#E63939] text-xs font-bold uppercase tracking-[0.2em] mb-3">
                 Our Story
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight text-balance leading-[1.1] mb-5">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight text-balance leading-[1.1] mb-5">
                 Powering South Africa with quality electronics
               </h2>
               <div className="space-y-4 text-gray-600 text-base leading-relaxed">
                 <p>
                   CW Electronics is a fast-growing importer and wholesaler of
-                  quality electronics based at <strong className="text-[#111827]">China Mart,
+                  quality electronics based at <strong className="text-[#0F172A]">China Mart,
                   Crown Mines, Johannesburg</strong>. Since 2022 we have been supplying South African
                   installers, retailers and businesses with CCTV systems, solar lighting,
                   routers, chargers, smartwatches and more — direct from trusted manufacturers
@@ -216,7 +216,7 @@ export function About() {
                 />
               </div>
               {/* Floating badge */}
-              <div className="absolute -bottom-5 -left-5 bg-black text-white rounded-xl px-5 py-4 shadow-xl flex items-center gap-3">
+              <div className="absolute -bottom-5 -left-5 bg-[#0F172A] text-white rounded-xl px-5 py-4 shadow-xl flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#E63939] rounded-lg flex items-center justify-center">
                   <Zap className="w-5 h-5 fill-white" />
                 </div>
@@ -238,7 +238,7 @@ export function About() {
               <span className="inline-block text-[#E63939] text-xs font-bold uppercase tracking-[0.2em] mb-3">
                 Why Choose Us
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight text-balance">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight text-balance">
                 Built for resellers, trusted by retailers
               </h2>
               <p className="mt-3 text-gray-600 leading-relaxed">
@@ -259,7 +259,7 @@ export function About() {
                   <div className="w-12 h-12 bg-[#E63939]/10 group-hover:bg-[#E63939] rounded-xl flex items-center justify-center mb-4 transition-colors">
                     <Icon className="w-6 h-6 text-[#E63939] group-hover:text-white transition-colors" />
                   </div>
-                  <h3 className="font-bold text-[#111827] mb-2 leading-tight">{title}</h3>
+                  <h3 className="font-bold text-[#0F172A] mb-2 leading-tight">{title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{body}</p>
                 </motion.div>
               ))}
@@ -273,7 +273,7 @@ export function About() {
             <span className="inline-block text-[#E63939] text-xs font-bold uppercase tracking-[0.2em] mb-3">
               Our Location
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight text-balance">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight text-balance">
               Visit Our Showroom
             </h2>
             <p className="mt-3 text-gray-600 leading-relaxed">
@@ -304,7 +304,7 @@ export function About() {
             </div>
 
             {/* Address card */}
-            <div className="bg-black rounded-2xl p-7 text-white flex flex-col">
+            <div className="bg-[#0F172A] rounded-2xl p-7 text-white flex flex-col">
               <div className="w-12 h-12 bg-[#E63939] rounded-xl flex items-center justify-center mb-5">
                 <MapPin className="w-6 h-6" />
               </div>
@@ -351,7 +351,7 @@ export function About() {
               <span className="inline-block text-[#E63939] text-xs font-bold uppercase tracking-[0.2em] mb-3">
                 Contact Us
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight text-balance">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] tracking-tight text-balance">
                 Let&apos;s talk electronics
               </h2>
               <p className="mt-3 text-gray-600 leading-relaxed">
@@ -373,7 +373,7 @@ export function About() {
                     <div className="w-16 h-16 bg-[#E63939]/10 rounded-full flex items-center justify-center mb-4">
                       <CheckCircle2 className="w-8 h-8 text-[#E63939]" />
                     </div>
-                    <h3 className="text-xl font-extrabold text-[#111827] mb-2">
+                    <h3 className="text-xl font-extrabold text-[#0F172A] mb-2">
                       Message Received
                     </h3>
                     <p className="text-sm text-gray-600 max-w-sm mb-6">
@@ -392,7 +392,7 @@ export function About() {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-1.5">
                           Full Name
                         </label>
                         <input
@@ -405,7 +405,7 @@ export function About() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-1.5">
                           Phone
                         </label>
                         <input
@@ -422,7 +422,7 @@ export function About() {
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-1.5">
                           Email
                         </label>
                         <input
@@ -436,7 +436,7 @@ export function About() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
+                        <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-1.5">
                           Inquiry Type
                         </label>
                         <select
@@ -453,7 +453,7 @@ export function About() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-[#111827] uppercase tracking-wider mb-1.5">
+                      <label className="block text-xs font-bold text-[#0F172A] uppercase tracking-wider mb-1.5">
                         Message
                       </label>
                       <textarea
@@ -511,7 +511,7 @@ export function About() {
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                       Phone
                     </div>
-                    <div className="text-sm font-bold text-[#111827]">{PHONE_DISPLAY}</div>
+                    <div className="text-sm font-bold text-[#0F172A]">{PHONE_DISPLAY}</div>
                   </div>
                 </a>
 
@@ -528,7 +528,7 @@ export function About() {
                     <div className="text-[10px] font-bold text-[#16a34a] uppercase tracking-widest">
                       WhatsApp — Fastest
                     </div>
-                    <div className="text-sm font-bold text-[#111827]">Chat with us now</div>
+                    <div className="text-sm font-bold text-[#0F172A]">Chat with us now</div>
                   </div>
                 </a>
 
@@ -543,7 +543,7 @@ export function About() {
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                       Email
                     </div>
-                    <div className="text-sm font-bold text-[#111827] truncate">{EMAIL}</div>
+                    <div className="text-sm font-bold text-[#0F172A] truncate">{EMAIL}</div>
                   </div>
                 </a>
 
@@ -555,7 +555,7 @@ export function About() {
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                       Address
                     </div>
-                    <div className="text-sm font-semibold text-[#111827] leading-relaxed">
+                    <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
                       {ADDRESS}
                     </div>
                   </div>
@@ -569,7 +569,7 @@ export function About() {
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">
                       Business Hours
                     </div>
-                    <div className="text-sm font-semibold text-[#111827] leading-relaxed">
+                    <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
                       Mon – Sat: 09:00 – 17:00
                       <br />
                       <span className="text-gray-500">Sunday: Closed</span>
@@ -582,7 +582,7 @@ export function About() {
         </section>
 
         {/* ─── Final CTA ────────────────────────────── */}
-        <section className="bg-black text-white">
+        <section className="bg-[#0F172A] text-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-14 text-center relative overflow-hidden">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#E63939]/15 rounded-full blur-3xl pointer-events-none" />
             <div className="relative">
@@ -595,7 +595,7 @@ export function About() {
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <Link
                   to="/shop"
-                  className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-[#111827] font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+                  className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-[#0F172A] font-bold px-6 py-3 rounded-lg transition-colors text-sm"
                 >
                   Browse Shop
                   <ArrowRight className="w-4 h-4" />

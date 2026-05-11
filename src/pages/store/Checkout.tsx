@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingCart, Loader2, CheckCircle, Store, Truck, Zap } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
@@ -7,8 +7,12 @@ import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
-import { notifyNewOrder } from '../../lib/webhooks'
+import { notifyNewOrder, notifyStatusChange } from '../../lib/webhooks'
 import { redirectToPayFast } from '../../lib/payfast'
+import { DemoPaymentModal } from '../../components/store/DemoPaymentModal'
+import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
+
+const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT === 'true'
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
@@ -30,18 +34,18 @@ const DELIVERY_OPTIONS: {
   },
   {
     key: 'economic',
-    label: 'Economic Delivery',
-    sub: 'Nationwide via courier',
-    eta: '3–5 business days',
-    price: 99,
+    label: 'Economy Delivery',
+    sub: 'Nationwide · Fastway courier',
+    eta: '2–5 business days',
+    price: 100,
     icon: Truck,
   },
   {
     key: 'express',
-    label: 'Express Same-Day',
-    sub: 'Gauteng only · Order before 11am',
-    eta: 'Delivered by 6pm today',
-    price: 199,
+    label: 'Overnight Delivery',
+    sub: 'Major cities · Order before 12pm',
+    eta: 'Next business day',
+    price: 140,
     icon: Zap,
   },
 ]
@@ -73,7 +77,7 @@ const EMPTY_FORM: FormData = {
 function generateOrderNumber(): string {
   const year = new Date().getFullYear()
   const seq = Math.floor(Math.random() * 9000) + 1000
-  return `CXX-${year}-${seq}`
+  return `${DEMO_CHECKOUT ? 'DEMO' : 'CXX'}-${year}-${seq}`
 }
 
 function saveOrderLocally(order: OrderWithDetails) {
@@ -103,12 +107,16 @@ export function Checkout() {
   const { items, subtotal, clearCart } = useCart()
   const { t } = useLang()
   const { user } = useCustomerAuth()
+  const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
   const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
+  const [demoPayment, setDemoPayment] = useState<{
+    orderId: string; orderNumber: string; order: OrderWithDetails
+  } | null>(null)
 
-  // Pre-fill form from logged-in customer account
+  // Pre-fill form from logged-in customer account + last shipping address
   useEffect(() => {
     if (!user) return
     setForm((prev) => ({
@@ -116,7 +124,52 @@ export function Checkout() {
       name: prev.name || user.name,
       email: prev.email || user.email,
     }))
+
+    // Look up the customer's most recent order to reuse their shipping details
+    let cancelled = false
+    ;(async () => {
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('id, phone, address_line1, address_line2, city, province, postal_code')
+        .eq('email', user.email)
+        .single()
+      if (cancelled || !customer) return
+
+      setForm((prev) => ({
+        ...prev,
+        phone:          prev.phone          || customer.phone          || '',
+        address_line1: prev.address_line1   || customer.address_line1 || '',
+        address_line2: prev.address_line2   || customer.address_line2 || '',
+        city:           prev.city           || customer.city           || '',
+        province:       customer.province   || prev.province,
+        postal_code:    prev.postal_code   || customer.postal_code    || '',
+      }))
+    })()
+
+    return () => { cancelled = true }
   }, [user])
+
+  async function handleDemoPay() {
+    if (!demoPayment) return
+    const { orderId, order } = demoPayment
+    const now = new Date().toISOString()
+    // Mark order as paid in Supabase
+    await supabase.from('orders').update({
+      status: 'paid',
+      payment_status: 'paid',
+      payment_reference: `DEMO-${Date.now()}`,
+      updated_at: now,
+    }).eq('id', orderId)
+    await supabase.from('order_status_events').insert({
+      order_id: orderId, status: 'paid',
+      triggered_by: 'demo_payment',
+      note: 'Demo checkout payment',
+      created_at: now,
+    })
+    // Fire payment confirmed webhooks (customer receipt email, owner alert)
+    notifyStatusChange({ ...order, status: 'paid', payment_status: 'paid' }, 'pending', 'paid')
+    navigate(`/order/${orderId}`)
+  }
 
   const isCollection = delivery === 'collection'
   const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
@@ -140,6 +193,23 @@ export function Checkout() {
   function set(key: keyof FormData, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }))
+  }
+
+  function applyAddressSelection(parsed: ParsedAddress) {
+    setForm((prev) => ({
+      ...prev,
+      address_line1: parsed.address_line1 || prev.address_line1,
+      city: parsed.city || prev.city,
+      province: parsed.province || prev.province,
+      postal_code: parsed.postal_code || prev.postal_code,
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      address_line1: undefined,
+      city: undefined,
+      province: undefined,
+      postal_code: undefined,
+    }))
   }
 
   function validate(): boolean {
@@ -271,7 +341,12 @@ export function Checkout() {
         notifyNewOrder(localOrder) // fire-and-forget
         clearCart()
 
-        // Redirect to PayFast payment page
+        if (DEMO_CHECKOUT) {
+          setDemoPayment({ orderId: order.id, orderNumber: order.order_number, order: localOrder })
+          setSubmitting(false)
+          return
+        }
+
         const nameParts = form.name.trim().split(' ')
         redirectToPayFast({
           orderId:     order.id,
@@ -322,6 +397,12 @@ export function Checkout() {
     notifyNewOrder(localOrder)
     clearCart()
 
+    if (DEMO_CHECKOUT) {
+      setDemoPayment({ orderId: localId, orderNumber: orderNumber, order: localOrder })
+      setSubmitting(false)
+      return
+    }
+
     const nameParts = form.name.trim().split(' ')
     redirectToPayFast({
       orderId:     localId,
@@ -336,6 +417,14 @@ export function Checkout() {
 
   return (
     <div className="min-h-screen bg-cxx-bg">
+      {demoPayment && (
+        <DemoPaymentModal
+          amount={demoPayment.order.total}
+          orderNumber={demoPayment.orderNumber}
+          onPay={handleDemoPay}
+          onCancel={() => { setDemoPayment(null); setSubmitting(false) }}
+        />
+      )}
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -407,7 +496,15 @@ export function Checkout() {
                   {!isCollection && (
                     <>
                       <Field label={t('address')} error={errors.address_line1} required>
-                        <input type="text" value={form.address_line1} onChange={(e) => set('address_line1', e.target.value)} className={inp(errors.address_line1)} placeholder="123 Main Street" />
+                        <AddressAutocomplete
+                          value={form.address_line1}
+                          onChange={(v) => set('address_line1', v)}
+                          onSelect={applyAddressSelection}
+                          className={inp(errors.address_line1)}
+                          placeholder="Start typing your address..."
+                          required
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Pick a suggestion to auto-fill the rest</p>
                       </Field>
 
                       <Field label={t('address2')}>
@@ -446,10 +543,21 @@ export function Checkout() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-amber-800">Secure PayFast Payment</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    You'll be redirected to PayFast to complete payment securely. Card, EFT & instant EFT accepted.
-                  </p>
+                  {DEMO_CHECKOUT ? (
+                    <>
+                      <p className="text-sm font-semibold text-amber-800">Demo Checkout Active</p>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        No real payment is processed. Orders and emails work exactly as in production.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-semibold text-amber-800">Secure PayFast Payment</p>
+                      <p className="text-xs text-amber-700 mt-0.5">
+                        You'll be redirected to PayFast to complete payment securely. Card, EFT & instant EFT accepted.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -495,7 +603,9 @@ export function Checkout() {
                   className="w-full flex items-center justify-center gap-2 bg-cxx-blue hover:bg-cxx-blue-hover text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60"
                 >
                   {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {submitting ? 'Redirecting to PayFast...' : 'Pay with PayFast'}
+                  {submitting
+                    ? (DEMO_CHECKOUT ? 'Creating order…' : 'Redirecting to PayFast…')
+                    : (DEMO_CHECKOUT ? 'Continue to Payment' : 'Pay with PayFast')}
                 </button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">

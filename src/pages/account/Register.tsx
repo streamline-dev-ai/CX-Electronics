@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Zap, Loader2, Mail } from 'lucide-react'
+import { Zap, Loader2, Mail, Check } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 export function AccountRegister() {
@@ -10,6 +10,7 @@ export function AccountRegister() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [state, setState] = useState<'idle' | 'loading' | 'confirm'>('idle')
 
@@ -20,7 +21,7 @@ export function AccountRegister() {
     setState('loading')
     setError(null)
 
-    const { error: err, needsConfirmation } = await signUp(email, password, name)
+    const { error: err, needsConfirmation } = await signUp(email, password, name, remember)
     if (err) {
       setError(err)
       setState('idle')
@@ -37,7 +38,7 @@ export function AccountRegister() {
 
   if (state === 'confirm') {
     return (
-      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4 py-8">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 bg-blue-900/40 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <Mail className="w-7 h-7 text-blue-400" />
@@ -59,7 +60,7 @@ export function AccountRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -92,6 +93,24 @@ export function AccountRegister() {
                 placeholder={placeholder} />
             </div>
           ))}
+
+          <label className="flex items-center gap-2 cursor-pointer select-none group pt-1">
+            <span
+              className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                remember ? 'bg-[#E63939] border-[#E63939]' : 'border-white/30 group-hover:border-white/50'
+              }`}
+            >
+              {remember && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+            </span>
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="sr-only"
+            />
+            <span className="text-xs text-white/60 group-hover:text-white/80 transition-colors">Keep me signed in on this device</span>
+          </label>
+
           <button type="submit" disabled={state === 'loading'}
             className="w-full flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-60">
             {state === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}

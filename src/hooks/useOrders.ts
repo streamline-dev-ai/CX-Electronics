@@ -17,6 +17,8 @@ const ORDER_DETAIL_SELECT = ORDER_SELECT + `,
 
 interface UseOrdersOptions {
   status?: OrderStatus
+  search?: string
+  demoMode?: boolean
   page?: number
   pageSize?: number
 }
@@ -30,7 +32,7 @@ interface UseOrdersResult {
 }
 
 export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
-  const { status, page = 1, pageSize = 50 } = opts
+  const { status, search, demoMode, page = 1, pageSize = 50 } = opts
   const [orders, setOrders] = useState<OrderWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -54,6 +56,9 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
         .range(from, to)
 
       if (status) query = query.eq('status', status)
+      if (search) query = query.ilike('order_number', `%${search}%`)
+      if (demoMode === true) query = query.like('order_number', 'DEMO-%')
+      if (demoMode === false) query = query.not('order_number', 'like', 'DEMO-%')
 
       const { data, error: err, count } = await query
 
@@ -73,7 +78,7 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
 
     load()
     return () => { cancelled = true }
-  }, [status, page, pageSize, version])
+  }, [status, search, demoMode, page, pageSize, version])
 
   return { orders, loading, error, totalCount, refetch }
 }

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X } from 'lucide-react'
 import { useOrders, updateOrderStatus } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
+import { useAdminMode } from '../../hooks/useAdminMode'
 import type { OrderStatus, OrderWithDetails } from '../../lib/supabase'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
@@ -48,12 +49,27 @@ const ALL_STATUSES: OrderStatus[] = [
 ]
 
 export function AdminOrders() {
+  const [adminMode] = useAdminMode()
+  const isDemo = adminMode === 'demo'
   const [status, setStatus] = useState<OrderStatus | undefined>()
   const [page, setPage] = useState(1)
   const [advancing, setAdvancing] = useState<string | null>(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
 
-  const { orders, loading, totalCount, refetch } = useOrders({ status, page, pageSize: 50 })
+  const { orders, loading, totalCount, refetch } = useOrders({ status, search: search || undefined, demoMode: isDemo, page, pageSize: 50 })
   const totalPages = Math.ceil(totalCount / 50)
+
+  const applySearch = useCallback(() => {
+    setPage(1)
+    setSearch(searchInput.trim())
+  }, [searchInput])
+
+  function clearSearch() {
+    setSearchInput('')
+    setSearch('')
+    setPage(1)
+  }
 
   async function advanceOrder(order: OrderWithDetails, next: OrderStatus) {
     setAdvancing(order.id)
@@ -67,11 +83,38 @@ export function AdminOrders() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">
-          Orders <span className="text-sm font-normal text-gray-400">订单</span>
-        </h1>
-        <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">
+            Orders <span className="text-sm font-normal text-gray-400">订单</span>
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
+        </div>
+
+        {/* Search by order number */}
+        <form
+          onSubmit={(e) => { e.preventDefault(); applySearch() }}
+          className="flex gap-2 flex-shrink-0"
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Order number…"
+              className="pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] w-48"
+            />
+            {searchInput && (
+              <button type="button" onClick={clearSearch} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+          <button type="submit" className="px-3 py-2 text-sm font-semibold bg-[#0F172A] text-white rounded-lg hover:bg-[#1e293b] transition-colors">
+            Search
+          </button>
+        </form>
       </div>
 
       {/* Status filter */}

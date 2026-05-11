@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useLocation } from 'react-router-dom'
-import { CheckCircle, Package } from 'lucide-react'
+import { CheckCircle, Package, FileText, Clock } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { getOrder } from '../../hooks/useOrders'
@@ -31,12 +31,37 @@ export function OrderConfirmation() {
       }
     } catch { /* fall through */ }
 
-    // Try fetching from Supabase
+    // Fetch from Supabase
     getOrder(id).then((o) => {
       setOrder(o)
       setLoading(false)
     })
   }, [id, stateOrder])
+
+  // Poll for PayFast ITN payment confirmation.
+  // PayFast's return_url fires before the ITN in some cases, so the order
+  // may still be 'pending' when this page first loads. Poll for up to 45s.
+  useEffect(() => {
+    if (!id || !order) return
+    const alreadyPaid = order.payment_status === 'paid' || order.status === 'paid'
+    if (alreadyPaid) return
+
+    let attempts = 0
+    const MAX = 15 // 15 × 3s = 45s
+
+    const timer = setInterval(async () => {
+      attempts++
+      const fresh = await getOrder(id)
+      if (fresh && (fresh.payment_status === 'paid' || fresh.status === 'paid')) {
+        setOrder(fresh)
+        clearInterval(timer)
+      } else if (attempts >= MAX) {
+        clearInterval(timer)
+      }
+    }, 3000)
+
+    return () => clearInterval(timer)
+  }, [id, order?.payment_status, order?.status]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -64,6 +89,7 @@ export function OrderConfirmation() {
   }
 
   const addr = order.shipping_address
+  const isPaid = order.payment_status === 'paid' || order.status === 'paid'
 
   return (
     <div className="min-h-screen bg-cxx-bg">
@@ -72,17 +98,42 @@ export function OrderConfirmation() {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-12">
         {/* Success header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isPaid ? 'bg-green-100' : 'bg-blue-50'}`}>
+            {isPaid
+              ? <CheckCircle className="w-8 h-8 text-green-600" />
+              : <Clock className="w-8 h-8 text-blue-500" />}
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Order Placed!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {isPaid ? 'Payment Received!' : 'Order Placed!'}
+          </h1>
           <p className="text-gray-500">Order #{order.order_number}</p>
         </div>
 
         {/* Status banner */}
-        <div className="bg-green-50 text-green-700 border border-green-200 rounded-xl p-4 mb-5 text-sm font-medium text-center">
-          Order confirmed — our team will contact you to arrange payment.
-        </div>
+        {isPaid ? (
+          <div className="bg-green-50 text-green-700 border border-green-200 rounded-xl p-4 mb-5 text-sm font-medium text-center">
+            Payment confirmed — a receipt has been sent to your email.
+          </div>
+        ) : (
+          <div className="bg-blue-50 text-blue-700 border border-blue-200 rounded-xl p-4 mb-5 text-sm font-medium text-center">
+            Your order is being processed. You'll receive a confirmation email once payment clears.
+          </div>
+        )}
+
+        {/* Receipt button — shown when paid */}
+        {isPaid && (
+          <div className="mb-5 text-center">
+            <a
+              href={`/receipt/${order.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#0F172A] hover:bg-[#1e293b] text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              View &amp; Download Receipt
+            </a>
+          </div>
+        )}
 
         {/* Customer info */}
         {order.customers && (

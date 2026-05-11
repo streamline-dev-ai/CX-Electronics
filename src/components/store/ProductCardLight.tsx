@@ -7,6 +7,7 @@ import { useLang } from '../../context/LangContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { getProductImageUrl } from '../../lib/supabase'
 import type { ProductWithCategory } from '../../lib/supabase'
+import { getWholesalePrice, getWholesaleMinQty, getWholesaleSavingsPct } from '../../lib/wholesale'
 
 interface ProductCardLightProps {
   product: ProductWithCategory
@@ -28,7 +29,9 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
 
   const isOutOfStock = product.stock_status === 'out_of_stock'
   const isBulkView = basePath === '/bulk'
-  const price = isBulkView && product.bulk_price ? product.bulk_price : product.retail_price
+  const wholesalePrice = getWholesalePrice(product)
+  const wholesaleMinQty = getWholesaleMinQty(product)
+  const price = isBulkView ? wholesalePrice : product.retail_price
   const name = lang === 'zh' && product.name_zh ? product.name_zh : product.name
 
   const groupSlug = product.product_variant_groups?.slug
@@ -88,10 +91,7 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
     return () => { clearTimeout(timeout); stopCycling() }
   }, [isInView, cardImages.length])
 
-  const savingsPct =
-    isBulkView && product.bulk_price && product.retail_price > product.bulk_price
-      ? Math.round((1 - product.bulk_price / product.retail_price) * 100)
-      : 0
+  const savingsPct = isBulkView ? getWholesaleSavingsPct(product.retail_price, wholesalePrice) : 0
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault()
@@ -100,10 +100,10 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
       productId: product.id,
       name: product.name,
       price,
-      quantity: isBulkView && product.bulk_min_qty ? product.bulk_min_qty : 1,
+      quantity: isBulkView ? wholesaleMinQty : 1,
       image: product.thumbnail_url ?? '',
       orderType: isBulkView ? 'bulk' : 'retail',
-      bulkMinQty: product.bulk_min_qty ?? undefined,
+      bulkMinQty: isBulkView ? wholesaleMinQty : undefined,
     })
   }
 
@@ -173,16 +173,16 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
                   {t('featured')}
                 </span>
               )}
-              {!isBulkView && product.is_bulk_available && product.bulk_price && (
-                <span className="text-[10px] bg-gray-900 text-white px-2 py-0.5 rounded font-bold">
-                  Bulk from R{product.bulk_price.toFixed(0)}
+              {!isBulkView && (
+                <span className="text-[10px] bg-[#0F172A] text-white px-2 py-0.5 rounded font-bold">
+                  Wholesale R{wholesalePrice.toFixed(0)} ({wholesaleMinQty}+)
                 </span>
               )}
             </div>
 
-            {isBulkView && product.bulk_min_qty && (
+            {isBulkView && (
               <span className="absolute bottom-2.5 left-2.5 text-[10px] bg-[#E63939] text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                {product.bulk_min_qty}+ units
+                {wholesaleMinQty}+ units
               </span>
             )}
 
@@ -222,8 +222,8 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
 
             <div className="mt-auto pt-2">
               {/* Price */}
-              <div className="flex items-baseline gap-2 mb-0.5">
-                <span className="text-base font-extrabold text-gray-900">
+              <div className="flex items-baseline gap-2 mb-0.5 flex-wrap">
+                <span className="text-base font-extrabold text-[#E63939]">
                   R{price.toFixed(2)}
                 </span>
                 {isBulkView && product.retail_price > price && (
@@ -232,7 +232,9 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
                   </span>
                 )}
                 {savingsPct > 0 && (
-                  <span className="text-xs font-bold text-[#E63939]">{savingsPct}% off</span>
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                    Save {savingsPct}%
+                  </span>
                 )}
               </div>
               {isBulkView && (

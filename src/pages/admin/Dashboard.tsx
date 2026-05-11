@@ -6,6 +6,7 @@ import {
   ResponsiveContainer, Legend,
 } from 'recharts'
 import { supabase } from '../../lib/supabase'
+import { useAdminMode } from '../../hooks/useAdminMode'
 
 type DateFilter = 'today' | '7d' | '30d' | '90d' | 'all' | 'custom'
 
@@ -132,6 +133,8 @@ function ProductTooltip({ active, payload, label }: { active?: boolean; payload?
 }
 
 export function AdminDashboard() {
+  const [adminMode] = useAdminMode()
+  const isDemo = adminMode === 'demo'
   const [filter, setFilter] = useState<DateFilter>('30d')
   const [customFrom, setCustomFrom] = useState('')
   const [customTo, setCustomTo] = useState('')
@@ -142,24 +145,33 @@ export function AdminDashboard() {
   })
   const [alerts, setAlerts] = useState({ pending: 0, outOfStock: 0 })
 
-  // Always-fresh alert stats (not date-filtered)
+  // Always-fresh alert stats (not date-filtered, scoped to current mode)
   useEffect(() => {
+    let pendingQ = supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+    if (isDemo) pendingQ = pendingQ.like('order_number', 'DEMO-%')
+    else pendingQ = pendingQ.not('order_number', 'like', 'DEMO-%')
+
     Promise.all([
-      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      pendingQ,
       supabase.from('products').select('id', { count: 'exact', head: true }).eq('stock_status', 'out_of_stock').eq('active', true),
     ]).then(([p, o]) => setAlerts({ pending: p.count ?? 0, outOfStock: o.count ?? 0 }))
-  }, [])
+  }, [isDemo])
 
   const loadData = useCallback(async () => {
     setLoading(true)
     const range = getDateRange(filter, customFrom, customTo)
 
-    const { data: orders } = await supabase
+    let ordersQ = supabase
       .from('orders')
       .select('id, total, payment_status, created_at')
       .gte('created_at', range.from)
       .lte('created_at', range.to)
       .order('created_at', { ascending: true })
+
+    if (isDemo) ordersQ = ordersQ.like('order_number', 'DEMO-%')
+    else ordersQ = ordersQ.not('order_number', 'like', 'DEMO-%')
+
+    const { data: orders } = await ordersQ
 
     const ordersData = orders ?? []
     const paidOrders = ordersData.filter((o) => o.payment_status === 'paid')
@@ -187,7 +199,7 @@ export function AdminDashboard() {
       topProducts: buildTopProducts(itemsData),
     })
     setLoading(false)
-  }, [filter, customFrom, customTo])
+  }, [filter, customFrom, customTo, isDemo])
 
   useEffect(() => {
     if (filter !== 'custom' || (customFrom && customTo)) {

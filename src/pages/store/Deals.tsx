@@ -31,7 +31,7 @@ const FEATURED_DEALS = [
     bulk: 749,
     minQty: 10,
     badge: 'Save R1,500',
-    accent: 'from-[#111827] to-[#374151]',
+    accent: 'from-[#0F172A] to-[#374151]',
   },
   {
     id: 'deal-3',
@@ -149,7 +149,7 @@ export function Deals() {
 // ─────────────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section className="relative bg-[#111827] overflow-hidden">
+    <section className="relative bg-[#0F172A] overflow-hidden">
       {/* Animated lightning bg */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <motion.div
@@ -264,13 +264,9 @@ function FeaturedOffers() {
                 className="group relative bg-white rounded-2xl overflow-hidden shadow-lg shadow-gray-200/50 border border-gray-100 hover:shadow-2xl hover:shadow-[#E63939]/15 hover:border-[#E63939]/40 transition-all"
               >
                 {/* Image */}
-                <div className={`relative aspect-[4/3] bg-gradient-to-br ${deal.accent} overflow-hidden`}>
-                  <img
-                    src={deal.image || '/placeholder.svg'}
-                    alt={deal.title}
-                    className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-90 group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className={`relative aspect-[4/3] bg-gradient-to-br ${deal.accent} overflow-hidden flex items-center justify-center`}>
+                  <Zap className="w-28 h-28 text-white/25 group-hover:scale-110 transition-transform duration-700" strokeWidth={1.2} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 via-transparent to-transparent" />
 
                   {/* Badge */}
                   <div className="absolute top-4 left-4 bg-white text-[#E63939] text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md uppercase tracking-wider">
@@ -278,7 +274,7 @@ function FeaturedOffers() {
                   </div>
 
                   {/* Min qty pill */}
-                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                  <div className="absolute top-4 right-4 bg-[#0F172A]/70 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                     Min {deal.minQty} units
                   </div>
                 </div>
@@ -427,7 +423,7 @@ function PricingTables() {
                   className="overflow-hidden"
                 >
                   <div className="px-4 pb-4">
-                    <div className="bg-[#111827] rounded-xl overflow-hidden">
+                    <div className="bg-[#0F172A] rounded-xl overflow-hidden">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-white/10">
@@ -509,7 +505,7 @@ function PricingTables() {
 // ─────────────────────────────────────────────────────────────
 function FinalCTA() {
   return (
-    <section className="py-16 bg-[#111827] relative overflow-hidden">
+    <section className="py-16 bg-[#0F172A] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <Zap className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] text-[#E63939]" strokeWidth={1} />
       </div>

@@ -307,18 +307,18 @@ export function VariantProductDetail() {
             {/* Price block: Retail + Wholesale */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl p-4">
-                <p className="text-[11px] uppercase tracking-widest text-[#000000]/50 font-semibold mb-1">
+                <p className="text-[11px] uppercase tracking-widest text-[#0F172A]/50 font-semibold mb-1">
                   {pricesVary ? 'From' : 'Retail'}
                 </p>
-                <p className="text-2xl sm:text-3xl font-bold text-[#000000] leading-none">
+                <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] leading-none">
                   R{activeVariant.retail_price.toFixed(2)}
                 </p>
                 {pricesVary && (
-                  <p className="text-[11px] text-[#000000]/50 mt-1">Price varies by variant</p>
+                  <p className="text-[11px] text-[#0F172A]/50 mt-1">Price varies by variant</p>
                 )}
               </div>
 
-              <div className="relative bg-[#000000] rounded-xl p-4 text-white">
+              <div className="relative bg-[#0F172A] rounded-xl p-4 text-white">
                 <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider">
                   Save {wholesaleSavingsPct}%
                 </span>
@@ -334,7 +334,7 @@ export function VariantProductDetail() {
 
             {/* Volume bar */}
             <div className="mb-6 bg-[#F5F5F5] border border-[#E5E7EB] rounded-xl px-4 py-3">
-              <p className="text-xs font-semibold text-[#000000] mb-1.5">
+              <p className="text-xs font-semibold text-[#0F172A] mb-1.5">
                 Buy {wholesaleMinQty}+ units to unlock wholesale — save {wholesaleSavingsPct}%
               </p>
               <div className="h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
@@ -343,7 +343,7 @@ export function VariantProductDetail() {
                   style={{ width: `${Math.min(100, (qty / wholesaleMinQty) * 100)}%` }}
                 />
               </div>
-              <p className="text-[11px] text-[#000000]/50 mt-1">
+              <p className="text-[11px] text-[#0F172A]/50 mt-1">
                 {qty >= wholesaleMinQty
                   ? 'Wholesale price unlocked! Contact us to order.'
                   : `Add ${wholesaleMinQty - qty} more unit${wholesaleMinQty - qty === 1 ? '' : 's'} for wholesale pricing`}

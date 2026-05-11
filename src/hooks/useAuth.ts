@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase, setAdminRememberMe } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthState {
@@ -26,7 +26,8 @@ export function useAuth(): AuthState {
   return state
 }
 
-export async function signIn(email: string, password: string) {
+export async function signIn(email: string, password: string, remember = true) {
+  setAdminRememberMe(remember)
   return supabase.auth.signInWithPassword({ email, password })
 }
 

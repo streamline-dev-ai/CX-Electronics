@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { User } from '@supabase/supabase-js'
-import { customerSupabase } from '../lib/customerAuth'
+import { customerSupabase, setRememberMe } from '../lib/customerAuth'
 import { notifySignup } from '../lib/webhooks'
 
 export interface CustomerUser {
@@ -18,8 +18,8 @@ interface SignUpResult {
 interface CustomerAuthContextType {
   user: CustomerUser | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<string | null>
-  signUp: (email: string, password: string, name: string) => Promise<SignUpResult>
+  signIn: (email: string, password: string, remember?: boolean) => Promise<string | null>
+  signUp: (email: string, password: string, name: string, remember?: boolean) => Promise<SignUpResult>
   signOut: () => Promise<void>
   updateName: (name: string) => Promise<string | null>
 }
@@ -52,7 +52,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  async function signUp(email: string, password: string, name: string): Promise<SignUpResult> {
+  async function signUp(email: string, password: string, name: string, remember = true): Promise<SignUpResult> {
+    setRememberMe(remember)
     const { data, error } = await customerSupabase.auth.signUp({
       email,
       password,
@@ -72,7 +73,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     return { error: null, needsConfirmation }
   }
 
-  async function signIn(email: string, password: string): Promise<string | null> {
+  async function signIn(email: string, password: string, remember = true): Promise<string | null> {
+    setRememberMe(remember)
     const { error } = await customerSupabase.auth.signInWithPassword({ email, password })
     if (error) {
       if (error.message.toLowerCase().includes('email not confirmed')) {

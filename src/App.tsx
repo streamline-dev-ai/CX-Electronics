@@ -8,13 +8,17 @@ import { ProtectedRoute } from './components/admin/ProtectedRoute'
 import { ScrollToTop } from './components/ScrollToTop'
 import { AddToCartDrawer } from './components/store/AddToCartDrawer'
 import { ExitIntentPopup } from './components/store/ExitIntentPopup'
+import { PWAPrompt } from './components/PWAPrompt'
 
 // Customer account — lazy loaded
 const AccountLogin    = lazy(() => import('./pages/account/Login').then((m) => ({ default: m.AccountLogin })))
 const AccountRegister = lazy(() => import('./pages/account/Register').then((m) => ({ default: m.AccountRegister })))
+const ForgotPassword  = lazy(() => import('./pages/account/ForgotPassword').then((m) => ({ default: m.ForgotPassword })))
+const ResetPassword   = lazy(() => import('./pages/account/ResetPassword').then((m) => ({ default: m.ResetPassword })))
 const AccountLayout   = lazy(() => import('./pages/account/AccountLayout').then((m) => ({ default: m.AccountLayout })))
 const AccountProfile  = lazy(() => import('./pages/account/Profile').then((m) => ({ default: m.AccountProfile })))
 const MyOrders        = lazy(() => import('./pages/account/MyOrders').then((m) => ({ default: m.MyOrders })))
+const AccountOrderDetail = lazy(() => import('./pages/account/OrderDetail').then((m) => ({ default: m.AccountOrderDetail })))
 const Wishlist        = lazy(() => import('./pages/account/Wishlist').then((m) => ({ default: m.Wishlist })))
 
 // Public store — eagerly loaded
@@ -43,6 +47,7 @@ const ProductForm = lazy(() => import('./pages/admin/ProductForm').then((m) => (
 const AdminOrders = lazy(() => import('./pages/admin/Orders').then((m) => ({ default: m.AdminOrders })))
 const AdminOrderDetail  = lazy(() => import('./pages/admin/OrderDetail').then((m) => ({ default: m.AdminOrderDetail })))
 const AdminOrderInvoice = lazy(() => import('./pages/admin/OrderInvoice').then((m) => ({ default: m.AdminOrderInvoice })))
+const AdminCustomers    = lazy(() => import('./pages/admin/Customers').then((m) => ({ default: m.AdminCustomers })))
 const ReceiptDemo       = lazy(() => import('./pages/admin/ReceiptDemo').then((m) => ({ default: m.ReceiptDemo })))
 
 function AdminFallback() {
@@ -63,6 +68,7 @@ export default function App() {
           <ScrollToTop />
           <AddToCartDrawer />
           <ExitIntentPopup />
+          <PWAPrompt />
           <Routes>
             {/* ── Public store ─────────────────────────────────── */}
             <Route path="/" element={<Home />} />
@@ -85,13 +91,16 @@ export default function App() {
             <Route path="/invoice/wholesale" element={<WholesaleInvoice />} />
 
             {/* ── Customer account ──────────────────────────────── */}
-            <Route path="/account/login"    element={<Suspense fallback={<AdminFallback />}><AccountLogin /></Suspense>} />
-            <Route path="/account/register" element={<Suspense fallback={<AdminFallback />}><AccountRegister /></Suspense>} />
+            <Route path="/account/login"           element={<Suspense fallback={<AdminFallback />}><AccountLogin /></Suspense>} />
+            <Route path="/account/register"        element={<Suspense fallback={<AdminFallback />}><AccountRegister /></Suspense>} />
+            <Route path="/account/forgot-password" element={<Suspense fallback={<AdminFallback />}><ForgotPassword /></Suspense>} />
+            <Route path="/account/reset-password"  element={<Suspense fallback={<AdminFallback />}><ResetPassword /></Suspense>} />
             <Route path="/account" element={<Suspense fallback={<AdminFallback />}><AccountLayout /></Suspense>}>
               <Route index element={<Navigate to="/account/profile" replace />} />
-              <Route path="profile"  element={<Suspense fallback={<AdminFallback />}><AccountProfile /></Suspense>} />
-              <Route path="orders"   element={<Suspense fallback={<AdminFallback />}><MyOrders /></Suspense>} />
-              <Route path="wishlist" element={<Suspense fallback={<AdminFallback />}><Wishlist /></Suspense>} />
+              <Route path="profile"    element={<Suspense fallback={<AdminFallback />}><AccountProfile /></Suspense>} />
+              <Route path="orders"     element={<Suspense fallback={<AdminFallback />}><MyOrders /></Suspense>} />
+              <Route path="orders/:id" element={<Suspense fallback={<AdminFallback />}><AccountOrderDetail /></Suspense>} />
+              <Route path="wishlist"   element={<Suspense fallback={<AdminFallback />}><Wishlist /></Suspense>} />
             </Route>
 
             {/* ── Admin ─────────────────────────────────────────── */}
@@ -121,6 +130,7 @@ export default function App() {
               <Route path="orders" element={<Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>} />
               <Route path="orders/:id" element={<Suspense fallback={<AdminFallback />}><AdminOrderDetail /></Suspense>} />
               <Route path="orders/:id/invoice" element={<Suspense fallback={<AdminFallback />}><AdminOrderInvoice /></Suspense>} />
+              <Route path="customers" element={<Suspense fallback={<AdminFallback />}><AdminCustomers /></Suspense>} />
             </Route>
 
             {/* Fallback */}

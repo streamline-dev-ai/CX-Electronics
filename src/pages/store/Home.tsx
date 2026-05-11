@@ -85,9 +85,10 @@ export function Home() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <SEO
-        title="CW Electronics — Wholesale & Retail Electronics | Crown Mines JHB"
-        description="Direct importer of chargers, CCTV, solar, routers, smartwatches & accessories in Johannesburg. Trade pricing for resellers. Free Gauteng delivery over R2,000."
-        url="https://cw-electronics.co.za/"
+        title="CW Electronics — Wholesale & Retail Electronics in Johannesburg"
+        description="Direct importer of chargers, CCTV cameras, solar inverters, routers, smartwatches & accessories. Trade pricing for resellers, fast nationwide delivery. China Mart, Crown Mines, JHB."
+        url="/"
+        keywords="electronics wholesale Johannesburg, CCTV South Africa, solar inverters, chargers, routers, China Mart Crown Mines, electronics importer JHB, wholesale electronics South Africa"
       />
       <Navbar />
       <HeroCarousel />

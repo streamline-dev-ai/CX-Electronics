@@ -89,7 +89,7 @@ export function BulkShop() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative bg-[#111827] overflow-hidden">
+      <section className="relative bg-[#0F172A] overflow-hidden">
         <div className="absolute -right-32 top-1/2 -translate-y-1/2 hidden md:block pointer-events-none">
           <Zap className="w-[560px] h-[560px] text-[#E63939] opacity-10" strokeWidth={1} />
         </div>
@@ -150,7 +150,7 @@ export function BulkShop() {
 
       {/* ── Top Bulk Deals Pricing Table ─────────────────── */}
       {topDeals.length > 0 && (
-        <section className="bg-[#0d1424] py-14 border-t border-white/5">
+        <section className="bg-[#0B1220] py-14 border-t border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-8">
               <div>
@@ -171,7 +171,7 @@ export function BulkShop() {
               </a>
             </div>
 
-            <div className="bg-[#111827] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="bg-[#0F172A] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -356,7 +356,7 @@ export function BulkShop() {
       </section>
 
       {/* ── Big CTA ──────────────────────────────────────── */}
-      <section className="bg-[#111827] py-16 relative overflow-hidden">
+      <section className="bg-[#0F172A] py-16 relative overflow-hidden">
         <div className="absolute -left-32 top-0 hidden md:block pointer-events-none">
           <Zap className="w-[420px] h-[420px] text-[#E63939] opacity-10" strokeWidth={1} />
         </div>

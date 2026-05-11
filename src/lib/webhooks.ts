@@ -5,6 +5,9 @@ import {
   orderPackedDelivery,
   orderPackedCollection,
   outForDelivery,
+  orderDelivered,
+  orderCollected,
+  orderCancelled,
   ownerNewOrder,
   welcomeEmail,
 } from '../emails'
@@ -120,6 +123,12 @@ export async function notifyStatusChange(
       : orderPackedDelivery(updatedOrder)
   } else if (newStatus === 'out_for_delivery') {
     customerEmailHtml = outForDelivery(updatedOrder)
+  } else if (newStatus === 'delivered') {
+    customerEmailHtml = orderDelivered(updatedOrder)
+  } else if (newStatus === 'collected') {
+    customerEmailHtml = orderCollected(updatedOrder)
+  } else if (newStatus === 'cancelled') {
+    customerEmailHtml = orderCancelled(updatedOrder)
   }
 
   const subjectLabel = STATUS_SUBJECTS[newStatus] ?? 'Order Update'

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Zap, Loader2 } from 'lucide-react'
+import { Zap, Loader2, Check } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 export function AccountLogin() {
@@ -11,6 +11,7 @@ export function AccountLogin() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -18,13 +19,13 @@ export function AccountLogin() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const err = await signIn(email, password)
+    const err = await signIn(email, password, remember)
     if (err) { setError(err); setLoading(false) }
     else navigate(from, { replace: true })
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -58,6 +59,31 @@ export function AccountLogin() {
               className="w-full px-3 py-2.5 text-sm bg-white/10 border border-white/20 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E63939] placeholder:text-white/30"
               placeholder="••••••••" />
           </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <label className="flex items-center gap-2 cursor-pointer select-none group">
+              <span
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  remember
+                    ? 'bg-[#E63939] border-[#E63939]'
+                    : 'border-white/30 group-hover:border-white/50'
+                }`}
+              >
+                {remember && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+              </span>
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="sr-only"
+              />
+              <span className="text-xs text-white/60 group-hover:text-white/80 transition-colors">Remember me</span>
+            </label>
+            <Link to="/account/forgot-password" className="text-xs text-white/40 hover:text-white/70 transition-colors">
+              Forgot password?
+            </Link>
+          </div>
+
           <button type="submit" disabled={loading}
             className="w-full flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-60">
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}

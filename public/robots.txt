@@ -1,6 +1,19 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /account/
 
+# Block admin & checkout flow (private + non-indexable)
+Disallow: /admin
+Disallow: /admin/
+Disallow: /account
+Disallow: /account/
+Disallow: /checkout
+Disallow: /cart
+Disallow: /order/
+Disallow: /receipt/
+Disallow: /invoice/
+
+# Crawler hints
+Crawl-delay: 1
+
+# Sitemaps
 Sitemap: https://cw-electronics.co.za/sitemap.xml

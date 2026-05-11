@@ -1,11 +1,13 @@
-﻿import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Check } from 'lucide-react'
 import { signIn } from '../../hooks/useAuth'
 
 export function AdminLogin() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -14,7 +16,7 @@ export function AdminLogin() {
     setLoading(true)
     setError(null)
 
-    const { error: err } = await signIn(email, password)
+    const { error: err } = await signIn(email, password, remember)
 
     if (err) {
       setError('Invalid email or password')
@@ -29,7 +31,13 @@ export function AdminLogin() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8"><img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-10 w-auto" /><div><p className="font-bold text-cxx-navy leading-tight">CW Electronics</p><p className="text-xs text-cxx-muted">Admin Panel</p></div></div>
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <img src="https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png" alt="CW Electronics Logo" className="h-10 w-auto" />
+          <div>
+            <p className="font-bold text-cxx-navy leading-tight">CW Electronics</p>
+            <p className="text-xs text-cxx-muted">Admin Panel</p>
+          </div>
+        </div>
 
         {/* Form */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -51,8 +59,9 @@ export function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cxx-blue focus:border-transparent"
-                placeholder="admin@cxxelectronics.com"
+                placeholder="admin@cwelectronics.co.za"
               />
             </div>
 
@@ -65,10 +74,28 @@ export function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cxx-blue focus:border-transparent"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="••••••••"
               />
             </div>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none group">
+              <span
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  remember ? 'bg-cxx-blue border-cxx-blue' : 'border-gray-300 group-hover:border-gray-400'
+                }`}
+              >
+                {remember && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+              </span>
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="sr-only"
+              />
+              <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Keep me signed in</span>
+            </label>
 
             <button
               type="submit"
@@ -83,4 +110,3 @@ export function AdminLogin() {
     </div>
   )
 }
-

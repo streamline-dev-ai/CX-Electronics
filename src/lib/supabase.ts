@@ -5,6 +5,41 @@ const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL ||
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ||
   import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) as string
 
+const ADMIN_REMEMBER_KEY = 'cxx-admin-remember'
+
+export function setAdminRememberMe(remember: boolean) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(ADMIN_REMEMBER_KEY, remember ? 'true' : 'false')
+}
+
+export function getAdminRememberMe(): boolean {
+  if (typeof window === 'undefined') return true
+  return localStorage.getItem(ADMIN_REMEMBER_KEY) !== 'false'
+}
+
+// Storage adapter: route session to localStorage (remember) or sessionStorage (don't).
+const adminStorage = {
+  getItem(key: string): string | null {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem(key) ?? sessionStorage.getItem(key)
+  },
+  setItem(key: string, value: string): void {
+    if (typeof window === 'undefined') return
+    if (getAdminRememberMe()) {
+      localStorage.setItem(key, value)
+      sessionStorage.removeItem(key)
+    } else {
+      sessionStorage.setItem(key, value)
+      localStorage.removeItem(key)
+    }
+  },
+  removeItem(key: string): void {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem(key)
+    sessionStorage.removeItem(key)
+  },
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
@@ -12,6 +47,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     storageKey: 'cxx-admin-auth',
     flowType: 'pkce',
+    storage: adminStorage,
   },
 })
 

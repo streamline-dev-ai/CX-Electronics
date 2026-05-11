@@ -75,7 +75,7 @@ export function HeroSection() {
   const slide = HERO_SLIDES[currentSlide]
 
   return (
-    <section className="relative bg-[#000000] overflow-hidden">
+    <section className="relative bg-[#0F172A] overflow-hidden">
       {/* Background images with smooth transitions */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
@@ -90,8 +90,8 @@ export function HeroSection() {
             className="w-full h-full object-cover"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#000000] via-[#000000]/85 to-[#000000]/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#000000] via-transparent to-[#000000]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/85 to-[#0F172A]/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-[#0F172A]/40" />
       </div>
 
       {/* Subtle grid pattern */}
@@ -237,7 +237,7 @@ const BENEFITS = [
 
 export function BenefitCards() {
   return (
-    <section className="bg-[#000000] border-t border-white/10">
+    <section className="bg-[#0F172A] border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {BENEFITS.map(({ icon: Icon, title, description }, index) => (
@@ -295,7 +295,7 @@ export function RedCTASection() {
             </Link>
             <Link
               to="/wholesale"
-              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#000000] hover:bg-[#000000]/80 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0F172A] hover:bg-[#0F172A]/80 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
             >
               Browse Wholesale Deals
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

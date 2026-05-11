@@ -327,7 +327,83 @@ export function welcomeEmail(name: string, email: string): string {
   return wrap(body)
 }
 
-// ─── Template 7: Owner New Order Notification ────────────────────────────────
+// ─── Template 7: Order Delivered ─────────────────────────────────────────────
+
+export function orderDelivered(order: OrderWithDetails): string {
+  const name = order.customers?.name ?? 'Customer'
+  const body = `
+    <tr><td style="padding:36px 40px 12px;">
+      <h1 style="margin:0 0 8px;font-size:26px;color:#111827;">Your order has been delivered!</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#4B5563;">Order <strong>#${order.order_number}</strong></p>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">
+        Hi ${name}, your order has been successfully delivered. We hope you love your purchase!
+      </p>
+    </td></tr>
+    <tr><td style="padding:0 0 8px;">
+      ${itemsListSimple(order)}
+    </td></tr>
+    <tr><td style="padding:0 40px 36px;">
+      ${receiptButton(order.id)}
+      <p style="margin:0;text-align:center;font-size:13px;color:#94A3B8;">
+        Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a>
+      </p>
+    </td></tr>`
+  return wrap(body)
+}
+
+// ─── Template 8: Order Collected ─────────────────────────────────────────────
+
+export function orderCollected(order: OrderWithDetails): string {
+  const name = order.customers?.name ?? 'Customer'
+  const body = `
+    <tr><td style="padding:36px 40px 12px;">
+      <h1 style="margin:0 0 8px;font-size:26px;color:#111827;">Order collected — thank you!</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#4B5563;">Order <strong>#${order.order_number}</strong></p>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">
+        Hi ${name}, your order has been collected. Thank you for shopping with us!
+      </p>
+    </td></tr>
+    <tr><td style="padding:0 0 8px;">
+      ${itemsListSimple(order)}
+    </td></tr>
+    <tr><td style="padding:0 40px 36px;">
+      ${receiptButton(order.id)}
+      <p style="margin:0;text-align:center;font-size:13px;color:#94A3B8;">
+        Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a>
+      </p>
+    </td></tr>`
+  return wrap(body)
+}
+
+// ─── Template 9: Order Cancelled ─────────────────────────────────────────────
+
+export function orderCancelled(order: OrderWithDetails): string {
+  const name = order.customers?.name ?? 'Customer'
+  const body = `
+    <tr><td style="padding:36px 40px 12px;">
+      <h1 style="margin:0 0 8px;font-size:26px;color:#111827;">Your order has been cancelled</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#4B5563;">Order <strong>#${order.order_number}</strong></p>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
+        Hi ${name}, your order has been cancelled. If you didn't request this or have any questions, please reach out to us.
+      </p>
+      <div style="background:#FEF2F2;border:1px solid #FECACA;padding:16px 20px;">
+        <p style="margin:0;font-size:14px;color:#991B1B;">
+          If a payment was made, a refund will be processed within 3–5 business days.
+        </p>
+      </div>
+    </td></tr>
+    <tr><td style="padding:0 0 8px;">
+      ${itemsListSimple(order)}
+    </td></tr>
+    <tr><td style="padding:24px 40px 36px;text-align:center;">
+      <p style="margin:0;font-size:13px;color:#94A3B8;">
+        Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a>
+      </p>
+    </td></tr>`
+  return wrap(body)
+}
+
+// ─── Template 10: Owner New Order Notification ───────────────────────────────
 
 export function ownerNewOrder(order: OrderWithDetails): string {
   const isCollection = order.fulfillment_type === 'collection'

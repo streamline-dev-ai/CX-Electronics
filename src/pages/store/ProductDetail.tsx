@@ -17,6 +17,7 @@ import { useProducts } from '../../hooks/useProducts'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { useWishlist } from '../../context/WishlistContext'
+import { getWholesalePrice, getWholesaleMinQty, getWholesaleSavingsPct } from '../../lib/wholesale'
 
 const WHATSAPP_NUMBER = '27000000000'
 
@@ -86,30 +87,32 @@ export function ProductDetail() {
   const isOutOfStock = product.stock_status === 'out_of_stock'
   const images = product.images.length > 0 ? product.images : [product.thumbnail_url ?? '']
 
-  const bulkSavingsPct =
-    product.is_bulk_available && product.bulk_price
-      ? Math.round((1 - product.bulk_price / product.retail_price) * 100)
-      : 0
+  const wholesalePrice = getWholesalePrice(product)
+  const wholesaleMinQty = getWholesaleMinQty(product)
+  const bulkSavingsPct = getWholesaleSavingsPct(product.retail_price, wholesalePrice)
+  const isWholesaleUnlocked = qty >= wholesaleMinQty
+  const activePrice = isWholesaleUnlocked ? wholesalePrice : product.retail_price
+  const savingsPerUnit = product.retail_price - wholesalePrice
+  const totalSaved = isWholesaleUnlocked ? savingsPerUnit * qty : 0
+  const unitsToUnlock = Math.max(0, wholesaleMinQty - qty)
 
   // Filter related, exclude current product
   const relatedProducts = related.filter((p) => p.id !== product.id).slice(0, 4)
 
   function handleAddToCart() {
     if (isOutOfStock) return
-    const useWholesale = product!.is_bulk_available && product!.bulk_price && qty >= (product!.bulk_min_qty ?? Infinity)
-    const activePrice = useWholesale ? product!.bulk_price! : product!.retail_price
     addItem({
       productId: product!.id,
       name: product!.name,
       price: activePrice,
       quantity: qty,
       image: product!.thumbnail_url ?? '',
-      orderType: useWholesale ? 'bulk' : 'retail',
+      orderType: isWholesaleUnlocked ? 'bulk' : 'retail',
       categorySlug: product!.categories?.slug,
     })
   }
 
-  const waMessage = `Bulk enquiry: ${product.name}${product.bulk_min_qty ? ` (min. ${product.bulk_min_qty} units)` : ''}. Bulk price: R${product.bulk_price?.toFixed(2) ?? 'TBD'}.`
+  const waMessage = `Wholesale enquiry: ${product.name} (min. ${wholesaleMinQty} units). Wholesale price: R${wholesalePrice.toFixed(2)}.`
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`
 
   // Build fallback specs for products that don't yet have specifications JSONB
@@ -166,11 +169,42 @@ export function ProductDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO
-        title={`${product.name} | CW Electronics`}
-        description={product.description ? product.description.slice(0, 160) : `Buy ${product.name} at the best price in Johannesburg. Fast delivery across South Africa.`}
+        title={product.name}
+        description={
+          product.description
+            ? product.description.replace(/\s+/g, ' ').slice(0, 160)
+            : `Buy ${product.name} at the best price in Johannesburg. Direct importer · fast nationwide delivery · wholesale pricing available.`
+        }
         image={images[0] || undefined}
-        url={`https://cw-electronics.co.za/shop/${product.slug}`}
+        url={`/shop/${product.slug}`}
         type="product"
+        keywords={[
+          product.name,
+          product.categories?.name,
+          'CW Electronics',
+          'Johannesburg',
+          'South Africa',
+          'wholesale',
+        ].filter(Boolean).join(', ')}
+        breadcrumbs={[
+          { name: 'Home', url: '/' },
+          { name: 'Shop', url: '/shop' },
+          ...(product.categories ? [{ name: product.categories.name, url: `/shop?category=${product.categories.slug}` }] : []),
+          { name: product.name, url: `/shop/${product.slug}` },
+        ]}
+        product={{
+          name: product.name,
+          description: (product.description ?? product.name).replace(/\s+/g, ' ').slice(0, 5000),
+          image: images.filter(Boolean),
+          sku: product.id,
+          brand: 'CW Electronics',
+          category: product.categories?.name,
+          price: product.retail_price,
+          currency: 'ZAR',
+          availability: isOutOfStock ? 'OutOfStock' : 'InStock',
+          condition: 'NewCondition',
+          url: `/shop/${product.slug}`,
+        }}
       />
       <Navbar />
 
@@ -289,67 +323,82 @@ export function ProductDetail() {
               </span>
             </div>
 
-            {/* Price block: Retail + Bulk side-by-side */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            {/* Price block: Retail + Wholesale side-by-side */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Retail */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-4">
+              <div className={`bg-white border-2 rounded-2xl p-4 transition-all ${
+                !isWholesaleUnlocked ? 'border-[#E63939] shadow-md shadow-[#E63939]/10' : 'border-gray-200'
+              }`}>
                 <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-1">Retail</p>
-                <p className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-none">
+                <p className={`text-2xl sm:text-3xl font-extrabold leading-none ${
+                  !isWholesaleUnlocked ? 'text-[#E63939]' : 'text-gray-400 line-through'
+                }`}>
                   R{product.retail_price.toFixed(2)}
                 </p>
                 <p className="text-[11px] text-gray-400 mt-1">Single unit</p>
               </div>
 
-              {/* Bulk */}
-              {product.is_bulk_available && product.bulk_price ? (
-                <div className="relative bg-[#E63939] rounded-2xl p-4 text-white shadow-lg shadow-[#E63939]/30">
-                  {bulkSavingsPct > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
-                      -{bulkSavingsPct}%
-                    </span>
-                  )}
-                  <p className="text-[11px] uppercase tracking-widest text-white/80 font-bold mb-1">
-                    Wholesale ({product.bulk_min_qty}+ units)
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-extrabold leading-none">
-                    R{product.bulk_price.toFixed(2)}
-                  </p>
-                  <p className="text-[11px] text-white/80 mt-1">per unit</p>
-                </div>
-              ) : (
-                <div className="bg-gray-100 rounded-2xl p-4">
-                  <p className="text-[11px] uppercase tracking-widest text-gray-500 font-bold mb-1">Wholesale</p>
-                  <p className="text-base font-bold text-gray-700 leading-tight">Contact for quote</p>
-                </div>
-              )}
+              {/* Wholesale */}
+              <div className={`relative rounded-2xl p-4 transition-all ${
+                isWholesaleUnlocked
+                  ? 'bg-[#E63939] text-white shadow-lg shadow-[#E63939]/30'
+                  : 'bg-[#0F172A] text-white border border-white/10'
+              }`}>
+                {bulkSavingsPct > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-md">
+                    Save {bulkSavingsPct}%
+                  </span>
+                )}
+                <p className="text-[11px] uppercase tracking-widest text-white/80 font-bold mb-1">
+                  Wholesale ({wholesaleMinQty}+)
+                </p>
+                <p className="text-2xl sm:text-3xl font-extrabold leading-none">
+                  R{wholesalePrice.toFixed(2)}
+                </p>
+                <p className="text-[11px] text-white/80 mt-1">per unit</p>
+              </div>
             </div>
 
-            {/* Wholesale progress bar */}
-            {product.is_bulk_available && product.bulk_price && product.bulk_min_qty && (
-              <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
-                {qty >= product.bulk_min_qty ? (
-                  <p className="text-sm font-bold text-emerald-600">
-                    ✓ Wholesale price unlocked — save {bulkSavingsPct}%
+            {/* Wholesale progress bar — always shown */}
+            <div className={`mb-6 rounded-xl p-4 transition-all ${
+              isWholesaleUnlocked
+                ? 'bg-emerald-50 border border-emerald-200'
+                : 'bg-gradient-to-r from-[#FEE9E9] to-white border border-[#E63939]/20'
+            }`}>
+              {isWholesaleUnlocked ? (
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold text-emerald-700 flex items-center gap-1.5">
+                      ✓ Wholesale price unlocked
+                    </p>
+                    <p className="text-xs text-emerald-600 mt-0.5">
+                      Saving R{totalSaved.toFixed(2)} on this order ({bulkSavingsPct}% off retail)
+                    </p>
+                  </div>
+                  <BadgeCheck className="w-7 h-7 text-emerald-500 flex-shrink-0" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-baseline justify-between gap-2 mb-2">
+                    <p className="text-sm font-bold text-gray-900">
+                      Add <span className="text-[#E63939]">{unitsToUnlock}</span> more to unlock wholesale
+                    </p>
+                    <span className="text-xs font-bold text-[#E63939] whitespace-nowrap">
+                      Save R{savingsPerUnit.toFixed(2)}/unit
+                    </span>
+                  </div>
+                  <div className="w-full bg-white/70 rounded-full h-2 overflow-hidden mb-1.5 border border-[#E63939]/10">
+                    <div
+                      className="bg-gradient-to-r from-[#E63939] to-[#FF6B6B] h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((qty / wholesaleMinQty) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-500">
+                    {qty} of {wholesaleMinQty} units · then {bulkSavingsPct}% off every unit
                   </p>
-                ) : (
-                  <>
-                    <p className="text-sm font-semibold text-gray-800 mb-2">
-                      Buy {product.bulk_min_qty}+ units to unlock wholesale price —{' '}
-                      <span className="text-[#E63939] font-bold">save {bulkSavingsPct}%</span>
-                    </p>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1.5">
-                      <div
-                        className="bg-[#E63939] h-1.5 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min((qty / product.bulk_min_qty) * 100, 100)}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      Add {product.bulk_min_qty - qty} more unit{product.bulk_min_qty - qty !== 1 ? 's' : ''} for wholesale pricing
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
+                </>
+              )}
+            </div>
 
             {/* Variants */}
             {product.variants && product.variants.length > 0 && (
@@ -430,13 +479,20 @@ export function ProductDetail() {
                   className="flex-1 flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm sm:text-base"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  Add to Cart · R{(
-                    (product.is_bulk_available && product.bulk_price && qty >= (product.bulk_min_qty ?? Infinity)
-                      ? product.bulk_price
-                      : product.retail_price) * qty
-                  ).toFixed(2)}
+                  Add to Cart · R{(activePrice * qty).toFixed(2)}
                 </motion.button>
               </div>
+            )}
+
+            {/* Quick-jump to wholesale */}
+            {!isOutOfStock && !isWholesaleUnlocked && (
+              <button
+                onClick={() => setQty(wholesaleMinQty)}
+                className="w-full mb-3 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white border-2 border-dashed border-[#E63939]/40 text-[#E63939] hover:bg-[#FEE9E9] font-bold text-xs transition-all"
+              >
+                <Zap className="w-3.5 h-3.5 fill-[#E63939]" />
+                Buy {wholesaleMinQty} for wholesale — save R{(savingsPerUnit * wholesaleMinQty).toFixed(2)}
+              </button>
             )}
 
             {isOutOfStock && (
@@ -458,18 +514,16 @@ export function ProductDetail() {
               {inWishlist ? 'Saved to Wishlist' : 'Save to Wishlist'}
             </button>
 
-            {/* Bulk Quote CTA */}
-            {product.is_bulk_available && (
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-[#111827] hover:bg-[#0a1018] text-white font-bold py-3 rounded-xl transition-all border border-[#111827] hover:border-[#E63939] text-sm sm:text-base mb-6"
-              >
-                <MessageCircle className="w-5 h-5 text-[#25D366]" />
-                Wholesale Enquiry · WhatsApp
-              </a>
-            )}
+            {/* Wholesale Quote CTA */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold py-3 rounded-xl transition-all border border-[#0F172A] hover:border-[#E63939] text-sm sm:text-base mb-6"
+            >
+              <MessageCircle className="w-5 h-5 text-[#25D366]" />
+              Need bigger volume? WhatsApp us
+            </a>
 
             {/* Trust strip */}
             <div className="grid grid-cols-2 gap-3 pt-5 border-t border-gray-200">

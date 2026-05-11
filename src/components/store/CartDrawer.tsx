@@ -1,13 +1,38 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { X, ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react'
+import { X, ShoppingCart, Minus, Plus, Trash2, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
+import { supabase } from '../../lib/supabase'
+
+interface UpsellProduct {
+  id: string
+  name: string
+  retail_price: number
+  thumbnail_url: string | null
+  slug: string
+}
 
 export function CartDrawer() {
-  const { items, subtotal, shippingFee, total, isOpen, closeCart, removeItem, updateQuantity } = useCart()
+  const { items, subtotal, shippingFee, total, isOpen, closeCart, removeItem, updateQuantity, addItem } = useCart()
   const { t } = useLang()
+  const [upsells, setUpsells] = useState<UpsellProduct[]>([])
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!isOpen || items.length === 0) { setUpsells([]); return }
+    const cartIds = items.map((i) => i.productId)
+    supabase
+      .from('products')
+      .select('id, name, retail_price, thumbnail_url, slug')
+      .eq('active', true)
+      .neq('stock_status', 'out_of_stock')
+      .not('id', 'in', `(${cartIds.join(',')})`)
+      .order('created_at', { ascending: false })
+      .limit(8)
+      .then(({ data }) => setUpsells((data ?? []) as UpsellProduct[]))
+  }, [isOpen, items.map((i) => i.productId).join(',')])
 
   // Close on Escape
   useEffect(() => {
@@ -60,7 +85,8 @@ export function CartDrawer() {
             </div>
 
             {/* Items */}
-            <div className="flex-1 overflow-y-auto px-5 py-4">
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-5 py-4">
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
                   <ShoppingCart className="w-10 h-10" />
@@ -118,6 +144,52 @@ export function CartDrawer() {
                     </li>
                   ))}
                 </ul>
+              )}
+              </div>
+
+              {/* Upsells */}
+              {items.length > 0 && upsells.length > 0 && (
+                <div className="border-t border-gray-100 pt-4 pb-2">
+                  <div className="flex items-center gap-1.5 px-5 mb-3">
+                    <Sparkles className="w-3.5 h-3.5 text-cxx-blue flex-shrink-0" />
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">You might also like</p>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto px-5 pb-2 snap-x snap-mandatory scrollbar-hide">
+                    {upsells.map((p) => {
+                      const added = addedIds.has(p.id)
+                      return (
+                        <div key={p.id} className="flex-shrink-0 w-28 snap-start">
+                          <Link
+                            to={`/product/${p.slug}`}
+                            onClick={closeCart}
+                            className="block w-28 h-28 rounded-xl bg-gray-100 overflow-hidden mb-1.5"
+                          >
+                            {p.thumbnail_url ? (
+                              <img src={p.thumbnail_url} alt={p.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ShoppingCart className="w-5 h-5 text-gray-300" />
+                              </div>
+                            )}
+                          </Link>
+                          <p className="text-xs font-medium text-gray-800 leading-snug line-clamp-2 mb-1">{p.name}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-gray-900">R{p.retail_price.toFixed(0)}</span>
+                            <button
+                              onClick={() => {
+                                addItem({ productId: p.id, name: p.name, price: p.retail_price, image: p.thumbnail_url ?? '', quantity: 1, orderType: 'retail' })
+                                setAddedIds((prev) => new Set(prev).add(p.id))
+                              }}
+                              className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors text-white text-xs font-bold flex-shrink-0 ${added ? 'bg-green-500' : 'bg-cxx-blue hover:bg-cxx-blue-hover'}`}
+                            >
+                              {added ? '✓' : '+'}
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               )}
             </div>
 
