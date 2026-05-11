@@ -126,3 +126,27 @@ export async function getStatusEvents(orderId: string): Promise<OrderStatusEvent
     .order('created_at', { ascending: true })
   return (data ?? []) as OrderStatusEvent[]
 }
+
+export async function deleteOrder(orderId: string): Promise<{ error: string | null }> {
+  // Delete children first so we work even without ON DELETE CASCADE.
+  await supabase.from('order_status_events').delete().eq('order_id', orderId)
+  await supabase.from('order_items').delete().eq('order_id', orderId)
+  const { error } = await supabase.from('orders').delete().eq('id', orderId)
+  return { error: error?.message ?? null }
+}
+
+export async function deleteDemoOrders(): Promise<{ count: number; error: string | null }> {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('id')
+    .like('order_number', 'DEMO-%')
+  if (error) return { count: 0, error: error.message }
+
+  const ids = (data ?? []).map((r) => r.id)
+  if (ids.length === 0) return { count: 0, error: null }
+
+  await supabase.from('order_status_events').delete().in('order_id', ids)
+  await supabase.from('order_items').delete().in('order_id', ids)
+  const { error: delErr } = await supabase.from('orders').delete().in('id', ids)
+  return { count: ids.length, error: delErr?.message ?? null }
+}

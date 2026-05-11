@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X } from 'lucide-react'
-import { useOrders, updateOrderStatus } from '../../hooks/useOrders'
+import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X, Trash2, Loader2 } from 'lucide-react'
+import { useOrders, updateOrderStatus, deleteOrder, deleteDemoOrders } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
 import { useAdminMode } from '../../hooks/useAdminMode'
 import type { OrderStatus, OrderWithDetails } from '../../lib/supabase'
@@ -56,6 +56,9 @@ export function AdminOrders() {
   const [advancing, setAdvancing] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [clearingDemo, setClearingDemo] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const { orders, loading, totalCount, refetch } = useOrders({ status, search: search || undefined, demoMode: isDemo, page, pageSize: 50 })
   const totalPages = Math.ceil(totalCount / 50)
@@ -81,14 +84,57 @@ export function AdminOrders() {
     setAdvancing(null)
   }
 
+  async function handleDelete(order: OrderWithDetails) {
+    const ok = window.confirm(`Delete order ${order.order_number}? This cannot be undone.`)
+    if (!ok) return
+    setDeleting(order.id)
+    const { error } = await deleteOrder(order.id)
+    if (error) {
+      setToast(`Failed to delete: ${error}`)
+    } else {
+      setToast(`Deleted ${order.order_number}`)
+      refetch()
+    }
+    setDeleting(null)
+    setTimeout(() => setToast(null), 3500)
+  }
+
+  async function handleClearAllDemo() {
+    const ok = window.confirm('Delete ALL demo orders? This permanently removes every order whose number starts with "DEMO-". Cannot be undone.')
+    if (!ok) return
+    setClearingDemo(true)
+    const { count, error } = await deleteDemoOrders()
+    if (error) setToast(`Failed: ${error}`)
+    else setToast(`Cleared ${count} demo order${count === 1 ? '' : 's'}`)
+    setClearingDemo(false)
+    refetch()
+    setTimeout(() => setToast(null), 3500)
+  }
+
   return (
     <div>
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl">
+          {toast}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900">
             Orders <span className="text-sm font-normal text-gray-400">订单</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
+          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total{isDemo ? ' demo' : ''}</p>
+          {isDemo && totalCount > 0 && (
+            <button
+              onClick={handleClearAllDemo}
+              disabled={clearingDemo}
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60"
+            >
+              {clearingDemo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+              Clear all demo orders
+            </button>
+          )}
         </div>
 
         {/* Search by order number */}
@@ -231,6 +277,16 @@ export function AdminOrders() {
                             {fmt(next).split(' ')[0]}
                           </button>
                         )}
+                        <button
+                          onClick={() => handleDelete(order)}
+                          disabled={deleting === order.id}
+                          title="Delete order"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60"
+                        >
+                          {deleting === order.id
+                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                            : <Trash2 className="w-4 h-4" />}
+                        </button>
                       </div>
                     </td>
                   </tr>

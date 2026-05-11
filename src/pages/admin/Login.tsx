@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import { signIn } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
+import { isAdminEmail } from '../../lib/adminEmails'
 
 export function AdminLogin() {
   const navigate = useNavigate()
@@ -16,10 +18,18 @@ export function AdminLogin() {
     setLoading(true)
     setError(null)
 
-    const { error: err } = await signIn(email, password, remember)
+    const { data, error: err } = await signIn(email, password, remember)
 
     if (err) {
       setError('Invalid email or password')
+      setLoading(false)
+      return
+    }
+
+    // Reject non-admin emails: tear down the session and show a clear error.
+    if (!isAdminEmail(data?.user?.email)) {
+      await supabase.auth.signOut()
+      setError('This account does not have admin access.')
       setLoading(false)
       return
     }

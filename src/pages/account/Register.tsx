@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Zap, Loader2, Mail, Check } from 'lucide-react'
+import { Zap, Loader2, Check } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 export function AccountRegister() {
@@ -12,7 +12,7 @@ export function AccountRegister() {
   const [confirm, setConfirm] = useState('')
   const [remember, setRemember] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [state, setState] = useState<'idle' | 'loading' | 'confirm'>('idle')
+  const [state, setState] = useState<'idle' | 'loading'>('idle')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -21,42 +21,13 @@ export function AccountRegister() {
     setState('loading')
     setError(null)
 
-    const { error: err, needsConfirmation } = await signUp(email, password, name, remember)
+    const { error: err } = await signUp(email, password, name, remember)
     if (err) {
       setError(err)
       setState('idle')
       return
     }
-
-    if (needsConfirmation) {
-      setState('confirm')
-    } else {
-      // Email confirmation disabled — user is logged in immediately
-      navigate('/account', { replace: true })
-    }
-  }
-
-  if (state === 'confirm') {
-    return (
-      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center px-4 py-8">
-        <div className="text-center max-w-sm">
-          <div className="w-16 h-16 bg-blue-900/40 border border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="w-7 h-7 text-blue-400" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
-          <p className="text-white/50 text-sm mb-2">
-            We sent a confirmation link to <span className="text-white font-medium">{email}</span>.
-          </p>
-          <p className="text-white/40 text-sm mb-6">
-            Click the link in the email to confirm your account, then sign in.
-          </p>
-          <Link to="/account/login"
-            className="inline-block bg-[#E63939] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#C82020] transition-colors">
-            Go to Sign In
-          </Link>
-        </div>
-      </div>
-    )
+    navigate('/account', { replace: true })
   }
 
   return (

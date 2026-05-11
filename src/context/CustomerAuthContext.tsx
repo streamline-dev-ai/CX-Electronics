@@ -58,10 +58,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await customerSupabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name },
-        emailRedirectTo: `${window.location.origin}/account/login`,
-      },
+      options: { data: { name } },
     })
 
     if (error) return { error: error.message, needsConfirmation: false }
@@ -69,18 +66,20 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     // Fire welcome email — fire-and-forget
     notifySignup(name, email).catch(() => {})
 
-    // If session is null but user exists, Supabase requires email confirmation
-    const needsConfirmation = !!data.user && !data.session
-    return { error: null, needsConfirmation }
+    // Auto-confirm trigger sets email_confirmed_at server-side. If the initial
+    // signUp didn't return a session (Supabase project may still have email
+    // confirmation enabled), sign them in directly so they land logged in.
+    if (data.user && !data.session) {
+      await customerSupabase.auth.signInWithPassword({ email, password })
+    }
+
+    return { error: null, needsConfirmation: false }
   }
 
   async function signIn(email: string, password: string, remember = true): Promise<string | null> {
     setRememberMe(remember)
     const { error } = await customerSupabase.auth.signInWithPassword({ email, password })
     if (error) {
-      if (error.message.toLowerCase().includes('email not confirmed')) {
-        return 'Please check your inbox and confirm your email before signing in.'
-      }
       if (error.message.toLowerCase().includes('invalid login credentials')) {
         return 'Incorrect email or password.'
       }

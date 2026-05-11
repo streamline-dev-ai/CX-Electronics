@@ -12,7 +12,10 @@ import { redirectToPayFast } from '../../lib/payfast'
 import { DemoPaymentModal } from '../../components/store/DemoPaymentModal'
 import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
 
-const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT === 'true'
+// Demo mode is ON by default — flips off only when VITE_DEMO_CHECKOUT === 'false'.
+// While PayFast is pending, this keeps checkout working everywhere (local, Netlify, prod)
+// without needing to remember to set an env var.
+const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT !== 'false'
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
