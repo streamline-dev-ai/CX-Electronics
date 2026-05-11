@@ -8,14 +8,10 @@ import { useLang } from '../../context/LangContext'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
 import { notifyNewOrder, notifyStatusChange } from '../../lib/webhooks'
-import { redirectToPayFast } from '../../lib/payfast'
-import { DemoPaymentModal } from '../../components/store/DemoPaymentModal'
 import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
 
-// Demo mode hard-on while PayFast is still being activated.
-// When PayFast goes live, change this to:
-//   const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT === 'true'
-const DEMO_CHECKOUT = true
+// Checkout currently runs in fake-payment mode while PayFast is being activated.
+// Every order is auto-marked as paid and dropped straight into /order/:id.
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
@@ -80,7 +76,7 @@ const EMPTY_FORM: FormData = {
 function generateOrderNumber(): string {
   const year = new Date().getFullYear()
   const seq = Math.floor(Math.random() * 9000) + 1000
-  return `${DEMO_CHECKOUT ? 'DEMO' : 'CXX'}-${year}-${seq}`
+  return `DEMO-${year}-${seq}`
 }
 
 function saveOrderLocally(order: OrderWithDetails) {
@@ -115,9 +111,6 @@ export function Checkout() {
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
   const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
-  const [demoPayment, setDemoPayment] = useState<{
-    orderId: string; orderNumber: string; order: OrderWithDetails
-  } | null>(null)
 
   // Pre-fill form from logged-in customer account + last shipping address
   useEffect(() => {
@@ -151,28 +144,6 @@ export function Checkout() {
 
     return () => { cancelled = true }
   }, [user])
-
-  async function handleDemoPay() {
-    if (!demoPayment) return
-    const { orderId, order } = demoPayment
-    const now = new Date().toISOString()
-    // Mark order as paid in Supabase
-    await supabase.from('orders').update({
-      status: 'paid',
-      payment_status: 'paid',
-      payment_reference: `DEMO-${Date.now()}`,
-      updated_at: now,
-    }).eq('id', orderId)
-    await supabase.from('order_status_events').insert({
-      order_id: orderId, status: 'paid',
-      triggered_by: 'demo_payment',
-      note: 'Demo checkout payment',
-      created_at: now,
-    })
-    // Fire payment confirmed webhooks (customer receipt email, owner alert)
-    notifyStatusChange({ ...order, status: 'paid', payment_status: 'paid' }, 'pending', 'paid')
-    navigate(`/order/${orderId}`)
-  }
 
   const isCollection = delivery === 'collection'
   const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
@@ -248,6 +219,7 @@ export function Checkout() {
 
     const orderType = items.some((i) => i.orderType === 'bulk') ? 'bulk' : 'retail'
     const now = new Date().toISOString()
+    const paymentReference = `DEMO-${Date.now()}`
 
     try {
       const { data: customer } = await supabase
@@ -266,13 +238,14 @@ export function Checkout() {
         .select('id')
         .single()
 
+      // Insert the order already marked as paid — no PayFast, no demo modal.
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert({
           order_number: orderNumber,
           customer_id: customer?.id ?? null,
           order_type: orderType,
-          status: 'pending',
+          status: 'paid',
           fulfillment_type: fulfillmentType,
           collection_name: isCollection ? form.name : null,
           collection_phone: isCollection ? form.phone : null,
@@ -280,8 +253,9 @@ export function Checkout() {
           shipping_fee: shippingFee,
           total,
           shipping_address: shippingAddr,
-          payment_method: 'payfast',
-          payment_status: 'unpaid',
+          payment_method: 'demo',
+          payment_status: 'paid',
+          payment_reference: paymentReference,
           created_at: now,
           updated_at: now,
         })
@@ -302,26 +276,24 @@ export function Checkout() {
           })),
         )
 
-        // Log initial status event
-        await supabase.from('order_status_events').insert({
-          order_id: order.id,
-          status: 'pending',
-          triggered_by: 'system',
-          created_at: now,
-        })
+        // Log the full pending → paid timeline so the admin timeline looks right.
+        await supabase.from('order_status_events').insert([
+          { order_id: order.id, status: 'pending', triggered_by: 'system', created_at: now },
+          { order_id: order.id, status: 'paid', triggered_by: 'demo_payment', note: 'Demo checkout (auto-paid)', created_at: now },
+        ])
 
-        const localOrder: OrderWithDetails = {
+        const fullOrder: OrderWithDetails = {
           id: order.id,
           order_number: order.order_number,
           customer_id: customer?.id ?? null,
           order_type: orderType,
-          status: 'pending',
+          status: 'paid',
           fulfillment_type: fulfillmentType,
           collection_name: isCollection ? form.name : null,
           collection_phone: isCollection ? form.phone : null,
-          payment_status: 'unpaid',
-          payment_method: 'payfast',
-          payment_reference: null,
+          payment_status: 'paid',
+          payment_method: 'demo',
+          payment_reference: paymentReference,
           notes: `Delivery: ${selectedDelivery.label}`,
           subtotal,
           shipping_fee: shippingFee,
@@ -340,44 +312,32 @@ export function Checkout() {
           })),
         }
 
-        saveOrderLocally(localOrder)
-        notifyNewOrder(localOrder) // fire-and-forget
+        saveOrderLocally(fullOrder)
+        // Fire both webhooks: new-order alert + payment-received receipt
+        notifyNewOrder(fullOrder)
+        notifyStatusChange(fullOrder, 'pending', 'paid')
         clearCart()
 
-        if (DEMO_CHECKOUT) {
-          setDemoPayment({ orderId: order.id, orderNumber: order.order_number, order: localOrder })
-          setSubmitting(false)
-          return
-        }
-
-        const nameParts = form.name.trim().split(' ')
-        redirectToPayFast({
-          orderId:     order.id,
-          orderNumber: order.order_number,
-          nameFirst:   nameParts[0],
-          nameLast:    nameParts.slice(1).join(' '),
-          email:       form.email,
-          phone:       form.phone || undefined,
-          amount:      total,
-        })
+        navigate(`/order/${order.id}`)
         return
       }
     } catch { /* fall through to local order */ }
 
-    // Fallback: local-only order
+    // Fallback: Supabase write failed — keep a local-only paid order so the
+    // confirmation page still renders and emails still fire.
     const localId = crypto.randomUUID()
     const localOrder: OrderWithDetails = {
       id: localId,
       order_number: orderNumber,
       customer_id: null,
       order_type: orderType,
-      status: 'pending',
+      status: 'paid',
       fulfillment_type: fulfillmentType,
       collection_name: isCollection ? form.name : null,
       collection_phone: isCollection ? form.phone : null,
-      payment_status: 'unpaid',
-      payment_method: 'payfast',
-      payment_reference: null,
+      payment_status: 'paid',
+      payment_method: 'demo',
+      payment_reference: paymentReference,
       notes: `Delivery: ${selectedDelivery.label}`,
       subtotal,
       shipping_fee: shippingFee,
@@ -398,36 +358,13 @@ export function Checkout() {
 
     saveOrderLocally(localOrder)
     notifyNewOrder(localOrder)
+    notifyStatusChange(localOrder, 'pending', 'paid')
     clearCart()
-
-    if (DEMO_CHECKOUT) {
-      setDemoPayment({ orderId: localId, orderNumber: orderNumber, order: localOrder })
-      setSubmitting(false)
-      return
-    }
-
-    const nameParts = form.name.trim().split(' ')
-    redirectToPayFast({
-      orderId:     localId,
-      orderNumber: orderNumber,
-      nameFirst:   nameParts[0],
-      nameLast:    nameParts.slice(1).join(' '),
-      email:       form.email,
-      phone:       form.phone || undefined,
-      amount:      total,
-    })
+    navigate(`/order/${localId}`)
   }
 
   return (
     <div className="min-h-screen bg-cxx-bg">
-      {demoPayment && (
-        <DemoPaymentModal
-          amount={demoPayment.order.total}
-          orderNumber={demoPayment.orderNumber}
-          onPay={handleDemoPay}
-          onCancel={() => { setDemoPayment(null); setSubmitting(false) }}
-        />
-      )}
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -546,21 +483,10 @@ export function Checkout() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  {DEMO_CHECKOUT ? (
-                    <>
-                      <p className="text-sm font-semibold text-amber-800">Demo Checkout Active</p>
-                      <p className="text-xs text-amber-700 mt-0.5">
-                        No real payment is processed. Orders and emails work exactly as in production.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-sm font-semibold text-amber-800">Secure PayFast Payment</p>
-                      <p className="text-xs text-amber-700 mt-0.5">
-                        You'll be redirected to PayFast to complete payment securely. Card, EFT & instant EFT accepted.
-                      </p>
-                    </>
-                  )}
+                  <p className="text-sm font-semibold text-amber-800">Demo Checkout Active</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    No real payment is processed. Your order will appear in the admin and trigger confirmation emails.
+                  </p>
                 </div>
               </div>
             </div>
@@ -606,9 +532,7 @@ export function Checkout() {
                   className="w-full flex items-center justify-center gap-2 bg-cxx-blue hover:bg-cxx-blue-hover text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60"
                 >
                   {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {submitting
-                    ? (DEMO_CHECKOUT ? 'Creating order…' : 'Redirecting to PayFast…')
-                    : (DEMO_CHECKOUT ? 'Continue to Payment' : 'Pay with PayFast')}
+                  {submitting ? 'Placing order…' : `Place order — R${total.toFixed(2)}`}
                 </button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">
