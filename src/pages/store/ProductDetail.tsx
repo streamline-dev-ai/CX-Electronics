@@ -8,7 +8,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
-import { ProductCard } from '../../components/store/ProductCard'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { ProductSpecifications } from '../../components/store/ProductSpecifications'
 import { FrequentlyBoughtTogether } from '../../components/store/FrequentlyBoughtTogether'

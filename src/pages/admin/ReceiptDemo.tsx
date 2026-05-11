@@ -137,7 +137,7 @@ export function ReceiptDemo() {
             </div>
             <div className="flex justify-between text-sm text-gray-500">
               <span>Shipping</span>
-              <span>{shippingFee === 0 ? 'FREE' : `R ${shippingFee.toFixed(2)}`}</span>
+              <span>{shippingFee === 0 ? 'FREE' : `R ${(shippingFee as number).toFixed(2)}`}</span>
             </div>
             <div className="flex justify-between font-black text-gray-900 text-lg border-t-2 border-gray-900 pt-3 mt-1">
               <span>Total</span>

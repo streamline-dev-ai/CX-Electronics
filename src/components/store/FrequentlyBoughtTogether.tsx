@@ -39,7 +39,10 @@ export function FrequentlyBoughtTogether({
     image: currentProductImage,
   }
 
-  const allItems = [currentItem, ...companions]
+  const allItems = [
+    currentItem,
+    ...companions.map((p) => ({ id: p.id, name: p.name, price: p.retail_price, image: p.thumbnail_url ?? '' })),
+  ]
   const totalPrice = companions.reduce((sum, p) => sum + p.retail_price, currentProductPrice)
 
   function handleAddAll() {

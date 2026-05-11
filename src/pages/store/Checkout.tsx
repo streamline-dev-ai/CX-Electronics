@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ShoppingCart, Loader2, CheckCircle, Store, Truck, Zap } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
+import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
 import { notifyNewOrder } from '../../lib/webhooks'
 import { redirectToPayFast } from '../../lib/payfast'
@@ -101,10 +102,21 @@ function saveOrderLocally(order: OrderWithDetails) {
 export function Checkout() {
   const { items, subtotal, clearCart } = useCart()
   const { t } = useLang()
+  const { user } = useCustomerAuth()
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
   const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
+
+  // Pre-fill form from logged-in customer account
+  useEffect(() => {
+    if (!user) return
+    setForm((prev) => ({
+      ...prev,
+      name: prev.name || user.name,
+      email: prev.email || user.email,
+    }))
+  }, [user])
 
   const isCollection = delivery === 'collection'
   const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
@@ -302,6 +314,7 @@ export function Checkout() {
         quantity: item.quantity,
         unit_price: item.price,
         line_total: item.price * item.quantity,
+        thumbnail_url: item.image ?? '',
       })),
     }
 

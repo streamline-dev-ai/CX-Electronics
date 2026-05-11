@@ -15,7 +15,6 @@ import { ProductCardLight } from '../../components/store/ProductCardLight'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27000000000'
-const WA_RESELLER = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%2C%20I%27d%20like%20to%20become%20a%20reseller.`
 const MAP_EMBED =
   'https://www.google.com/maps?q=China+Mart+3+Press+Avenue+Crown+Mines+Johannesburg&output=embed'
 const DIRECTIONS_URL =
