@@ -225,8 +225,8 @@ const BENEFITS = [
   },
   {
     icon: Package,
-    title: 'Free Gauteng Delivery',
-    description: 'On orders over R2,000',
+    title: 'Fast Gauteng Delivery',
+    description: 'Flat-rate courier from R99',
   },
   {
     icon: RefreshCw,

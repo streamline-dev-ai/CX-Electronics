@@ -19,13 +19,12 @@ export interface CartState {
 }
 
 const STORAGE_KEY = 'cxx_cart'
-const SHIPPING_THRESHOLD = 2000   // free shipping over R2000
-const SHIPPING_FLAT_RATE = 99     // R99 flat rate
+const SHIPPING_FLAT_RATE = 99     // R99 flat rate — applied to every order
 const VAT_RATE = 0.15             // 15% VAT (included in price — for display only)
 
 function calcState(items: CartItem[]): CartState {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shippingFee = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE
+  const shippingFee = items.length > 0 ? SHIPPING_FLAT_RATE : 0
   const vat = Math.round(subtotal * VAT_RATE * 100) / 100
   const total = subtotal + shippingFee
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)

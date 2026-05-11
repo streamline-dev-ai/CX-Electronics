@@ -488,7 +488,7 @@ function PricingTables() {
           {[
             'Custom quantities? We can quote any volume.',
             'Mix & match across SKUs to hit volume pricing.',
-            'Free delivery on bulk orders over R10,000 in JHB.',
+            'Flat-rate courier delivery — calculated at checkout.',
             'Trade accounts available — Net 30 terms on approval.',
           ].map((t) => (
             <div key={t} className="flex items-start gap-2.5">

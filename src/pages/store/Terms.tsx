@@ -218,16 +218,12 @@ export function Terms() {
               </div>
               <ul className="space-y-3 mb-4">
                 <Bullet>
-                  <strong className="text-white">Free delivery within Gauteng</strong> on all orders
-                  over R2,000.
+                  Flat-rate courier delivery applies to every order — the exact shipping cost is
+                  calculated and displayed at checkout before payment.
                 </Bullet>
                 <Bullet>
-                  For orders below R2,000, or deliveries outside Gauteng, a courier fee applies. The
-                  shipping cost will be calculated and displayed at checkout before payment.
-                </Bullet>
-                <Bullet>
-                  <strong className="text-white">Shipping costs are the responsibility of the customer</strong> unless
-                  the free delivery threshold is met.
+                  <strong className="text-white">Shipping costs are the responsibility of the customer.</strong>{' '}
+                  Store collection is always free at our Fordsburg location.
                 </Bullet>
                 <Bullet>
                   Orders placed and paid before 12:00 PM on business days are generally dispatched the

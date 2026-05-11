@@ -12,10 +12,10 @@ import { redirectToPayFast } from '../../lib/payfast'
 import { DemoPaymentModal } from '../../components/store/DemoPaymentModal'
 import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
 
-// Demo mode is ON by default — flips off only when VITE_DEMO_CHECKOUT === 'false'.
-// While PayFast is pending, this keeps checkout working everywhere (local, Netlify, prod)
-// without needing to remember to set an env var.
-const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT !== 'false'
+// Demo mode hard-on while PayFast is still being activated.
+// When PayFast goes live, change this to:
+//   const DEMO_CHECKOUT = import.meta.env.VITE_DEMO_CHECKOUT === 'true'
+const DEMO_CHECKOUT = true
 
 type DeliveryMethod = 'collection' | 'economic' | 'express'
 
@@ -176,7 +176,7 @@ export function Checkout() {
 
   const isCollection = delivery === 'collection'
   const selectedDelivery = DELIVERY_OPTIONS.find((o) => o.key === delivery)!
-  const shippingFee = subtotal >= 2000 && delivery === 'economic' ? 0 : selectedDelivery.price
+  const shippingFee = isCollection ? 0 : selectedDelivery.price
   const total = subtotal + shippingFee
 
   if (items.length === 0) {
@@ -443,7 +443,7 @@ export function Checkout() {
                 <h2 className="font-semibold text-gray-900 mb-4">Delivery Method</h2>
                 <div className="space-y-2">
                   {DELIVERY_OPTIONS.map(({ key, label, sub, eta, price, icon: Icon }) => {
-                    const effectivePrice = subtotal >= 2000 && key === 'economic' ? 0 : price
+                    const effectivePrice = price
                     const isSelected = delivery === key
                     return (
                       <button
