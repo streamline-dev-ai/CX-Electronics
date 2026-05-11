@@ -6,11 +6,13 @@ import {
   orderPackedCollection,
   outForDelivery,
   ownerNewOrder,
+  welcomeEmail,
 } from '../emails'
 import { getReceiptHTMLString } from './generateReceipt'
 
 const N8N_NEW_ORDER     = import.meta.env.VITE_N8N_NEW_ORDER as string | undefined
 const N8N_STATUS_CHANGE = import.meta.env.VITE_N8N_STATUS_CHANGE as string | undefined
+const N8N_SIGNUP        = import.meta.env.VITE_N8N_SIGNUP as string | undefined
 
 async function send(url: string | undefined, payload: unknown): Promise<void> {
   if (!url) return
@@ -66,6 +68,18 @@ const STATUS_SUBJECTS: Partial<Record<OrderStatus, string>> = {
   ready_for_collection: 'Ready for Collection',
   collected:            'Order Collected',
   cancelled:            'Order Cancelled',
+}
+
+export async function notifySignup(name: string, email: string): Promise<void> {
+  await send(N8N_SIGNUP ?? N8N_NEW_ORDER, {
+    event: 'customer_signup',
+    customer_email_subject: `Welcome to CW Electronics, ${name.split(' ')[0]}!`,
+    customer_email_html: welcomeEmail(name, email),
+    customer: { name, email },
+    timestamp: new Date().toISOString(),
+    store_name: 'CW Electronics',
+    store_email: 'info@cw-electronics.co.za',
+  })
 }
 
 export async function notifyNewOrder(order: OrderWithDetails): Promise<void> {

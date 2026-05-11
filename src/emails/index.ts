@@ -293,7 +293,41 @@ export function outForDelivery(order: OrderWithDetails): string {
   return wrap(body)
 }
 
-// ─── Template 6: Owner New Order Notification ────────────────────────────────
+// ─── Template 6: Welcome Email (new customer signup) ─────────────────────────
+
+export function welcomeEmail(name: string, email: string): string {
+  const firstName = name.split(' ')[0] || name
+  const body = `
+    <tr><td style="padding:36px 40px 12px;">
+      <h1 style="margin:0 0 8px;font-size:26px;color:#111827;">Welcome to CW Electronics!</h1>
+      <p style="margin:0 0 20px;font-size:16px;color:#4B5563;">
+        Hi ${firstName}, your account has been created.
+      </p>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
+        Thanks for signing up! You can now track your orders, save your details, and enjoy a faster checkout experience every time you shop with us.
+      </p>
+    </td></tr>
+    <tr><td style="padding:0 40px 8px;">
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;padding:20px 28px;margin-bottom:24px;">
+        <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Account Details</p>
+        <p style="margin:0;font-size:15px;font-weight:600;color:#111827;">${name}</p>
+        <p style="margin:4px 0 0;font-size:14px;color:#374151;">${email}</p>
+      </div>
+    </td></tr>
+    <tr><td style="padding:0 40px 36px;text-align:center;">
+      <a href="${SITE}/shop"
+         style="background:${RED};color:#fff;padding:16px 38px;text-decoration:none;font-weight:600;font-size:16px;display:inline-block;">
+        Start Shopping
+      </a>
+      <p style="margin:24px 0 0;font-size:13px;color:#94A3B8;">
+        Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a>
+      </p>
+    </td></tr>`
+
+  return wrap(body)
+}
+
+// ─── Template 7: Owner New Order Notification ────────────────────────────────
 
 export function ownerNewOrder(order: OrderWithDetails): string {
   const isCollection = order.fulfillment_type === 'collection'
