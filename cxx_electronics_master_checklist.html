@@ -1,0 +1,335 @@
+
+<h2 class="sr-only">CXX Electronics — complete project checklist covering all phases from setup to handover</h2>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0 2rem}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.header p{font-size:13px;color:var(--color-text-secondary);margin-top:4px}
+.progress-bar-wrap{background:var(--color-background-secondary);border-radius:100px;height:6px;margin:12px 0 4px;overflow:hidden}
+.progress-bar-fill{height:100%;background:#e63329;border-radius:100px;transition:width 0.3s ease}
+.progress-label{font-size:12px;color:var(--color-text-secondary)}
+.phase{margin-bottom:1.5rem}
+.phase-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;user-select:none}
+.phase-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.phase-badge{font-size:11px;padding:2px 8px;border-radius:100px;margin-left:auto}
+.phase-count{font-size:12px;color:var(--color-text-secondary)}
+.items{display:flex;flex-direction:column;gap:2px}
+.item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--border-radius-md);cursor:pointer;transition:background 0.1s;border:0.5px solid transparent}
+.item:hover{background:var(--color-background-secondary)}
+.item.done{opacity:0.5}
+.item.done .item-text{text-decoration:line-through;color:var(--color-text-secondary)}
+.item.flagged{border-color:var(--color-border-warning);background:var(--color-background-warning)}
+.checkbox{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-border-secondary);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:var(--color-background-primary)}
+.checkbox.checked{background:#e63329;border-color:#e63329}
+.checkbox.checked::after{content:'';width:9px;height:6px;border-left:2px solid white;border-bottom:2px solid white;transform:rotate(-45deg) translate(0px,1px);display:block}
+.item-text{font-size:13px;color:var(--color-text-primary);line-height:1.5;flex:1}
+.item-tag{font-size:10px;padding:1px 6px;border-radius:100px;flex-shrink:0;margin-top:3px;font-weight:500}
+.tag-dev{background:var(--color-background-info);color:var(--color-text-info)}
+.tag-db{background:var(--color-background-success);color:var(--color-text-success)}
+.tag-n8n{background:#fef3c7;color:#92400e}
+.tag-client{background:var(--color-background-danger);color:var(--color-text-danger)}
+.tag-deploy{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.filter-btn{font-size:12px;padding:4px 10px;border-radius:100px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all 0.1s}
+.filter-btn.active{background:#e63329;border-color:#e63329;color:white}
+.section-divider{font-size:10px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:0.08em;text-transform:uppercase;padding:4px 10px 2px;margin-top:4px}
+</style>
+
+<div class="wrap">
+<div class="header">
+  <h1>CXX Electronics — Master Build Checklist</h1>
+  <p>Track every task from first commit to handover</p>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog" style="width:0%"></div></div>
+  <div class="progress-label"><span id="prog-label">0 / 0 done</span></div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="setFilter('all')">All</button>
+  <button class="filter-btn" onclick="setFilter('dev')">Dev</button>
+  <button class="filter-btn" onclick="setFilter('db')">Database</button>
+  <button class="filter-btn" onclick="setFilter('n8n')">n8n</button>
+  <button class="filter-btn" onclick="setFilter('client')">Client</button>
+  <button class="filter-btn" onclick="setFilter('deploy')">Deploy</button>
+  <button class="filter-btn" onclick="setFilter('todo')">Not done</button>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+const phases = [
+  {
+    id:'setup', label:'Phase 1 — Project Setup', color:'#5f6368',
+    items:[
+      {text:'Confirm official business name (C&X / CX / CXX)', tag:'client'},
+      {text:'Get WhatsApp number of main ongoing contact', tag:'client'},
+      {text:'Confirm deposit received (R3,000) before build starts', tag:'client'},
+      {text:'Create GitHub repo: CX-Website', tag:'dev'},
+      {text:'Scaffold project: React 18 + TypeScript + Vite 5 + Tailwind', tag:'dev'},
+      {text:'Set up Supabase project (new project, not shared)', tag:'db'},
+      {text:'Add .env.local with all placeholder env vars', tag:'dev'},
+      {text:'Set up Vercel project linked to GitHub repo', tag:'deploy'},
+      {text:'Confirm domain: cxxelectronics.com — get login credentials from client', tag:'client'},
+      {text:'Set up CLAUDE.md in repo root with project context', tag:'dev'},
+    ]
+  },
+  {
+    id:'db', label:'Phase 2 — Database Schema', color:'#0f6e56',
+    items:[
+      {text:'Run migration: categories table', tag:'db'},
+      {text:'Run migration: products table (with all columns incl. variant fields)', tag:'db'},
+      {text:'Run migration: customers table', tag:'db'},
+      {text:'Run migration: orders table (incl. fulfillment_type, collection fields)', tag:'db'},
+      {text:'Run migration: order_items table', tag:'db'},
+      {text:'Run migration: order_status_events table', tag:'db'},
+      {text:'Run migration: product_variant_groups table', tag:'db'},
+      {text:'Add variant_group_id + variant_label columns to products', tag:'db'},
+      {text:'Add status check constraint (all new statuses)', tag:'db'},
+      {text:'Set up Supabase Storage bucket for product images', tag:'db'},
+      {text:'Set up RLS policies (public read products/categories, auth write for admin)', tag:'db'},
+    ]
+  },
+  {
+    id:'store', label:'Phase 3 — Store Frontend', color:'#185fa5',
+    items:[
+      {text:'Home.tsx — Hero section with branding, featured products grid', tag:'dev'},
+      {text:'Home.tsx — Category grid / browse by category section', tag:'dev'},
+      {text:'Home.tsx — Language toggle (EN / 中文) visible and working', tag:'dev'},
+      {text:'Shop.tsx — Retail product grid with filters (category, search)', tag:'dev'},
+      {text:'Shop.tsx — Pagination (50 per page)', tag:'dev'},
+      {text:'BulkShop.tsx — Wholesale product grid (shows bulk_price, bulk_min_qty)', tag:'dev'},
+      {text:'BulkShop.tsx — Decide: checkout online vs enquiry/quote form (confirm with client)', tag:'client'},
+      {text:'Product.tsx — Standard product page (images, price, add to cart, description)', tag:'dev'},
+      {text:'Product.tsx — Variant group page (variant selector, image switching by variant)', tag:'dev'},
+      {text:'Product.tsx — All variant images shown, clicking thumbnail switches main image', tag:'dev'},
+      {text:'Product.tsx — Switching variant resets to image[0] of that variant', tag:'dev'},
+      {text:'Product.tsx — URL ?variant= param updates on variant switch (replaceState)', tag:'dev'},
+      {text:'Product.tsx — Price shows per-variant if prices differ across variants', tag:'dev'},
+      {text:'Cart.tsx — Cart drawer/page, quantity adjust, remove item', tag:'dev'},
+      {text:'Cart.tsx — Cart shows variant label (e.g. "USB Fan — Green")', tag:'dev'},
+      {text:'Checkout.tsx — Fulfillment type selector: Delivery vs Collection cards', tag:'dev'},
+      {text:'Checkout.tsx — Delivery: address form (line1, city, province, postal code)', tag:'dev'},
+      {text:'Checkout.tsx — Collection: hide address, show collector name + phone fields', tag:'dev'},
+      {text:'Checkout.tsx — Shipping fee = R0 for collection, configured flat rate for delivery', tag:'dev'},
+      {text:'Checkout.tsx — Confirm shipping fee strategy with client', tag:'client'},
+      {text:'Checkout.tsx — Order created in Supabase on checkout submit', tag:'dev'},
+      {text:'Checkout.tsx — order_status_events insert: pending / system on creation', tag:'dev'},
+      {text:'Checkout.tsx — triggerOrderPlaced() webhook fires after order created', tag:'dev'},
+      {text:'OrderConfirmation.tsx — Thank you page after checkout, show order number', tag:'dev'},
+      {text:'CartContext.tsx — Cart state, add/remove/clear, persists in localStorage', tag:'dev'},
+      {text:'i18n system — EN/ZH toggle, all UI strings have translations', tag:'dev'},
+      {text:'Mobile responsiveness — all pages tested at 375px width', tag:'dev'},
+    ]
+  },
+  {
+    id:'payments', label:'Phase 4 — Payments', color:'#ba7517',
+    items:[
+      {text:'Confirm if client has SA registered business + SA bank account', tag:'client'},
+      {text:'Collect CIPC registration certificate from client', tag:'client'},
+      {text:'Collect 3-month bank statement from client', tag:'client'},
+      {text:'Collect director/owner ID copy from client', tag:'client'},
+      {text:'Submit PayFast merchant application (if SA biz confirmed)', tag:'client'},
+      {text:'While waiting: implement Ozow OR Yoco as fallback option', tag:'dev'},
+      {text:'PayFast integration — checkout payload, ITN handler via n8n', tag:'dev'},
+      {text:'PayFast — add VITE_PAYFAST_MERCHANT_ID, MERCHANT_KEY, PASSPHRASE to .env.local', tag:'dev'},
+      {text:'PayFast — add same vars to Vercel environment settings', tag:'deploy'},
+      {text:'Test end-to-end payment in PayFast sandbox mode', tag:'dev'},
+    ]
+  },
+  {
+    id:'admin', label:'Phase 5 — Admin Dashboard', color:'#a32d2d',
+    items:[
+      {text:'Login.tsx — Supabase Auth email/password login, redirect to dashboard', tag:'dev'},
+      {text:'Dashboard.tsx — Summary stats: total orders, revenue today, pending orders, total products', tag:'dev'},
+      {text:'Products.tsx — Paginated product list (50/page), search bar, filter by category', tag:'dev'},
+      {text:'Products.tsx — Bulk actions: select multiple, delete, toggle active/inactive', tag:'dev'},
+      {text:'Products.tsx — CSV import: upload CSV to bulk-add/update products', tag:'dev'},
+      {text:'ProductForm.tsx — Add/edit product: all fields (name, name_zh, price, bulk price, images)', tag:'dev'},
+      {text:'ProductForm.tsx — Drag & drop image upload to Supabase Storage (1–5 images)', tag:'dev'},
+      {text:'ProductForm.tsx — Optional variant fields: Variant Group dropdown + Variant Label input', tag:'dev'},
+      {text:'ProductForm.tsx — stock_status selector: in_stock / out_of_stock / on_order', tag:'dev'},
+      {text:'Orders.tsx — Order list with status badge, fulfillment badge (delivery/collection)', tag:'dev'},
+      {text:'Orders.tsx — Status badge colours: pending=grey, paid=blue, processing=amber, packed=purple, out_for_delivery=orange, ready_for_collection=teal, delivered/collected=green, cancelled=red', tag:'dev'},
+      {text:'Orders.tsx — Filter by status, filter by fulfillment type, date range', tag:'dev'},
+      {text:'OrderDetail.tsx — Order header: number, date, status badge, fulfillment badge', tag:'dev'},
+      {text:'OrderDetail.tsx — Download Receipt button → generates PDF', tag:'dev'},
+      {text:'OrderDetail.tsx — Status timeline (vertical, all order_status_events, newest highlighted)', tag:'dev'},
+      {text:'OrderDetail.tsx — Fulfillment action button (correct button per status + fulfillment type)', tag:'dev'},
+      {text:'OrderDetail.tsx — Button triggers Supabase status update + status event insert + n8n webhook', tag:'dev'},
+      {text:'OrderDetail.tsx — Success toast on status update: "Order updated — customer notified"', tag:'dev'},
+      {text:'OrderDetail.tsx — Order items table with subtotal / shipping / total', tag:'dev'},
+      {text:'OrderDetail.tsx — Customer details section (address if delivery, collection info if collection)', tag:'dev'},
+      {text:'OrderDetail.tsx — Inline editable notes field', tag:'dev'},
+      {text:'Admin bilingual labels — key UI text in English + Chinese', tag:'dev'},
+      {text:'Admin mobile usable — works on phone screen (client manages in-store)', tag:'dev'},
+    ]
+  },
+  {
+    id:'variants', label:'Phase 6 — Product Variants', color:'#533ab7',
+    items:[
+      {text:'SQL seed: create 15 product_variant_groups records', tag:'db'},
+      {text:'SQL seed: link all variant products via variant_group_id + variant_label', tag:'db'},
+      {text:'Verify all 15 groups linked correctly (check row count per group)', tag:'db'},
+      {text:'Routing: /product/group/:groupSlug for variant pages', tag:'dev'},
+      {text:'Routing: /product/:slug redirects to group page if product has variant_group_id', tag:'dev'},
+      {text:'Fix typo: "WIITH" → "WITH" in Tumbler Cup group name', tag:'db'},
+      {text:'Fix typo: "Exlusive" → "Exclusive" in DRL Fog Lamp group name', tag:'db'},
+      {text:'Manual review: Daling clippers DL-1067/1072/1539/1759 — confirm if same or different products', tag:'client'},
+      {text:'Manual review: TV wall mount 40-80" vs 40-85" — confirm if typo or two products', tag:'client'},
+    ]
+  },
+  {
+    id:'emails', label:'Phase 7 — Emails & Notifications', color:'#3b6d11',
+    items:[
+      {text:'src/lib/orderWebhooks.ts — triggerOrderPlaced()', tag:'dev'},
+      {text:'src/lib/orderWebhooks.ts — triggerPaymentConfirmed()', tag:'dev'},
+      {text:'src/lib/orderWebhooks.ts — triggerPackedDelivery()', tag:'dev'},
+      {text:'src/lib/orderWebhooks.ts — triggerPackedCollection()', tag:'dev'},
+      {text:'src/lib/orderWebhooks.ts — triggerOutForDelivery()', tag:'dev'},
+      {text:'src/lib/orderWebhooks.ts — triggerReadyForCollection()', tag:'dev'},
+      {text:'Email template 1: Order Placed (to customer, payment pending)', tag:'dev'},
+      {text:'Email template 2: Payment Confirmed (to customer, with receipt attached)', tag:'dev'},
+      {text:'Email template 3: Order Packed — Delivery (to customer)', tag:'dev'},
+      {text:'Email template 4: Order Packed — Ready for Collection (to customer)', tag:'dev'},
+      {text:'Email template 5: Out for Delivery (to customer)', tag:'dev'},
+      {text:'Email template 6: New Order Alert (to owner: info@cw-electronics.co.za)', tag:'dev'},
+      {text:'src/lib/generateReceipt.ts — generateReceipt(order) downloads PDF', tag:'dev'},
+      {text:'src/lib/generateReceipt.ts — getReceiptHTMLString(order) returns HTML for n8n', tag:'dev'},
+    ]
+  },
+  {
+    id:'n8n', label:'Phase 8 — n8n Workflows', color:'#993c1d',
+    items:[
+      {text:'n8n Workflow 1: Order Placed — receive webhook → send Email 1 to customer', tag:'n8n'},
+      {text:'n8n Workflow 2: Payment Confirmed (PayFast ITN) — verify COMPLETE → update Supabase status=paid → insert status event → send Email 2 (with receipt PDF) to customer → send Email 6 to owner', tag:'n8n'},
+      {text:'n8n Workflow 3: Packed Delivery — receive webhook → send Email 3 to customer', tag:'n8n'},
+      {text:'n8n Workflow 4: Packed Collection — receive webhook → send Email 4 to customer', tag:'n8n'},
+      {text:'n8n Workflow 5: Out for Delivery — receive webhook → send Email 5 to customer', tag:'n8n'},
+      {text:'n8n Workflow 6: Ready for Collection — receive webhook → send email to customer', tag:'n8n'},
+      {text:'Add all 6 n8n webhook URLs to .env.local', tag:'dev'},
+      {text:'Add all 6 n8n webhook URLs to Vercel environment settings', tag:'deploy'},
+      {text:'Test each workflow end-to-end with a real test order', tag:'n8n'},
+      {text:'Set up email sender in n8n (SMTP or SendGrid)', tag:'n8n'},
+    ]
+  },
+  {
+    id:'products', label:'Phase 9 — Product Data', color:'#0c447c',
+    items:[
+      {text:'Search "CX Electronics" on Takealot — scrape names, descriptions, prices, images', tag:'client'},
+      {text:'Check Wayback Machine (web.archive.org) for cxxelectronics.com — scrape old catalogue', tag:'client'},
+      {text:'Format Takealot/Wayback data into import CSV matching schema', tag:'dev'},
+      {text:'CSV import into Supabase via admin dashboard (test CSV import feature first)', tag:'dev'},
+      {text:'Arrange in-store photography session with client (phone + price sticker photos)', tag:'client'},
+      {text:'Add in-store photographed products via admin or CSV', tag:'dev'},
+      {text:'Ask client to send any WhatsApp price lists, handwritten lists, spreadsheets', tag:'client'},
+      {text:'Set up product categories in Supabase (Chargers, Cables, CCTV, Routers, Smartwatches, Solar, Emergency Lighting, etc.)', tag:'db'},
+      {text:'Confirm logo choice with client — apply to site header', tag:'client'},
+      {text:'Get logo file from client (if they have one) OR export chosen logo from prepared options', tag:'client'},
+      {text:'Confirm shop/collection address details for Collection email templates', tag:'client'},
+      {text:'Confirm collection hours for email templates', tag:'client'},
+      {text:'Confirm returns policy text for site footer', tag:'client'},
+    ]
+  },
+  {
+    id:'deploy', label:'Phase 10 — Pre-Launch & Deploy', color:'#444441',
+    items:[
+      {text:'Point cxxelectronics.com DNS to Vercel (add A record / CNAME)', tag:'deploy'},
+      {text:'Verify SSL certificate active on Vercel (auto-provisioned)', tag:'deploy'},
+      {text:'Set up custom domain in Vercel project settings', tag:'deploy'},
+      {text:'All env vars set in Vercel production environment (not just .env.local)', tag:'deploy'},
+      {text:'Run full end-to-end test order: browse → add to cart → checkout (delivery) → pay → PayFast ITN fires → status updates → all emails send', tag:'dev'},
+      {text:'Run full end-to-end test order: collection flow specifically', tag:'dev'},
+      {text:'Test admin: mark as packed → webhook fires → email sends → timeline updates', tag:'dev'},
+      {text:'Test admin: mark as out for delivery → webhook fires → email sends', tag:'dev'},
+      {text:'Test admin: mark as ready for collection → webhook fires → email sends', tag:'dev'},
+      {text:'Test receipt PDF download from admin OrderDetail page', tag:'dev'},
+      {text:'Test CSV product import with a sample file', tag:'dev'},
+      {text:'Test variant group pages on mobile', tag:'dev'},
+      {text:'Test language toggle — confirm Chinese strings show correctly', tag:'dev'},
+      {text:'Check all pages on mobile (375px) — no overflow, no broken layouts', tag:'dev'},
+      {text:'Remove any console.logs, debug output, test data', tag:'dev'},
+      {text:'Confirm PayFast merchant approved and switch from sandbox to production keys', tag:'client'},
+    ]
+  },
+  {
+    id:'handover', label:'Phase 11 — Handover', color:'#3c3489',
+    items:[
+      {text:'Collect final payment: R3,000 (50% on delivery)', tag:'client'},
+      {text:'Create admin login credentials for client', tag:'dev'},
+      {text:'Walk client through admin: add product, upload images, view orders', tag:'client'},
+      {text:'Show client how to mark order as packed / out for delivery / collected', tag:'client'},
+      {text:'Show client how to download invoice/receipt from an order', tag:'client'},
+      {text:'Send client a short written guide (WhatsApp friendly, with screenshots) in simple English', tag:'client'},
+      {text:'Confirm retainer: R2,200/month — first month invoiced', tag:'client'},
+      {text:'Set calendar reminder: check in with client after 1 week live', tag:'client'},
+      {text:'Update CLAUDE.md with any decisions made during build', tag:'dev'},
+    ]
+  }
+];
+
+let filter = 'all';
+let checked = JSON.parse(localStorage.getItem('cxx_checklist')||'{}');
+
+function setFilter(f){
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim().toLowerCase()===f||(f==='all'&&b.textContent.trim()==='All')||(f==='todo'&&b.textContent.trim()==='Not done')));
+  render();
+}
+
+function toggle(id){
+  checked[id]=!checked[id];
+  localStorage.setItem('cxx_checklist',JSON.stringify(checked));
+  render();
+}
+
+function render(){
+  const list=document.getElementById('list');
+  let total=0,done=0;
+  let html='';
+
+  phases.forEach(phase=>{
+    const items=phase.items.filter(item=>{
+      const id=phase.id+':'+item.text;
+      if(filter==='todo') return !checked[id];
+      if(filter==='all') return true;
+      return item.tag===filter;
+    });
+    if(!items.length) return;
+
+    const phaseDone=items.filter(i=>checked[phase.id+':'+i.text]).length;
+    total+=items.length;
+    done+=phaseDone;
+
+    html+=`<div class="phase">
+      <div class="phase-header">
+        <span class="phase-title">${phase.label}</span>
+        <span class="phase-count">${phaseDone}/${items.length}</span>
+      </div>
+      <div class="items">`;
+
+    items.forEach(item=>{
+      const id=phase.id+':'+item.text;
+      const isDone=!!checked[id];
+      const tagLabel={dev:'Dev',db:'Database',n8n:'n8n',client:'Client',deploy:'Deploy'}[item.tag]||item.tag;
+      html+=`<div class="item${isDone?' done':''}" onclick="toggle('${id.replace(/'/g,"\\'")}')">
+        <div class="checkbox${isDone?' checked':''}"></div>
+        <span class="item-text">${item.text}</span>
+        <span class="item-tag tag-${item.tag}">${tagLabel}</span>
+      </div>`;
+    });
+
+    html+=`</div></div>`;
+  });
+
+  list.innerHTML=html;
+
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`${done} / ${total} done (${pct}%)`;
+}
+
+render();
+</script>

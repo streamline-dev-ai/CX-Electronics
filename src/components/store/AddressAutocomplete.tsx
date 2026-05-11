@@ -1,43 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin, Loader2 } from 'lucide-react'
 
-// Minimal subset of the google.maps.places.Autocomplete API we touch.
-// Declared locally so we don't need @types/google.maps.
-declare global {
-  interface Window {
-    google?: {
-      maps: {
-        places: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            opts?: {
-              componentRestrictions?: { country: string | string[] }
-              fields?: string[]
-              types?: string[]
-            },
-          ) => {
-            addListener: (event: string, handler: () => void) => void
-            getPlace: () => {
-              address_components?: Array<{
-                long_name: string
-                short_name: string
-                types: string[]
-              }>
-              formatted_address?: string
-            }
-          }
-        }
-      }
-    }
-    __cwGoogleMapsLoading?: Promise<void>
-  }
-}
+// Geoapify Geocoding Autocomplete — Google Places alternative.
+// https://apidocs.geoapify.com/docs/geocoding/autocomplete/
+
+const API_KEY =
+  (import.meta.env.VITE_GEOAPIFY_API_KEY as string | undefined) ||
+  'a3a2df68989545a2a2b7e0b5806a9f05'
 
 export interface ParsedAddress {
   address_line1: string
   city: string
   province: string
   postal_code: string
+}
+
+interface Suggestion {
+  place_id: string
+  formatted: string
+  parsed: ParsedAddress
 }
 
 interface Props {
@@ -49,55 +30,38 @@ interface Props {
   required?: boolean
 }
 
-const GOOGLE_API_KEY =
-  (import.meta.env.VITE_GOOGLE_PLACES_API_KEY as string | undefined) ||
-  (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined)
-
-function loadGoogleMapsScript(): Promise<void> {
-  if (typeof window === 'undefined') return Promise.resolve()
-  if (window.google?.maps?.places) return Promise.resolve()
-  if (window.__cwGoogleMapsLoading) return window.__cwGoogleMapsLoading
-  if (!GOOGLE_API_KEY) return Promise.reject(new Error('No Google Places API key'))
-
-  window.__cwGoogleMapsLoading = new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places&loading=async&v=weekly`
-    script.async = true
-    script.defer = true
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Google Maps'))
-    document.head.appendChild(script)
-  })
-  return window.__cwGoogleMapsLoading
+interface GeoapifyFeature {
+  properties: {
+    place_id?: string
+    formatted?: string
+    housenumber?: string
+    street?: string
+    address_line1?: string
+    city?: string
+    town?: string
+    village?: string
+    suburb?: string
+    county?: string
+    state?: string
+    postcode?: string
+  }
 }
 
-// Map Google's componentized address into our flat shape.
-function parseComponents(
-  components: Array<{ long_name: string; short_name: string; types: string[] }>,
-): ParsedAddress {
-  const get = (type: string, short = false) => {
-    const c = components.find((c) => c.types.includes(type))
-    if (!c) return ''
-    return short ? c.short_name : c.long_name
-  }
-
-  const streetNumber = get('street_number')
-  const route = get('route')
-  const line1 = [streetNumber, route].filter(Boolean).join(' ').trim()
-  const city =
-    get('locality') ||
-    get('postal_town') ||
-    get('sublocality_level_1') ||
-    get('sublocality') ||
-    get('administrative_area_level_2')
-  const province = get('administrative_area_level_1') || ''
-  const postal = get('postal_code') || ''
-
+function parseFeature(feature: GeoapifyFeature): Suggestion {
+  const p = feature.properties
+  const houseNum = p.housenumber ?? ''
+  const street = p.street ?? ''
+  const line1 = [houseNum, street].filter(Boolean).join(' ').trim() || p.address_line1 || ''
+  const city = p.city || p.town || p.village || p.suburb || p.county || ''
   return {
-    address_line1: line1,
-    city,
-    province,
-    postal_code: postal,
+    place_id: p.place_id ?? `${p.formatted}-${Math.random()}`,
+    formatted: p.formatted ?? line1,
+    parsed: {
+      address_line1: line1,
+      city,
+      province: p.state ?? '',
+      postal_code: p.postcode ?? '',
+    },
   }
 }
 
@@ -109,53 +73,135 @@ export function AddressAutocomplete({
   placeholder = 'Start typing your address...',
   required = false,
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>(
-    GOOGLE_API_KEY ? 'loading' : 'error',
-  )
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [activeIdx, setActiveIdx] = useState(-1)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
+  const debounceRef = useRef<number | null>(null)
+  const skipNextFetchRef = useRef(false)
 
+  // Debounced fetch
   useEffect(() => {
-    if (!GOOGLE_API_KEY) return
-    let cancelled = false
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false
+      return
+    }
+    if (debounceRef.current) window.clearTimeout(debounceRef.current)
 
-    loadGoogleMapsScript()
-      .then(() => {
-        if (cancelled || !inputRef.current || !window.google?.maps?.places) return
-        const ac = new window.google.maps.places.Autocomplete(inputRef.current, {
-          componentRestrictions: { country: 'za' },
-          fields: ['address_components', 'formatted_address'],
-          types: ['address'],
-        })
-        ac.addListener('place_changed', () => {
-          const place = ac.getPlace()
-          if (!place.address_components) return
-          const parsed = parseComponents(place.address_components)
-          onSelect(parsed)
-          if (parsed.address_line1) onChange(parsed.address_line1)
-        })
-        setStatus('ready')
-      })
-      .catch(() => setStatus('error'))
+    const trimmed = value.trim()
+    if (trimmed.length < 3) {
+      setSuggestions([])
+      setOpen(false)
+      return
+    }
 
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    debounceRef.current = window.setTimeout(() => {
+      // Cancel any in-flight request
+      abortRef.current?.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+
+      setLoading(true)
+      const url = new URL('https://api.geoapify.com/v1/geocode/autocomplete')
+      url.searchParams.set('text', trimmed)
+      url.searchParams.set('filter', 'countrycode:za')
+      url.searchParams.set('limit', '6')
+      url.searchParams.set('format', 'geojson')
+      url.searchParams.set('apiKey', API_KEY)
+
+      fetch(url.toString(), { signal: controller.signal })
+        .then((r) => r.json())
+        .then((data: { features?: GeoapifyFeature[] }) => {
+          const results = (data.features ?? []).map(parseFeature)
+          setSuggestions(results)
+          setOpen(results.length > 0)
+          setActiveIdx(-1)
+        })
+        .catch((err) => {
+          if (err.name !== 'AbortError') console.warn('Address autocomplete failed:', err)
+        })
+        .finally(() => setLoading(false))
+    }, 250)
+
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    }
+  }, [value])
+
+  // Close on outside click
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
+  function choose(s: Suggestion) {
+    skipNextFetchRef.current = true
+    onChange(s.parsed.address_line1 || s.formatted)
+    onSelect(s.parsed)
+    setSuggestions([])
+    setOpen(false)
+    setActiveIdx(-1)
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || suggestions.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIdx((i) => (i + 1) % suggestions.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIdx((i) => (i <= 0 ? suggestions.length - 1 : i - 1))
+    } else if (e.key === 'Enter' && activeIdx >= 0) {
+      e.preventDefault()
+      choose(suggestions[activeIdx])
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
+  }
+
   return (
-    <div className="relative">
-      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+    <div ref={containerRef} className="relative">
+      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
       <input
-        ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        onFocus={() => suggestions.length > 0 && setOpen(true)}
         placeholder={placeholder}
         required={required}
-        autoComplete="street-address"
+        autoComplete="off"
         className={(className ?? '') + ' pl-9'}
       />
-      {status === 'loading' && (
+      {loading && (
         <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 animate-spin" />
+      )}
+
+      {open && suggestions.length > 0 && (
+        <ul className="absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-72 overflow-y-auto">
+          {suggestions.map((s, i) => (
+            <li key={s.place_id}>
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); choose(s) }}
+                onMouseEnter={() => setActiveIdx(i)}
+                className={`w-full text-left px-3 py-2.5 text-sm transition-colors flex items-start gap-2 ${
+                  i === activeIdx ? 'bg-gray-100' : 'hover:bg-gray-50'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 leading-snug">{s.formatted}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )
