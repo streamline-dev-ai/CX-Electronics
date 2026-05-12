@@ -101,7 +101,7 @@ export function VariantProductDetail() {
         ? activeVariant.bulk_price
         : Math.round(activeVariant.retail_price * 0.825 * 100) / 100)
     : 0
-  const wholesaleMinQty = activeVariant?.bulk_min_qty ?? 6
+  const wholesaleMinQty = 6
   const wholesaleSavingsPct = activeVariant
     ? Math.round((1 - wholesalePrice / activeVariant.retail_price) * 100)
     : 0

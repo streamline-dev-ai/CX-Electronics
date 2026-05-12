@@ -111,10 +111,10 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
       productId: product.id,
       name: product.name,
       price,
-      quantity: isBulkView && product.bulk_min_qty ? product.bulk_min_qty : 1,
+      quantity: isBulkView ? 6 : 1,
       image: product.thumbnail_url ?? '',
       orderType: isBulkView ? 'bulk' : 'retail',
-      bulkMinQty: product.bulk_min_qty ?? undefined,
+      bulkMinQty: isBulkView ? 6 : undefined,
     })
   }
 
@@ -195,9 +195,9 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               )}
             </div>
 
-            {isBulkView && product.bulk_min_qty && (
+            {isBulkView && (
               <span className="absolute bottom-10 left-2.5 text-[10px] bg-[#E63939] text-white px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                {product.bulk_min_qty}+ units
+                6+ units
               </span>
             )}
 

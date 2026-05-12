@@ -1,16 +1,21 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigationType } from 'react-router-dom'
 
-/**
- * Scrolls the window to the top whenever the route pathname changes.
- * Mount once inside the BrowserRouter so it can read location.
- */
+// Scroll to the top on every pathname OR query-string change (e.g. ?category=cctv),
+// except when the user is doing browser back/forward — in that case we let
+// the browser restore its own scroll position.
 export function ScrollToTop() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  const navType = useNavigationType() // 'PUSH' | 'REPLACE' | 'POP'
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
+    if (navType === 'POP') return
+    // requestAnimationFrame avoids the new page rendering, then scrolling
+    // — fires after layout so the jump is instant from the user's POV.
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    })
+  }, [pathname, search, navType])
 
   return null
 }

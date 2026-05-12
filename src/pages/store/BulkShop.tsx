@@ -187,7 +187,7 @@ export function BulkShop() {
                   <tbody>
                     {topDeals.map((p) => {
                       const savings = p.bulk_price ? Math.round((1 - p.bulk_price / p.retail_price) * 100) : 0
-                      const waMsg = encodeURIComponent(`Bulk enquiry: ${p.name} (min ${p.bulk_min_qty ?? 10} units @ R${p.bulk_price?.toFixed(2)})`)
+                      const waMsg = encodeURIComponent(`Bulk enquiry: ${p.name} (min ${6} units @ R${p.bulk_price?.toFixed(2)})`)
                       return (
                         <tr key={p.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                           <td className="px-6 py-4">
@@ -206,7 +206,7 @@ export function BulkShop() {
                           </td>
                           <td className="px-4 py-4 text-sm text-white/70">
                             <span className="bg-[#E63939]/15 text-[#E63939] px-2 py-0.5 rounded-md text-xs font-bold">
-                              {p.bulk_min_qty ?? 10}+
+                              {6}+
                             </span>
                           </td>
                           <td className="px-4 py-4 text-sm text-white/40 line-through hidden sm:table-cell">

@@ -1,33 +1,68 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { X, Truck, ShieldCheck, BadgePercent, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../context/CartContext'
 
+const STORAGE_KEY = 'cw_exit_shown_at'
+const COOLDOWN_MS = 24 * 60 * 60 * 1000 // once per 24h
+const ARM_DELAY_MS = 15_000 // grace period after page load
+const SUPPRESSED_PATHS = ['/admin', '/account', '/checkout', '/order', '/receipt']
+
 export function ExitIntentPopup() {
   const { items, itemCount, total } = useCart()
+  const { pathname } = useLocation()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (sessionStorage.getItem('exitShown') === '1') return
-    let armed = false
-    const armTimer = setTimeout(() => { armed = true }, 8000) // don't fire for 8s after page load
+    // Skip on transactional / authenticated routes
+    if (SUPPRESSED_PATHS.some((p) => pathname.startsWith(p))) return
 
-    function handleMouseLeave(e: MouseEvent) {
-      if (!armed) return
-      if (e.clientY > 12) return
-      if ((e.relatedTarget as Node | null)) return // ignore intra-page leaves
-      setVisible(true)
-      sessionStorage.setItem('exitShown', '1')
-      document.removeEventListener('mouseleave', handleMouseLeave)
+    // Mobile / touch devices have no real "exit intent" via mouseleave —
+    // and previously fired spuriously on scroll-away/tab-switch. Skip entirely.
+    const isTouch =
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(hover: none)').matches ||
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0)
+    if (isTouch) return
+
+    // Respect 24h cooldown
+    try {
+      const last = Number(localStorage.getItem(STORAGE_KEY) || '0')
+      if (last && Date.now() - last < COOLDOWN_MS) return
+    } catch {
+      /* ignore */
     }
 
-    document.addEventListener('mouseleave', handleMouseLeave)
+    let armed = false
+    let fired = false
+    const armTimer = setTimeout(() => { armed = true }, ARM_DELAY_MS)
+
+    function fire() {
+      if (fired) return
+      fired = true
+      setVisible(true)
+      try { localStorage.setItem(STORAGE_KEY, String(Date.now())) } catch { /* ignore */ }
+      document.removeEventListener('mouseout', handleMouseOut, true)
+    }
+
+    function handleMouseOut(e: MouseEvent) {
+      if (!armed || fired) return
+      // Only fire when the pointer truly leaves the viewport from the top edge
+      if (e.relatedTarget !== null) return
+      if ((e as any).toElement) return
+      if (e.clientY > 0) return
+      if (!document.hasFocus()) return
+      fire()
+    }
+
+    document.addEventListener('mouseout', handleMouseOut, true)
     return () => {
       clearTimeout(armTimer)
-      document.removeEventListener('mouseleave', handleMouseLeave)
+      document.removeEventListener('mouseout', handleMouseOut, true)
     }
-  }, [])
+  }, [pathname])
 
   function close() {
     setVisible(false)

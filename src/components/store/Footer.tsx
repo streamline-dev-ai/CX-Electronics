@@ -37,7 +37,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-2">
               <a
-                href="https://wa.me/27000000000"
+                href="https://wa.me/27649533333"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
@@ -77,14 +77,20 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
-                <a href="tel:+27000000000" className="hover:text-white transition-colors">
-                  +27 00 000 0000
+                <a href="tel:+27649533333" className="hover:text-white transition-colors">
+                  Emily: 064 953 3333
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
+                <a href="tel:+27628058899" className="hover:text-white transition-colors">
+                  Kevin: 062 805 8899
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <MessageCircle className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
                 <a
-                  href="https://wa.me/27000000000"
+                  href="https://wa.me/27649533333"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
@@ -100,7 +106,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#E63939]" />
-                <span>Mon-Sat: 09:00 - 15:00<br />Sun: Closed</span>
+                <span>Mon-Sun: 09:00 - 15:00<br />Open every day</span>
               </li>
             </ul>
           </div>
@@ -114,7 +120,7 @@ export function Footer() {
               Want a product you don't see here? Send us a message and we'll source it for you.
             </p>
             <a
-              href="https://wa.me/27000000000?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27m%20looking%20for%20a%20product%20I%20don%27t%20see%20on%20your%20site."
+              href="https://wa.me/27649533333?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27m%20looking%20for%20a%20product%20I%20don%27t%20see%20on%20your%20site."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm w-full"

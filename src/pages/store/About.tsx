@@ -33,8 +33,11 @@ const REASONS = [
   },
 ] as const
 
-const WHATSAPP_NUMBER = '27000000000'
-const PHONE_DISPLAY = '+27 00 000 0000'
+const WHATSAPP_NUMBER = '27649533333' // Emily — primary WhatsApp
+const EMILY_PHONE = '064 953 3333'
+const EMILY_TEL = '+27649533333'
+const KEVIN_PHONE = '062 805 8899'
+const KEVIN_TEL = '+27628058899'
 const EMAIL = 'info@cw-electronics.co.za'
 const ADDRESS = 'China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092'
 
@@ -329,15 +332,8 @@ export function About() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                   <div>
-                    <div className="font-semibold">Mon – Sat</div>
+                    <div className="font-semibold">Mon – Sun</div>
                     <div className="text-white/60">09:00 – 15:00</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Clock className="w-4 h-4 mt-0.5 text-white/30 flex-shrink-0" />
-                  <div>
-                    <div className="font-semibold text-white/60">Sunday</div>
-                    <div className="text-white/40">Closed</div>
                   </div>
                 </div>
               </div>
@@ -515,7 +511,7 @@ export function About() {
                 className="lg:col-span-2 space-y-3"
               >
                 <a
-                  href={`tel:${PHONE_DISPLAY.replace(/\s/g, '')}`}
+                  href={`tel:${EMILY_TEL}`}
                   className="flex items-center gap-4 bg-[#F8FAFC] hover:bg-white hover:shadow-md border border-gray-100 rounded-xl p-5 transition-all group"
                 >
                   <div className="w-11 h-11 bg-[#E63939]/10 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors flex-shrink-0">
@@ -523,9 +519,24 @@ export function About() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                      Phone
+                      Emily — Phone
                     </div>
-                    <div className="text-sm font-bold text-[#0F172A]">{PHONE_DISPLAY}</div>
+                    <div className="text-sm font-bold text-[#0F172A]">{EMILY_PHONE}</div>
+                  </div>
+                </a>
+
+                <a
+                  href={`tel:${KEVIN_TEL}`}
+                  className="flex items-center gap-4 bg-[#F8FAFC] hover:bg-white hover:shadow-md border border-gray-100 rounded-xl p-5 transition-all group"
+                >
+                  <div className="w-11 h-11 bg-[#E63939]/10 group-hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors flex-shrink-0">
+                    <Phone className="w-5 h-5 text-[#E63939] group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                      Kevin — Phone
+                    </div>
+                    <div className="text-sm font-bold text-[#0F172A]">{KEVIN_PHONE}</div>
                   </div>
                 </a>
 
@@ -584,9 +595,9 @@ export function About() {
                       Business Hours
                     </div>
                     <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
-                      Mon – Sat: 09:00 – 15:00
+                      Mon – Sun: 09:00 – 15:00
                       <br />
-                      <span className="text-gray-500">Sunday: Closed</span>
+                      <span className="text-gray-500">Open every day</span>
                     </div>
                   </div>
                 </div>
@@ -615,7 +626,7 @@ export function About() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <a
-                  href="https://wa.me/27000000000?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27d%20like%20to%20chat."
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27d%20like%20to%20chat.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm shadow-lg shadow-[#E63939]/30"

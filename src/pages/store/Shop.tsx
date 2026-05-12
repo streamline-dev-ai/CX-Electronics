@@ -8,6 +8,7 @@ import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
+import { SmartSearchBar } from '../../components/store/SmartSearchBar'
 import { CategoryGrid } from '../../components/store/CategoryGrid'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
@@ -76,14 +77,21 @@ export function Shop() {
     })
   }
 
-  function applySearch(e: React.FormEvent) {
-    e.preventDefault()
+  function applySearch(q: string) {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
-      searchInput ? next.set('q', searchInput) : next.delete('q')
+      q.trim() ? next.set('q', q.trim()) : next.delete('q')
       return next
     })
   }
+
+  // Live-filter the grid as the user types — 350ms debounce.
+  useEffect(() => {
+    if (searchInput === search) return
+    const handle = setTimeout(() => applySearch(searchInput), 350)
+    return () => clearTimeout(handle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
 
   function clearAll() {
     setPriceRange({})
@@ -275,25 +283,17 @@ export function Shop() {
               CCTV, solar, chargers, routers, smartwatches and more — wholesale &amp; retail.
             </p>
 
-            {/* Search */}
-            <form onSubmit={applySearch} className="mt-5 flex max-w-lg">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                <input
-                  type="search"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full bg-white/10 text-white placeholder:text-white/40 pl-11 pr-4 py-3 rounded-l-lg border border-white/20 border-r-0 focus:outline-none focus:ring-2 focus:ring-[#E63939] focus:border-transparent text-sm"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-3 rounded-r-lg transition-colors text-sm"
-              >
-                Search
-              </button>
-            </form>
+            {/* Smart, live-filtering search with product suggestions */}
+            <div className="mt-5">
+              <SmartSearchBar
+                value={searchInput}
+                onChange={setSearchInput}
+                onSubmit={applySearch}
+                tone="dark"
+                placeholder="Search chargers, CCTV, routers..."
+                productBasePath="/shop"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -347,7 +347,7 @@ export function Shop() {
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="hidden md:block w-56 flex-shrink-0">
-            <div className="sticky top-28">
+            <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-2 pb-6 -mr-2 sidebar-scroll">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A] mb-5">
                 <SlidersHorizontal className="w-4 h-4 text-[#E63939]" />
                 Filters

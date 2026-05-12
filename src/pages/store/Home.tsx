@@ -15,7 +15,7 @@ import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { CategoryGrid } from '../../components/store/CategoryGrid'
 
 // ── Branded contact constants ─────────────────────────────────
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 const MAP_EMBED =
   'https://www.google.com/maps?q=China+Mart+3+Press+Avenue+Crown+Mines+Johannesburg&output=embed'
 const DIRECTIONS_URL =
@@ -609,9 +609,18 @@ function LocationSection() {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
-                  <div className="text-white/60 text-xs">Call</div>
-                  <a href="tel:+27000000000" className="font-semibold hover:text-[#E63939] transition-colors">
-                    +27 00 000 0000
+                  <div className="text-white/60 text-xs">Emily</div>
+                  <a href="tel:+27649533333" className="font-semibold hover:text-[#E63939] transition-colors">
+                    064 953 3333
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
+                <div>
+                  <div className="text-white/60 text-xs">Kevin</div>
+                  <a href="tel:+27628058899" className="font-semibold hover:text-[#E63939] transition-colors">
+                    062 805 8899
                   </a>
                 </div>
               </div>
@@ -633,7 +642,7 @@ function LocationSection() {
                 <Sparkles className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
                   <div className="text-white/60 text-xs">Trading Hours</div>
-                  <div className="font-semibold">Mon–Sat: 09:00 – 15:00</div>
+                  <div className="font-semibold">Mon–Sun: 09:00 – 15:00</div>
                 </div>
               </div>
             </div>
@@ -694,7 +703,7 @@ function WhyChooseCW() {
             </p>
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://wa.me/27000000000?text=Hi%20CW%20%E2%80%94%20I%27d%20like%20to%20chat%20about%20wholesale%20pricing."
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%20%E2%80%94%20I%27d%20like%20to%20chat%20about%20wholesale%20pricing.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm hover:-translate-y-0.5"
@@ -703,7 +712,7 @@ function WhyChooseCW() {
                 Talk to Us on WhatsApp
               </a>
               <a
-                href="tel:+27000000000"
+                href="tel:+27649533333"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-md"
               >
                 <Phone className="w-4 h-4" />

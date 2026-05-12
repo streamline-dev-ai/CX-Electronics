@@ -30,6 +30,7 @@ export function getWholesaleSavingsPct(retail: number, wholesale: number): numbe
   return Math.round((1 - wholesale / retail) * 100)
 }
 
-export function getWholesaleMinQty(product: { bulk_min_qty?: number | null }): number {
-  return product.bulk_min_qty && product.bulk_min_qty > 0 ? product.bulk_min_qty : WHOLESALE_MIN_QTY
+export function getWholesaleMinQty(_product: { bulk_min_qty?: number | null }): number {
+  // Uniform wholesale tier across the catalogue: 6+ units for every product.
+  return WHOLESALE_MIN_QTY
 }

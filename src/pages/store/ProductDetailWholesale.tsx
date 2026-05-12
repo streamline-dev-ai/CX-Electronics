@@ -19,7 +19,7 @@ export function ProductDetailWholesale() {
   const { product, loading, error } = useProduct(slug ?? '')
   const { addItem } = useCart()
   const { lang } = useLang()
-  const [qty, setQtyInput] = useState(product?.bulk_min_qty ?? 6)
+  const [qty, setQtyInput] = useState(6)
   const [activeImage, setActiveImage] = useState(0)
 
   if (loading) {
@@ -54,7 +54,7 @@ export function ProductDetailWholesale() {
   
   const retailPrice = product.retail_price
   const bulkPrice = product.bulk_price || retailPrice
-  const bulkMinQty = product.bulk_min_qty || 6
+  const bulkMinQty = 6
   const savingsPct = Math.round((1 - bulkPrice / retailPrice) * 100)
   const savingsPerUnit = retailPrice - bulkPrice
   const totalPrice = bulkPrice * qty
