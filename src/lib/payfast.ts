@@ -41,7 +41,7 @@ function buildSignature(params: Params): string {
 
 export interface PayFastPayload {
   orderId:     string  // Supabase UUID — used in return/cancel URLs
-  orderNumber: string  // CXX-YYYY-NNNN — sent as m_payment_id for ITN lookup
+  orderNumber: string  // CW-YYYY-NNNN — sent as m_payment_id for ITN lookup
   nameFirst:   string
   nameLast:    string
   email:       string
@@ -64,7 +64,7 @@ export function redirectToPayFast(payload: PayFastPayload): void {
     cell_number:   payload.phone || undefined,
     m_payment_id:  payload.orderNumber,
     amount:        payload.amount.toFixed(2),
-    item_name:     `CXX Electronics Order ${payload.orderNumber}`,
+    item_name:     `CW Electronics Order ${payload.orderNumber}`,
     custom_str1:   payload.orderId,
   }
 

@@ -11,9 +11,6 @@ export function generateReceipt(order: OrderWithDetails): void {
 // Returns self-contained receipt HTML for inclusion in n8n webhook payloads.
 // n8n can attach this as a PDF via its HTML-to-PDF node or send inline.
 export function getReceiptHTMLString(order: OrderWithDetails): string {
-  const VAT_RATE = 0.15
-  const subtotalExVat = order.subtotal / (1 + VAT_RATE)
-  const vatAmount = order.subtotal - subtotalExVat
   const isCollection = order.fulfillment_type === 'collection'
 
   const addr = order.shipping_address
@@ -94,7 +91,7 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
         <div style="margin-top:8px;">
           ${
             isCollection
-              ? `<p style="margin:0;font-size:13px;color:#374151;">Dragon City Mall, Shop 14, Fordsburg, Johannesburg</p>
+              ? `<p style="margin:0;font-size:13px;color:#374151;">China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092</p>
                  ${order.collection_name ? `<p style="margin:3px 0 0;font-size:13px;color:#374151;">Collector: ${order.collection_name}</p>` : ''}`
               : deliveryAddrHtml
           }
@@ -127,12 +124,8 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
       <td style="width:260px;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6b7280;">Subtotal (excl. VAT)</td>
-            <td style="padding:5px 0;font-size:13px;color:#6b7280;text-align:right;">R ${subtotalExVat.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6b7280;">VAT (15%)</td>
-            <td style="padding:5px 0;font-size:13px;color:#6b7280;text-align:right;">R ${vatAmount.toFixed(2)}</td>
+            <td style="padding:5px 0;font-size:13px;color:#6b7280;">Subtotal</td>
+            <td style="padding:5px 0;font-size:13px;color:#6b7280;text-align:right;">R ${order.subtotal.toFixed(2)}</td>
           </tr>
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#6b7280;">Shipping</td>
@@ -156,7 +149,7 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
     <tr>
       <td style="vertical-align:bottom;">
         <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          CW Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+          CW Electronics · China Mart, Shop C15, Crown Mines, Johannesburg<br />
           info@cw-electronics.co.za
         </p>
       </td>

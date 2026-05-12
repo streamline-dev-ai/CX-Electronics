@@ -17,7 +17,10 @@ export default {
           navy: '#000000',
           blue: '#E63939',
           'blue-hover': '#C82020',
+          'blue-light': '#FEE9E9',
           text: '#000000',
+          muted: '#94A3B8',
+          bg: '#F8FAFC',
         },
       },
       fontFamily: {

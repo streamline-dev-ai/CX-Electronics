@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import {
   ShoppingCart, Menu, X, Search, Heart, User, ChevronDown, MessageCircle,
 } from 'lucide-react'
@@ -7,6 +7,7 @@ import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { useCategories } from '../../hooks/useCategories'
 import { CartDrawer } from './CartDrawer'
+import { NavbarSearch } from './NavbarSearch'
 import { getCategoryIcon } from '../../lib/categoryIcons'
 
 const navLinks = [
@@ -27,10 +28,9 @@ export function Navbar() {
   const { itemCount, openCart } = useCart()
   const { ids: wishlistIds } = useWishlist()
   const { categories } = useCategories()
-  const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [catsOpen, setCatsOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
   const catsRef = useRef<HTMLDivElement>(null)
 
   const navCategories = categories.map((c) => ({
@@ -49,14 +49,6 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    const q = searchValue.trim()
-    if (q) navigate(`/shop?q=${encodeURIComponent(q)}`)
-    else navigate('/shop')
-    setMobileOpen(false)
-  }
-
   return (
     <>
       <header className="sticky top-0 z-40 bg-[#0F172A] border-b border-slate-700">
@@ -64,7 +56,7 @@ export function Navbar() {
         <div className="lg:hidden px-3 sm:px-4 h-16 grid grid-cols-[auto_1fr_auto] items-center gap-2">
           {/* Left: hamburger */}
           <button
-            onClick={() => setMobileOpen((v) => !v)}
+            onClick={() => { setMobileOpen((v) => !v); setMobileSearchOpen(false) }}
             className="p-2 text-slate-300 hover:text-white rounded-lg"
             aria-label="Toggle menu"
           >
@@ -79,8 +71,17 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Right: wishlist + account + cart */}
+          {/* Right: search + wishlist + cart */}
           <div className="flex items-center gap-0.5">
+            <button
+              onClick={() => { setMobileSearchOpen((v) => !v); setMobileOpen(false) }}
+              aria-label="Search"
+              className={`p-2 rounded-lg transition-colors ${
+                mobileSearchOpen ? 'bg-slate-700 text-white' : 'text-slate-300 hover:text-white hover:bg-slate-700'
+              }`}
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <Link
               to="/account/wishlist"
               aria-label="Wishlist"
@@ -92,13 +93,6 @@ export function Navbar() {
                   {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
                 </span>
               )}
-            </Link>
-            <Link
-              to="/account/login"
-              aria-label="My Account"
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <User className="w-5 h-5" />
             </Link>
             <button
               onClick={openCart}
@@ -115,6 +109,16 @@ export function Navbar() {
           </div>
         </div>
 
+        {/* Mobile: inline search bar (toggled via Search icon) */}
+        {mobileSearchOpen && (
+          <div className="lg:hidden px-3 sm:px-4 pb-3">
+            <NavbarSearch
+              variant="mobile"
+              onNavigate={() => setMobileSearchOpen(false)}
+            />
+          </div>
+        )}
+
         {/* ── Desktop row (lg+) ── */}
         <div className="hidden lg:flex max-w-7xl mx-auto px-4 sm:px-6 items-center h-16 gap-6">
           {/* Logo + brand name */}
@@ -128,25 +132,10 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop search bar */}
-          <form onSubmit={handleSearch} className="flex flex-1 max-w-xl mx-4">
-            <div className="flex w-full bg-slate-800 border border-slate-600 rounded-lg overflow-hidden transition-colors focus-within:border-[#E63939]">
-              <input
-                type="search"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Search chargers, CCTV, routers..."
-                className="flex-1 px-4 py-2 text-sm bg-transparent text-white placeholder:text-slate-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="bg-[#E63939] hover:bg-[#C82020] px-5 flex items-center justify-center transition-colors"
-                aria-label="Search"
-              >
-                <Search className="w-4 h-4 text-white" />
-              </button>
-            </div>
-          </form>
+          {/* Desktop search bar with autocomplete */}
+          <div className="flex-1 max-w-xl mx-4">
+            <NavbarSearch variant="desktop" />
+          </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-2 ml-auto">
@@ -253,39 +242,32 @@ export function Navbar() {
         {/* Mobile drawer */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-slate-700 bg-[#0F172A] px-4 py-4">
-            {/* Mobile search */}
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="flex bg-slate-800 border border-slate-600 rounded-lg overflow-hidden">
-                <input
-                  type="search"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  placeholder="Search products..."
-                  className="flex-1 px-4 py-2.5 text-sm text-white bg-transparent placeholder:text-slate-400 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#E63939] px-5 flex items-center justify-center"
-                  aria-label="Search"
-                >
-                  <Search className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </form>
+            <NavbarSearch variant="mobile" onNavigate={() => setMobileOpen(false)} />
 
-            {navLinks.map(({ to, label, exact }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={exact}
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `block py-3 text-sm border-b border-slate-700 ${isActive ? 'text-[#E63939] font-semibold' : 'text-slate-300'}`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
+            <div className="mt-4">
+              {navLinks.map(({ to, label, exact }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={exact}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    `block py-3 text-sm border-b border-slate-700 ${isActive ? 'text-[#E63939] font-semibold' : 'text-slate-300'}`
+                  }
+                >
+                  {label}
+                </NavLink>
+              ))}
+            </div>
+
+            <Link
+              to="/account/login"
+              onClick={() => setMobileOpen(false)}
+              className="mt-4 flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
+            >
+              <User className="w-4 h-4" />
+              My Account
+            </Link>
 
             <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
               Categories

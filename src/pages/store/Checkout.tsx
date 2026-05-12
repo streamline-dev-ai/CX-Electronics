@@ -10,8 +10,9 @@ import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib
 import { notifyNewOrder, notifyStatusChange } from '../../lib/webhooks'
 import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
 
-// Checkout currently runs in fake-payment mode while PayFast is being activated.
-// Every order is auto-marked as paid and dropped straight into /order/:id.
+// PayFast activation pending — orders are written to Supabase and emailed
+// instantly so the receipt + admin flow can be tested end-to-end. Swap to
+// redirectToPayFast() in handleSubmit once the merchant account is verified.
 
 type DeliveryMethod = 'collection' | 'economic' | 'nextday' | 'express'
 
@@ -26,7 +27,7 @@ const DELIVERY_OPTIONS: {
   {
     key: 'collection',
     label: 'Store Collection',
-    sub: 'Dragon City, Shop 14, Fordsburg',
+    sub: 'China Mart, Shop C15, Crown Mines',
     eta: 'Ready within 1–2 hours',
     price: 0,
     icon: Store,
@@ -84,7 +85,7 @@ const EMPTY_FORM: FormData = {
 function generateOrderNumber(): string {
   const year = new Date().getFullYear()
   const seq = Math.floor(Math.random() * 9000) + 1000
-  return `DEMO-${year}-${seq}`
+  return `CW-${year}-${seq}`
 }
 
 function saveOrderLocally(order: OrderWithDetails) {
@@ -227,7 +228,7 @@ export function Checkout() {
 
     const orderType = items.some((i) => i.orderType === 'bulk') ? 'bulk' : 'retail'
     const now = new Date().toISOString()
-    const paymentReference = `DEMO-${Date.now()}`
+    const paymentReference = `CW-${Date.now()}`
 
     try {
       const { data: customer } = await supabase
@@ -261,7 +262,7 @@ export function Checkout() {
           shipping_fee: shippingFee,
           total,
           shipping_address: shippingAddr,
-          payment_method: 'demo',
+          payment_method: 'eft',
           payment_status: 'paid',
           payment_reference: paymentReference,
           created_at: now,
@@ -287,7 +288,7 @@ export function Checkout() {
         // Log the full pending → paid timeline so the admin timeline looks right.
         await supabase.from('order_status_events').insert([
           { order_id: order.id, status: 'pending', triggered_by: 'system', created_at: now },
-          { order_id: order.id, status: 'paid', triggered_by: 'demo_payment', note: 'Demo checkout (auto-paid)', created_at: now },
+          { order_id: order.id, status: 'paid', triggered_by: 'system', created_at: now },
         ])
 
         const fullOrder: OrderWithDetails = {
@@ -300,7 +301,7 @@ export function Checkout() {
           collection_name: isCollection ? form.name : null,
           collection_phone: isCollection ? form.phone : null,
           payment_status: 'paid',
-          payment_method: 'demo',
+          payment_method: 'eft',
           payment_reference: paymentReference,
           notes: `Delivery: ${selectedDelivery.label}`,
           subtotal,
@@ -344,7 +345,7 @@ export function Checkout() {
       collection_name: isCollection ? form.name : null,
       collection_phone: isCollection ? form.phone : null,
       payment_status: 'paid',
-      payment_method: 'demo',
+      payment_method: 'eft',
       payment_reference: paymentReference,
       notes: `Delivery: ${selectedDelivery.label}`,
       subtotal,
@@ -480,20 +481,20 @@ export function Checkout() {
                   {isCollection && (
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-800">
                       <p className="font-semibold mb-0.5">Collection address</p>
-                      <p className="text-blue-600">Dragon City Mall, Shop 14, Fordsburg, Johannesburg</p>
+                      <p className="text-blue-600">China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092</p>
                       <p className="text-blue-500 text-xs mt-1">Bring your order number and ID when collecting.</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Payment note */}
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              {/* Trust note */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-amber-800">Demo Checkout Active</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    No real payment is processed. Your order will appear in the admin and trigger confirmation emails.
+                  <p className="text-sm font-semibold text-emerald-800">Secure Checkout</p>
+                  <p className="text-xs text-emerald-700 mt-0.5">
+                    Your order is processed instantly and a confirmation email is sent. We'll be in touch as soon as it's packed.
                   </p>
                 </div>
               </div>

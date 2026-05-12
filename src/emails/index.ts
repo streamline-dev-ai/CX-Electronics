@@ -29,7 +29,7 @@ function wrap(body: string): string {
 
       <tr>
         <td style="background:#F1F5F9;padding:32px 40px;text-align:center;font-size:13px;color:#64748B;">
-          <p style="margin:0;">CW Electronics &bull; Dragon City, Shop 14, Fordsburg, Johannesburg</p>
+          <p style="margin:0;">CW Electronics &bull; China Mart, Shop C15, Crown Mines, Johannesburg</p>
           <p style="margin:8px 0 0;">Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a></p>
         </td>
       </tr>
@@ -103,8 +103,8 @@ function fulfillmentBlock(order: OrderWithDetails): string {
     return `
     <div style="background:#F8FAFC;border:1px solid #E2E8F0;padding:20px 28px;margin:0 0 24px;">
       <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Collection Point</p>
-      <p style="margin:0;font-size:14px;color:#111827;font-weight:600;">Dragon City Mall, Shop 14</p>
-      <p style="margin:4px 0 0;font-size:14px;color:#374151;">Fordsburg, Johannesburg</p>
+      <p style="margin:0;font-size:14px;color:#111827;font-weight:600;">China Mart, Shop C15</p>
+      <p style="margin:4px 0 0;font-size:14px;color:#374151;">3 Press Avenue, Crown Mines, Johannesburg</p>
       ${order.collection_name ? `<p style="margin:8px 0 0;font-size:13px;color:#64748B;">Collecting: <strong>${order.collection_name}</strong></p>` : ''}
     </div>`
   }
@@ -242,8 +242,8 @@ export function orderPackedCollection(order: OrderWithDetails): string {
     <tr><td style="padding:0 40px 36px;">
       <div style="background:#F8FAFC;border:1px solid #E2E8F0;padding:20px 28px;margin-bottom:16px;">
         <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Collection Details</p>
-        <p style="margin:0;font-size:15px;font-weight:700;color:#111827;">Dragon City Mall, Shop 14</p>
-        <p style="margin:4px 0 0;font-size:14px;color:#374151;">Fordsburg, Johannesburg</p>
+        <p style="margin:0;font-size:15px;font-weight:700;color:#111827;">China Mart, Shop C15</p>
+        <p style="margin:4px 0 0;font-size:14px;color:#374151;">3 Press Avenue, Crown Mines, Johannesburg</p>
         <p style="margin:4px 0 0;font-size:13px;color:#64748B;">Mon–Sat 09:00–15:00</p>
         ${order.collection_name ? `<p style="margin:10px 0 0;font-size:13px;color:#64748B;">Collector: <strong>${order.collection_name}</strong></p>` : ''}
       </div>
@@ -458,7 +458,7 @@ export function ownerNewOrder(order: OrderWithDetails): string {
         <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">${isCollection ? 'Collection' : 'Deliver to'}</p>
         <p style="margin:0;font-size:14px;color:#374151;">
           ${isCollection
-            ? `Dragon City, Shop 14, Fordsburg${order.collection_name ? ` · Collector: ${order.collection_name}` : ''}`
+            ? `China Mart, Shop C15, Crown Mines${order.collection_name ? ` · Collector: ${order.collection_name}` : ''}`
             : addrStr}
         </p>
       </div>

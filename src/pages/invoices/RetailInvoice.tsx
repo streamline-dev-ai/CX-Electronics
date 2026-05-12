@@ -1,7 +1,7 @@
 import { Zap, Printer } from 'lucide-react'
 
 const INVOICE = {
-  number: 'CXX-2026-00142',
+  number: 'CW-2026-00142',
   date: '30 April 2026',
   customer: {
     name: 'Thabo Nkosi',
@@ -20,12 +20,9 @@ const INVOICE = {
   paymentRef: 'PF-8823741920',
 }
 
-const VAT_RATE = 0.15
-
 export function RetailInvoice() {
   const subtotal = INVOICE.items.reduce((s, i) => s + i.qty * i.unit, 0)
-  const vat = subtotal * VAT_RATE
-  const total = subtotal + vat + INVOICE.shipping
+  const total = subtotal + INVOICE.shipping
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 print:bg-white print:py-0">
@@ -49,8 +46,8 @@ export function RetailInvoice() {
               <Zap className="w-5 h-5 text-white fill-white" />
             </div>
             <div>
-              <p className="font-extrabold text-white text-xl tracking-tight">CXX Electronics</p>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Dragon City, Fordsburg, JHB</p>
+              <p className="font-extrabold text-white text-xl tracking-tight">CW Electronics</p>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">China Mart, Crown Mines, JHB</p>
             </div>
           </div>
           <div className="text-right">
@@ -110,12 +107,8 @@ export function RetailInvoice() {
           <div className="flex justify-end">
             <div className="w-64 space-y-2">
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Subtotal (excl. VAT)</span>
-                <span>R{(subtotal / (1 + VAT_RATE)).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>VAT (15%)</span>
-                <span>R{(subtotal - subtotal / (1 + VAT_RATE)).toFixed(2)}</span>
+                <span>Subtotal</span>
+                <span>R{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Shipping</span>
@@ -132,9 +125,8 @@ export function RetailInvoice() {
           <div className="border-t border-gray-100 pt-6 flex items-end justify-between">
             <div>
               <p className="text-xs text-gray-400 leading-relaxed">
-                CXX Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
-                Tel: +27 11 123 4567 · info@cxxelectronics.co.za<br />
-                VAT Reg No: 4123456789
+                CW Electronics · China Mart, Shop C15, Crown Mines, Johannesburg<br />
+                info@cw-electronics.co.za
               </p>
             </div>
             <div className="text-right">

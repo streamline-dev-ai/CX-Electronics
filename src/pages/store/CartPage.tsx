@@ -6,7 +6,7 @@ import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 
 export function CartPage() {
-  const { items, subtotal, shippingFee, total, removeItem, updateQuantity } = useCart()
+  const { items, subtotal, removeItem, updateQuantity } = useCart()
   const { t } = useLang()
 
   return (
@@ -83,22 +83,18 @@ export function CartPage() {
                     <span>{t('subtotal')}</span>
                     <span>R{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>{t('shipping')}</span>
-                    <span className={shippingFee === 0 ? 'text-green-600 font-medium' : ''}>
-                      {shippingFee === 0 ? t('freeShipping') : `R${shippingFee.toFixed(2)}`}
-                    </span>
+                    <span>Calculated at checkout</span>
                   </div>
-                  {shippingFee > 0 && (
-                    <p className="text-xs text-gray-400">{t('freeShippingThreshold')}</p>
-                  )}
                 </div>
 
                 <div className="border-t border-gray-100 pt-3 mb-5">
                   <div className="flex justify-between font-bold text-lg text-gray-900">
                     <span>{t('total')}</span>
-                    <span>R{total.toFixed(2)}</span>
+                    <span>R{subtotal.toFixed(2)}</span>
                   </div>
+                  <p className="text-xs text-gray-400 mt-1">Delivery fee added at the next step.</p>
                 </div>
 
                 <Link

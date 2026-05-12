@@ -32,5 +32,8 @@ export async function signIn(email: string, password: string, remember = true) {
 }
 
 export async function signOut() {
-  return supabase.auth.signOut()
+  // scope:'local' — only end this admin session, don't cascade through
+  // refresh tokens server-side (which can knock out a separate logged-in
+  // customer session sharing the same auth user).
+  return supabase.auth.signOut({ scope: 'local' })
 }

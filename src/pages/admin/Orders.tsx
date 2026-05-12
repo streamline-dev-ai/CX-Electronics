@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X, Trash2, Loader2 } from 'lucide-react'
-import { useOrders, updateOrderStatus, deleteOrder, deleteDemoOrders } from '../../hooks/useOrders'
+import { useOrders, updateOrderStatus, deleteOrder } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
-import { useAdminMode } from '../../hooks/useAdminMode'
 import type { OrderStatus, OrderWithDetails } from '../../lib/supabase'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
@@ -49,18 +48,15 @@ const ALL_STATUSES: OrderStatus[] = [
 ]
 
 export function AdminOrders() {
-  const [adminMode] = useAdminMode()
-  const isDemo = adminMode === 'demo'
   const [status, setStatus] = useState<OrderStatus | undefined>()
   const [page, setPage] = useState(1)
   const [advancing, setAdvancing] = useState<string | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [deleting, setDeleting] = useState<string | null>(null)
-  const [clearingDemo, setClearingDemo] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
-  const { orders, loading, totalCount, refetch } = useOrders({ status, search: search || undefined, demoMode: isDemo, page, pageSize: 50 })
+  const { orders, loading, totalCount, refetch } = useOrders({ status, search: search || undefined, page, pageSize: 50 })
   const totalPages = Math.ceil(totalCount / 50)
 
   const applySearch = useCallback(() => {
@@ -99,57 +95,35 @@ export function AdminOrders() {
     setTimeout(() => setToast(null), 3500)
   }
 
-  async function handleClearAllDemo() {
-    const ok = window.confirm('Delete ALL demo orders? This permanently removes every order whose number starts with "DEMO-". Cannot be undone.')
-    if (!ok) return
-    setClearingDemo(true)
-    const { count, error } = await deleteDemoOrders()
-    if (error) setToast(`Failed: ${error}`)
-    else setToast(`Cleared ${count} demo order${count === 1 ? '' : 's'}`)
-    setClearingDemo(false)
-    refetch()
-    setTimeout(() => setToast(null), 3500)
-  }
-
   return (
     <div>
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl">
+        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl whitespace-nowrap">
           {toast}
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
         <div>
           <h1 className="text-xl font-bold text-gray-900">
             Orders <span className="text-sm font-normal text-gray-400">订单</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total{isDemo ? ' demo' : ''}</p>
-          {isDemo && totalCount > 0 && (
-            <button
-              onClick={handleClearAllDemo}
-              disabled={clearingDemo}
-              className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60"
-            >
-              {clearingDemo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-              Clear all demo orders
-            </button>
-          )}
+          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
         </div>
 
-        {/* Search by order number */}
+        {/* Search */}
         <form
           onSubmit={(e) => { e.preventDefault(); applySearch() }}
-          className="flex gap-2 flex-shrink-0"
+          className="flex gap-2 w-full sm:w-auto"
         >
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Order number…"
-              className="pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] w-48"
+              placeholder="Order #, name, email, phone…"
+              className="pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] w-full sm:w-48"
             />
             {searchInput && (
               <button type="button" onClick={clearSearch} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -157,17 +131,17 @@ export function AdminOrders() {
               </button>
             )}
           </div>
-          <button type="submit" className="px-3 py-2 text-sm font-semibold bg-[#0F172A] text-white rounded-lg hover:bg-[#1e293b] transition-colors">
+          <button type="submit" className="px-3 py-2 text-sm font-semibold bg-[#0F172A] text-white rounded-lg hover:bg-[#1e293b] transition-colors flex-shrink-0">
             Search
           </button>
         </form>
       </div>
 
-      {/* Status filter */}
-      <div className="flex flex-wrap gap-2 mb-5">
+      {/* Status filter — scrollable on mobile */}
+      <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
         <button
           onClick={() => { setStatus(undefined); setPage(1) }}
-          className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+          className={`px-3 py-1 text-sm rounded-full border transition-colors flex-shrink-0 ${
             !status ? 'bg-cxx-blue text-white border-cxx-blue' : 'border-gray-300 text-gray-600 hover:border-gray-400'
           }`}
         >
@@ -177,7 +151,7 @@ export function AdminOrders() {
           <button
             key={s}
             onClick={() => { setStatus(s); setPage(1) }}
-            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+            className={`px-3 py-1 text-sm rounded-full border transition-colors flex-shrink-0 ${
               status === s ? 'bg-cxx-blue text-white border-cxx-blue' : 'border-gray-300 text-gray-600 hover:border-gray-400'
             }`}
           >
@@ -201,12 +175,12 @@ export function AdminOrders() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Order #</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600 whitespace-nowrap">Order #</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Customer</th>
-                  <th className="px-4 py-3 text-center font-medium text-gray-600">Via</th>
-                  <th className="px-4 py-3 text-right font-medium text-gray-600">Total</th>
+                  <th className="px-3 py-3 text-center font-medium text-gray-600">Via</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-600 whitespace-nowrap">Total</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-600">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Date</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600 whitespace-nowrap">Date</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-600">Actions</th>
                 </tr>
               </thead>
@@ -219,17 +193,17 @@ export function AdminOrders() {
                     <td className="px-4 py-3">
                       <Link
                         to={`/admin/orders/${order.id}`}
-                        className="font-medium text-cxx-blue hover:underline"
+                        className="font-medium text-cxx-blue hover:underline whitespace-nowrap"
                       >
                         {order.order_number}
                       </Link>
                       <p className="text-xs text-gray-400 capitalize">{order.order_type}</p>
                     </td>
-                    <td className="px-4 py-3">
-                      <p className="text-gray-900">{order.customers?.name ?? '—'}</p>
-                      <p className="text-xs text-gray-400">{order.customers?.email ?? ''}</p>
+                    <td className="px-4 py-3 max-w-[140px]">
+                      <p className="text-gray-900 truncate">{order.customers?.name ?? '—'}</p>
+                      <p className="text-xs text-gray-400 truncate">{order.customers?.email ?? ''}</p>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-3 py-3 text-center">
                       <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
                         order.fulfillment_type === 'collection'
                           ? 'bg-teal-100 text-teal-700'
@@ -238,14 +212,14 @@ export function AdminOrders() {
                         {order.fulfillment_type === 'collection'
                           ? <Store className="w-3 h-3" />
                           : <Truck className="w-3 h-3" />}
-                        {order.fulfillment_type}
+                        <span className="hidden sm:inline">{order.fulfillment_type}</span>
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right font-medium text-gray-900">
+                    <td className="px-4 py-3 text-right font-medium text-gray-900 whitespace-nowrap">
                       R{order.total.toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[order.status]}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${STATUS_STYLES[order.status]}`}>
                         {fmt(order.status)}
                       </span>
                     </td>
@@ -255,7 +229,7 @@ export function AdminOrders() {
                       })}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-1">
                         <Link
                           to={`/admin/orders/${order.id}/invoice`}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -268,13 +242,13 @@ export function AdminOrders() {
                             onClick={() => advanceOrder(order, next)}
                             disabled={isAdvancing}
                             title={`Mark as ${fmt(next)}`}
-                            className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg
-                              bg-cxx-blue text-white hover:bg-cxx-blue-hover transition-colors disabled:opacity-60"
+                            className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg
+                              bg-cxx-blue text-white hover:bg-cxx-blue-hover transition-colors disabled:opacity-60 whitespace-nowrap"
                           >
                             {isAdvancing
                               ? <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
                               : <ArrowNext className="w-3 h-3" />}
-                            {fmt(next).split(' ')[0]}
+                            <span className="hidden sm:inline">{fmt(next).split(' ')[0]}</span>
                           </button>
                         )}
                         <button

@@ -1,24 +1,44 @@
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight, Package } from 'lucide-react'
+import {
+  Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight, Package,
+  Tag, Percent, BadgeCheck, X as XIcon,
+} from 'lucide-react'
 import { useProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { supabase } from '../../lib/supabase'
+import { useAdminLang } from '../../context/AdminLangContext'
 import type { ProductWithCategory, StockStatus } from '../../lib/supabase'
 
 const STOCK_LABELS: Record<StockStatus, { label: string; color: string }> = {
-  in_stock: { label: 'In Stock', color: 'bg-green-100 text-green-700' },
+  in_stock:     { label: 'In Stock',     color: 'bg-green-100 text-green-700' },
   out_of_stock: { label: 'Out of Stock', color: 'bg-red-100 text-red-700' },
-  on_order: { label: 'On Order', color: 'bg-amber-100 text-amber-700' },
+  on_order:     { label: 'On Order',     color: 'bg-amber-100 text-amber-700' },
 }
 
+type BulkAction =
+  | 'set_retail'
+  | 'adjust_pct'
+  | 'set_bulk'
+  | 'set_min_qty'
+  | 'set_stock'
+  | 'set_active'
+  | 'set_featured'
+
 export function AdminProducts() {
+  const { t } = useAdminLang()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [categorySlug, setCategorySlug] = useState('')
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
+  const [applying, setApplying] = useState(false)
+  const [activeAction, setActiveAction] = useState<BulkAction | null>(null)
+  const [actionValue, setActionValue] = useState('')
+  const [actionStock, setActionStock] = useState<StockStatus>('in_stock')
+  const [actionBool, setActionBool] = useState(true)
+  const [toast, setToast] = useState<string | null>(null)
 
   const { categories } = useCategories()
   const { products, loading, totalCount, refetch } = useProducts({
@@ -57,13 +77,139 @@ export function AdminProducts() {
     }
   }
 
+  function showToast(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3500)
+  }
+
+  function closeAction() {
+    setActiveAction(null)
+    setActionValue('')
+  }
+
   async function deleteSelected() {
     if (!selected.size) return
     if (!confirm(`Delete ${selected.size} product(s)? This cannot be undone.`)) return
     setDeleting(true)
-    await supabase.from('products').delete().in('id', [...selected])
-    setSelected(new Set())
+    const { error } = await supabase.from('products').delete().in('id', [...selected])
     setDeleting(false)
+    if (error) {
+      showToast(`Failed: ${error.message}`)
+      return
+    }
+    showToast(`Deleted ${selected.size} product(s)`)
+    setSelected(new Set())
+    refetch()
+  }
+
+  async function applyBulkAction() {
+    if (!activeAction || !selected.size) return
+    const ids = [...selected]
+    setApplying(true)
+
+    let payload: Record<string, unknown> = {}
+    let confirmMsg = ''
+
+    switch (activeAction) {
+      case 'set_retail': {
+        const v = Number(actionValue)
+        if (!Number.isFinite(v) || v < 0) {
+          showToast('Enter a valid price')
+          setApplying(false)
+          return
+        }
+        payload = { retail_price: v, updated_at: new Date().toISOString() }
+        confirmMsg = `Set retail price = R${v.toFixed(2)} on ${ids.length} product(s)`
+        break
+      }
+      case 'set_bulk': {
+        const v = Number(actionValue)
+        if (!Number.isFinite(v) || v < 0) {
+          showToast('Enter a valid price')
+          setApplying(false)
+          return
+        }
+        payload = { bulk_price: v, is_bulk_available: true, updated_at: new Date().toISOString() }
+        confirmMsg = `Set wholesale price = R${v.toFixed(2)} on ${ids.length} product(s)`
+        break
+      }
+      case 'set_min_qty': {
+        const v = parseInt(actionValue, 10)
+        if (!Number.isFinite(v) || v < 1) {
+          showToast('Enter a valid quantity')
+          setApplying(false)
+          return
+        }
+        payload = { bulk_min_qty: v, updated_at: new Date().toISOString() }
+        confirmMsg = `Set min wholesale qty = ${v} on ${ids.length} product(s)`
+        break
+      }
+      case 'set_stock': {
+        payload = { stock_status: actionStock, updated_at: new Date().toISOString() }
+        confirmMsg = `Set stock = ${actionStock} on ${ids.length} product(s)`
+        break
+      }
+      case 'set_active': {
+        payload = { active: actionBool, updated_at: new Date().toISOString() }
+        confirmMsg = `Set ${actionBool ? 'active' : 'inactive'} on ${ids.length} product(s)`
+        break
+      }
+      case 'set_featured': {
+        payload = { featured: actionBool, updated_at: new Date().toISOString() }
+        confirmMsg = `Set featured = ${actionBool ? 'yes' : 'no'} on ${ids.length} product(s)`
+        break
+      }
+      case 'adjust_pct': {
+        // Server-side percentage adjust isn't a single-row update — fetch + bulk update each
+        const pct = Number(actionValue)
+        if (!Number.isFinite(pct) || pct === 0) {
+          showToast('Enter a valid % (e.g. -10 or 15)')
+          setApplying(false)
+          return
+        }
+        const factor = 1 + pct / 100
+        const { data, error: fetchErr } = await supabase
+          .from('products')
+          .select('id, retail_price, bulk_price')
+          .in('id', ids)
+        if (fetchErr || !data) {
+          showToast(`Failed: ${fetchErr?.message ?? 'fetch error'}`)
+          setApplying(false)
+          return
+        }
+        // Update one row at a time with the new computed price
+        await Promise.all(data.map((row) => {
+          const newRetail = Math.max(1, Math.round(row.retail_price * factor * 100) / 100)
+          const newBulk = row.bulk_price
+            ? Math.max(1, Math.round(row.bulk_price * factor * 100) / 100)
+            : null
+          return supabase
+            .from('products')
+            .update({
+              retail_price: newRetail,
+              bulk_price: newBulk,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', row.id)
+        }))
+        showToast(`Adjusted prices by ${pct > 0 ? '+' : ''}${pct}% on ${ids.length} product(s)`)
+        setApplying(false)
+        closeAction()
+        setSelected(new Set())
+        refetch()
+        return
+      }
+    }
+
+    const { error } = await supabase.from('products').update(payload).in('id', ids)
+    setApplying(false)
+    if (error) {
+      showToast(`Failed: ${error.message}`)
+      return
+    }
+    showToast(confirmMsg)
+    closeAction()
+    setSelected(new Set())
     refetch()
   }
 
@@ -89,20 +235,25 @@ export function AdminProducts() {
 
   return (
     <div>
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl">
+          {toast}
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Products <span className="text-sm font-normal text-gray-400">产品</span>
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
+          <h1 className="text-xl font-bold text-gray-900">{t('productsPage')}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{totalCount} {t('total')}</p>
         </div>
         <Link
           to="/admin/products/new"
           className="inline-flex items-center gap-2 bg-cxx-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-cxx-blue-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Product
+          {t('addProduct')}
         </Link>
       </div>
 
@@ -112,7 +263,7 @@ export function AdminProducts() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search products... 搜索产品"
+            placeholder={`${t('search')}...`}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cxx-blue"
@@ -130,18 +281,195 @@ export function AdminProducts() {
         </select>
       </div>
 
-      {/* Bulk actions bar */}
+      {/* Bulk actions toolbar */}
       {selected.size > 0 && (
-        <div className="flex items-center gap-3 bg-cxx-blue-light border border-cxx-blue/20 rounded-lg px-4 py-2.5 mb-4">
-          <span className="text-sm text-cxx-blue font-medium">{selected.size} selected</span>
-          <button
-            onClick={deleteSelected}
-            disabled={deleting}
-            className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium"
-          >
-            <Trash2 className="w-4 h-4" />
-            {deleting ? 'Deleting...' : 'Delete'}
-          </button>
+        <div className="bg-cxx-blue-light border border-cxx-blue/20 rounded-xl mb-4 overflow-hidden">
+          <div className="flex flex-wrap items-center gap-2 px-4 py-2.5">
+            <span className="text-sm text-cxx-blue font-semibold mr-1">
+              {selected.size} {t('selected')}
+            </span>
+            <button
+              type="button"
+              onClick={() => setSelected(new Set())}
+              className="text-xs text-gray-500 hover:text-gray-700 inline-flex items-center gap-1 mr-3"
+              title="Clear selection"
+            >
+              <XIcon className="w-3 h-3" />
+              {t('clear')}
+            </button>
+
+            <BulkBtn
+              icon={Tag}
+              label={t('setRetailPrice')}
+              active={activeAction === 'set_retail'}
+              onClick={() => { setActiveAction('set_retail'); setActionValue('') }}
+            />
+            <BulkBtn
+              icon={Percent}
+              label={t('adjustByPct')}
+              active={activeAction === 'adjust_pct'}
+              onClick={() => { setActiveAction('adjust_pct'); setActionValue('') }}
+            />
+            <BulkBtn
+              icon={Tag}
+              label={t('setBulkPrice')}
+              active={activeAction === 'set_bulk'}
+              onClick={() => { setActiveAction('set_bulk'); setActionValue('') }}
+            />
+            <BulkBtn
+              icon={Package}
+              label={t('setMinQty')}
+              active={activeAction === 'set_min_qty'}
+              onClick={() => { setActiveAction('set_min_qty'); setActionValue('') }}
+            />
+            <BulkBtn
+              icon={Package}
+              label={t('setStockStatus')}
+              active={activeAction === 'set_stock'}
+              onClick={() => setActiveAction('set_stock')}
+            />
+            <BulkBtn
+              icon={BadgeCheck}
+              label={t('setActiveStatus')}
+              active={activeAction === 'set_active'}
+              onClick={() => setActiveAction('set_active')}
+            />
+            <BulkBtn
+              icon={BadgeCheck}
+              label={t('setFeatured')}
+              active={activeAction === 'set_featured'}
+              onClick={() => setActiveAction('set_featured')}
+            />
+
+            <div className="ml-auto">
+              <button
+                onClick={deleteSelected}
+                disabled={deleting}
+                className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-semibold px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                {deleting ? t('deleting') : t('delete')}
+              </button>
+            </div>
+          </div>
+
+          {/* Active action input row */}
+          {activeAction && (
+            <div className="border-t border-cxx-blue/20 bg-white px-4 py-3 flex flex-wrap items-center gap-3">
+              {activeAction === 'set_retail' || activeAction === 'set_bulk' ? (
+                <>
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    New price (R)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      autoFocus
+                      value={actionValue}
+                      onChange={(e) => setActionValue(e.target.value)}
+                      className="w-32 pl-7 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cxx-blue"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </>
+              ) : activeAction === 'adjust_pct' ? (
+                <>
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    Adjust prices by
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.5"
+                      autoFocus
+                      value={actionValue}
+                      onChange={(e) => setActionValue(e.target.value)}
+                      className="w-28 pr-7 pl-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cxx-blue"
+                      placeholder="e.g. 10"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">%</span>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Negative = discount. Both retail + wholesale are adjusted proportionally.
+                  </p>
+                </>
+              ) : activeAction === 'set_min_qty' ? (
+                <>
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    Min. wholesale qty
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    autoFocus
+                    value={actionValue}
+                    onChange={(e) => setActionValue(e.target.value)}
+                    className="w-24 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cxx-blue"
+                    placeholder="6"
+                  />
+                </>
+              ) : activeAction === 'set_stock' ? (
+                <>
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    Stock status
+                  </label>
+                  <select
+                    value={actionStock}
+                    onChange={(e) => setActionStock(e.target.value as StockStatus)}
+                    className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-cxx-blue"
+                  >
+                    <option value="in_stock">In Stock</option>
+                    <option value="out_of_stock">Out of Stock</option>
+                    <option value="on_order">On Order</option>
+                  </select>
+                </>
+              ) : (
+                <>
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    {activeAction === 'set_active' ? 'Active state' : 'Featured state'}
+                  </label>
+                  <div className="inline-flex border border-gray-300 rounded-lg overflow-hidden text-sm">
+                    <button
+                      type="button"
+                      onClick={() => setActionBool(true)}
+                      className={`px-3 py-1.5 ${actionBool ? 'bg-cxx-blue text-white font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActionBool(false)}
+                      className={`px-3 py-1.5 ${!actionBool ? 'bg-cxx-blue text-white font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      No
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={closeAction}
+                  className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={applyBulkAction}
+                  disabled={applying}
+                  className="inline-flex items-center gap-1.5 bg-cxx-blue text-white font-semibold text-sm px-4 py-1.5 rounded-lg hover:bg-cxx-blue-hover transition-colors disabled:opacity-60"
+                >
+                  {applying ? '...' : t('apply')}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -169,12 +497,12 @@ export function AdminProducts() {
                       className="rounded border-gray-300"
                     />
                   </th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Product</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Category</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">{t('productName')}</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">{t('category')}</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-600">Price</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-600">Stock</th>
-                  <th className="px-4 py-3 text-center font-medium text-gray-600">Active</th>
-                  <th className="px-4 py-3 text-center font-medium text-gray-600">Actions</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-600">{t('active')}</th>
+                  <th className="px-4 py-3 text-center font-medium text-gray-600">{t('actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -199,7 +527,9 @@ export function AdminProducts() {
                               className="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0" />
+                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-300">
+                              <Package className="w-4 h-4" />
+                            </div>
                           )}
                           <div className="min-w-0">
                             <p className="font-medium text-gray-900 truncate">{product.name}</p>
@@ -216,7 +546,7 @@ export function AdminProducts() {
                         <div>
                           <p className="font-medium text-gray-900">R{product.retail_price.toFixed(2)}</p>
                           {product.is_bulk_available && product.bulk_price && (
-                            <p className="text-xs text-cxx-blue">Bulk: R{product.bulk_price.toFixed(2)}</p>
+                            <p className="text-xs text-cxx-blue">Wholesale: R{product.bulk_price.toFixed(2)}</p>
                           )}
                         </div>
                       </td>
@@ -285,5 +615,26 @@ export function AdminProducts() {
         )}
       </div>
     </div>
+  )
+}
+
+function BulkBtn({
+  icon: Icon, label, active, onClick,
+}: {
+  icon: typeof Tag; label: string; active: boolean; onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${
+        active
+          ? 'bg-cxx-blue text-white border-cxx-blue'
+          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+      {label}
+    </button>
   )
 }

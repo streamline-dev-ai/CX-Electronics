@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import {
-  ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2, Star,
+  ShoppingCart, Minus, Plus, ArrowLeft, Package, Loader2,
   MessageCircle, Truck, Shield, RotateCcw, BadgeCheck, Zap, Heart,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -298,18 +298,8 @@ export function ProductDetail() {
               {name}
             </h1>
 
-            {/* Rating + stock */}
-            <div className="flex items-center gap-4 mb-5 flex-wrap">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < 4 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
-                  />
-                ))}
-                <span className="text-xs text-gray-600 ml-1.5 font-medium">4.0 (24 reviews)</span>
-              </div>
-              <span className="text-gray-300">|</span>
+            {/* Stock */}
+            <div className="flex items-center gap-3 mb-5 flex-wrap">
               <span
                 className={`text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider ${
                   product.stock_status === 'in_stock'
@@ -321,6 +311,11 @@ export function ProductDetail() {
               >
                 {product.stock_status === 'in_stock' ? 'In Stock' : product.stock_status === 'on_order' ? 'On Order' : 'Out of Stock'}
               </span>
+              {product.featured && (
+                <span className="text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider bg-[#FEE9E9] text-[#E63939]">
+                  Best Seller
+                </span>
+              )}
             </div>
 
             {/* Price block: Retail + Wholesale side-by-side */}

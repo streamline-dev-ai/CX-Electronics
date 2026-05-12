@@ -10,6 +10,9 @@
   html {
     scroll-behavior: smooth;
     background-color: #FFFFFF;
+    /* Prevent iOS auto-zoom on input focus by ensuring a 16px text-size root */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -18,6 +21,38 @@
     background-color: #FFFFFF;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal page scroll caused by stray overflowing elements */
+    overflow-x: hidden;
+  }
+
+  /*
+   * iOS Safari auto-zooms when focusing a form field with font-size < 16px.
+   * Force inputs/selects/textareas to at least 16px on mobile so the page
+   * never zooms in on focus. Desktop keeps tighter Tailwind sizes.
+   */
+  @media (max-width: 768px) {
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='number'],
+    input[type='password'],
+    input[type='search'],
+    input[type='date'],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Tap targets feel right on mobile — at least 40x40 by default for inputs */
+  input, select, textarea, button {
+    touch-action: manipulation;
+  }
+
+  /* Make images responsive by default — avoids overflow */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 

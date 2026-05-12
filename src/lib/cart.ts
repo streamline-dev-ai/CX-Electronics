@@ -12,23 +12,17 @@ export interface CartItem {
 export interface CartState {
   items: CartItem[]
   subtotal: number
-  shippingFee: number
-  vat: number
-  total: number
+  shippingFee: number   // always 0 in cart — calculated at checkout based on chosen method
+  total: number         // subtotal + shippingFee (0)
   itemCount: number
 }
 
 const STORAGE_KEY = 'cxx_cart'
-const SHIPPING_FLAT_RATE = 99     // R99 flat rate — applied to every order
-const VAT_RATE = 0.15             // 15% VAT (included in price — for display only)
 
 function calcState(items: CartItem[]): CartState {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shippingFee = items.length > 0 ? SHIPPING_FLAT_RATE : 0
-  const vat = Math.round(subtotal * VAT_RATE * 100) / 100
-  const total = subtotal + shippingFee
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
-  return { items, subtotal, shippingFee, vat, total, itemCount }
+  return { items, subtotal, shippingFee: 0, total: subtotal, itemCount }
 }
 
 function loadFromStorage(): CartItem[] {

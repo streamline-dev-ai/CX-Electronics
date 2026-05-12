@@ -15,7 +15,7 @@ interface UpsellProduct {
 }
 
 export function CartDrawer() {
-  const { items, subtotal, shippingFee, total, isOpen, closeCart, removeItem, updateQuantity, addItem } = useCart()
+  const { items, subtotal, isOpen, closeCart, removeItem, updateQuantity, addItem } = useCart()
   const { t } = useLang()
   const [upsells, setUpsells] = useState<UpsellProduct[]>([])
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
@@ -201,18 +201,13 @@ export function CartDrawer() {
                     <span>{t('subtotal')}</span>
                     <span>R{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-gray-500 text-xs">
                     <span>{t('shipping')}</span>
-                    <span className={shippingFee === 0 ? 'text-green-600 font-medium' : ''}>
-                      {shippingFee === 0 ? t('freeShipping') : `R${shippingFee.toFixed(2)}`}
-                    </span>
+                    <span>Calculated at checkout</span>
                   </div>
-                  {shippingFee > 0 && (
-                    <p className="text-xs text-gray-400">{t('freeShippingThreshold')}</p>
-                  )}
                   <div className="flex justify-between font-bold text-gray-900 text-base pt-1 border-t border-gray-100">
                     <span>{t('total')}</span>
-                    <span>R{total.toFixed(2)}</span>
+                    <span>R{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 

@@ -49,6 +49,7 @@ const AdminOrders = lazy(() => import('./pages/admin/Orders').then((m) => ({ def
 const AdminOrderDetail  = lazy(() => import('./pages/admin/OrderDetail').then((m) => ({ default: m.AdminOrderDetail })))
 const AdminOrderInvoice = lazy(() => import('./pages/admin/OrderInvoice').then((m) => ({ default: m.AdminOrderInvoice })))
 const AdminCustomers    = lazy(() => import('./pages/admin/Customers').then((m) => ({ default: m.AdminCustomers })))
+const AdminMessages     = lazy(() => import('./pages/admin/Messages').then((m) => ({ default: m.AdminMessages })))
 const ReceiptDemo       = lazy(() => import('./pages/admin/ReceiptDemo').then((m) => ({ default: m.ReceiptDemo })))
 
 function AdminFallback() {
@@ -133,6 +134,7 @@ export default function App() {
               <Route path="orders/:id" element={<Suspense fallback={<AdminFallback />}><AdminOrderDetail /></Suspense>} />
               <Route path="orders/:id/invoice" element={<Suspense fallback={<AdminFallback />}><AdminOrderInvoice /></Suspense>} />
               <Route path="customers" element={<Suspense fallback={<AdminFallback />}><AdminCustomers /></Suspense>} />
+              <Route path="messages"  element={<Suspense fallback={<AdminFallback />}><AdminMessages /></Suspense>} />
             </Route>
 
             {/* Fallback */}

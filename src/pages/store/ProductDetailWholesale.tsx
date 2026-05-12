@@ -77,10 +77,10 @@ export function ProductDetailWholesale() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <SEO
-        title={`${product.name} — Wholesale | CXX Electronics`}
+        title={`${product.name} — Wholesale | CW Electronics`}
         description={description ? description.slice(0, 160) : `Wholesale pricing on ${product.name}. Bulk discounts from ${bulkMinQty}+ units in Johannesburg.`}
         image={images[0] || undefined}
-        url={`https://cxx-electronics.co.za/shop/wholesale/${product.slug}`}
+        url={`https://cw-electronics.co.za/shop/wholesale/${product.slug}`}
         type="product"
       />
       <Navbar />

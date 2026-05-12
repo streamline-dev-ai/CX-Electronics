@@ -18,7 +18,6 @@ const ORDER_DETAIL_SELECT = ORDER_SELECT + `,
 interface UseOrdersOptions {
   status?: OrderStatus
   search?: string
-  demoMode?: boolean
   page?: number
   pageSize?: number
 }
@@ -32,7 +31,7 @@ interface UseOrdersResult {
 }
 
 export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
-  const { status, search, demoMode, page = 1, pageSize = 50 } = opts
+  const { status, search, page = 1, pageSize = 50 } = opts
   const [orders, setOrders] = useState<OrderWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -49,6 +48,18 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
       const from = (page - 1) * pageSize
       const to = from + pageSize - 1
 
+      // If a search term is given, look up matching customer ids first so we can
+      // search by name/email/phone in addition to order number.
+      let customerIdMatches: string[] | null = null
+      if (search) {
+        const { data: matchedCustomers } = await supabase
+          .from('customers')
+          .select('id')
+          .or(`name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`)
+          .limit(500)
+        customerIdMatches = (matchedCustomers ?? []).map((c) => c.id as string)
+      }
+
       let query = supabase
         .from('orders')
         .select(ORDER_SELECT, { count: 'exact' })
@@ -56,9 +67,15 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
         .range(from, to)
 
       if (status) query = query.eq('status', status)
-      if (search) query = query.ilike('order_number', `%${search}%`)
-      if (demoMode === true) query = query.like('order_number', 'DEMO-%')
-      if (demoMode === false) query = query.not('order_number', 'like', 'DEMO-%')
+      if (search) {
+        // Match by order_number OR by customer_id (from name/email/phone lookup).
+        if (customerIdMatches && customerIdMatches.length > 0) {
+          const idList = customerIdMatches.map((id) => `"${id}"`).join(',')
+          query = query.or(`order_number.ilike.%${search}%,customer_id.in.(${idList})`)
+        } else {
+          query = query.ilike('order_number', `%${search}%`)
+        }
+      }
 
       const { data, error: err, count } = await query
 
@@ -78,7 +95,7 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
 
     load()
     return () => { cancelled = true }
-  }, [status, search, demoMode, page, pageSize, version])
+  }, [status, search, page, pageSize, version])
 
   return { orders, loading, error, totalCount, refetch }
 }
@@ -135,18 +152,3 @@ export async function deleteOrder(orderId: string): Promise<{ error: string | nu
   return { error: error?.message ?? null }
 }
 
-export async function deleteDemoOrders(): Promise<{ count: number; error: string | null }> {
-  const { data, error } = await supabase
-    .from('orders')
-    .select('id')
-    .like('order_number', 'DEMO-%')
-  if (error) return { count: 0, error: error.message }
-
-  const ids = (data ?? []).map((r) => r.id)
-  if (ids.length === 0) return { count: 0, error: null }
-
-  await supabase.from('order_status_events').delete().in('order_id', ids)
-  await supabase.from('order_items').delete().in('order_id', ids)
-  const { error: delErr } = await supabase.from('orders').delete().in('id', ids)
-  return { count: ids.length, error: delErr?.message ?? null }
-}

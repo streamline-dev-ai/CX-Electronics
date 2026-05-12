@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { Printer, ArrowLeft } from 'lucide-react'
 
 const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png'
-const VAT_RATE = 0.15
 
 const DEMO_ITEMS = [
   { id: '1',  product_name: 'Samsung 65" QLED 4K Smart TV — Charcoal Black',     quantity: 1, unit_price: 18999, line_total: 18999 },
@@ -35,8 +34,6 @@ const DEMO_ITEMS = [
 const subtotal    = DEMO_ITEMS.reduce((s, i) => s + i.line_total, 0)
 const shippingFee = 0
 const total       = subtotal + shippingFee
-const subtotalExVat = subtotal / (1 + VAT_RATE)
-const vatAmount     = subtotal - subtotalExVat
 
 export function ReceiptDemo() {
   return (
@@ -67,7 +64,7 @@ export function ReceiptDemo() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-4xl font-black tracking-tight text-gray-900">RECEIPT</h1>
-            <p className="text-sm text-gray-500 mt-2">Receipt #: CWW-2026-8842</p>
+            <p className="text-sm text-gray-500 mt-2">Receipt #: CW-2026-8842</p>
             <p className="text-sm text-gray-500 mt-0.5">Date: 8 May 2026, 14:32</p>
           </div>
           <div className="text-right">
@@ -128,12 +125,8 @@ export function ReceiptDemo() {
         <div className="flex justify-end">
           <div className="w-64 space-y-1.5">
             <div className="flex justify-between text-sm text-gray-500">
-              <span>Subtotal (excl. VAT)</span>
-              <span>R {subtotalExVat.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>VAT (15%)</span>
-              <span>R {vatAmount.toFixed(2)}</span>
+              <span>Subtotal</span>
+              <span>R {subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
               <span>Shipping</span>
@@ -149,7 +142,7 @@ export function ReceiptDemo() {
         {/* Footer */}
         <div className="border-t border-gray-100 mt-10 pt-5 flex items-start justify-between">
           <p className="text-xs text-gray-400 leading-relaxed">
-            CW Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+            CW Electronics · China Mart, Shop C15, Crown Mines, Johannesburg<br />
             info@cw-electronics.co.za
           </p>
           <p className="text-xs text-gray-400 text-right leading-relaxed">

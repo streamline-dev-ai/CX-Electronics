@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { customerSupabase, setRememberMe } from '../lib/customerAuth'
+import { supabase } from '../lib/supabase'
 import { notifySignup } from '../lib/webhooks'
 
 export interface CustomerUser {
@@ -46,8 +47,18 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    const { data: { subscription } } = customerSupabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ? toCustomerUser(session.user) : null)
+    const { data: { subscription } } = customerSupabase.auth.onAuthStateChange((event, session) => {
+      // Only react to events that actually change who the user is.
+      // Ignore TOKEN_REFRESHED-with-null, INITIAL_SESSION-without-session etc.
+      // — the initial getSession() above already established the right state.
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        if (session?.user) setUser(toCustomerUser(session.user))
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        // Only update user details if the refreshed session has changed metadata.
+        setUser(toCustomerUser(session.user))
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -68,6 +79,17 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
 
     // Fire welcome email — fire-and-forget
     notifySignup(name, email).catch(() => {})
+
+    // Stub a customers row so the admin Customers page can see new signups
+    // even before they place an order. The checkout upserts on email later
+    // and fills in the address details.
+    supabase
+      .from('customers')
+      .upsert(
+        { name: name.trim(), email: email.toLowerCase().trim() },
+        { onConflict: 'email' },
+      )
+      .then(() => {}, () => {})
 
     // No session yet → Supabase is waiting for email confirmation.
     const needsConfirmation = !!data.user && !data.session
@@ -91,7 +113,10 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
-    await customerSupabase.auth.signOut()
+    // scope:'local' = only sign out this client/tab. Default 'global' would
+    // hit the auth server and could cascade into the admin session if the
+    // server invalidates all refresh tokens for the same user.
+    await customerSupabase.auth.signOut({ scope: 'local' })
     setUser(null)
   }
 

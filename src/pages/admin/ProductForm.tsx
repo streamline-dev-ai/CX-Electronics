@@ -2,14 +2,17 @@ import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from 'r
 import { useNavigate, useParams } from 'react-router-dom'
 import { Upload, X, ArrowLeft, Loader2, Plus, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { supabase } from '../../lib/supabase'
+import { supabase, getProductImageUrl } from '../../lib/supabase'
 import { useCategories } from '../../hooks/useCategories'
+import { useAdminLang } from '../../context/AdminLangContext'
 import type { StockStatus, Variant, ProductVariantGroup } from '../../lib/supabase'
 
 interface FormState {
   name: string
+  name_zh: string
   slug: string
   description: string
+  description_zh: string
   category_id: string
   retail_price: string
   is_bulk_available: boolean
@@ -26,7 +29,7 @@ interface FormState {
 }
 
 const INITIAL: FormState = {
-  name: '', slug: '', description: '',
+  name: '', name_zh: '', slug: '', description: '', description_zh: '',
   category_id: '', retail_price: '', is_bulk_available: false,
   bulk_price: '', bulk_min_qty: '', active: true, featured: false,
   stock_status: 'in_stock', images: [], imageUrls: [], variants: [],
@@ -42,6 +45,7 @@ export function ProductForm() {
   const isEdit = Boolean(id)
   const navigate = useNavigate()
   const { categories } = useCategories()
+  const { t } = useAdminLang()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState<FormState>(INITIAL)
@@ -68,7 +72,7 @@ export function ProductForm() {
     async function load() {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, slug, description, category_id, retail_price, is_bulk_available, bulk_price, bulk_min_qty, active, featured, stock_status, images, thumbnail_url, variants, variant_group_id, variant_label')
+        .select('id, name, name_zh, slug, description, description_zh, category_id, retail_price, is_bulk_available, bulk_price, bulk_min_qty, active, featured, stock_status, images, thumbnail_url, variants, variant_group_id, variant_label')
         .eq('id', id)
         .single()
 
@@ -78,17 +82,15 @@ export function ProductForm() {
       }
 
       const images: string[] = data.images ?? []
-      const imageUrls = images.map((path) => {
-        const { data: url } = supabase.storage.from('products').getPublicUrl(path, {
-          transform: { width: 400, height: 400, resize: 'contain', format: 'webp' as 'origin', quality: 80 },
-        })
-        return url.publicUrl
-      })
+      // Use shared helper so external URLs (Cloudinary etc.) and Supabase Storage paths both work
+      const imageUrls = images.map((path) => getProductImageUrl(path, 400))
 
       setForm({
         name: data.name ?? '',
+        name_zh: data.name_zh ?? '',
         slug: data.slug ?? '',
         description: data.description ?? '',
+        description_zh: data.description_zh ?? '',
         category_id: data.category_id ?? '',
         retail_price: String(data.retail_price ?? ''),
         is_bulk_available: data.is_bulk_available ?? false,
@@ -136,10 +138,7 @@ export function ProductForm() {
       })
       if (!error) {
         newPaths.push(path)
-        const { data: url } = supabase.storage.from('products').getPublicUrl(path, {
-          transform: { width: 400, height: 400, resize: 'contain', format: 'webp' as 'origin', quality: 80 },
-        })
-        newUrls.push(url.publicUrl)
+        newUrls.push(getProductImageUrl(path, 400))
       }
     }
 
@@ -217,8 +216,10 @@ export function ProductForm() {
 
     const payload = {
       name: form.name.trim(),
+      name_zh: form.name_zh.trim() || null,
       slug: form.slug.trim(),
       description: form.description.trim() || null,
+      description_zh: form.description_zh.trim() || null,
       category_id: form.category_id || null,
       retail_price: Number(form.retail_price),
       is_bulk_available: form.is_bulk_available,
@@ -268,7 +269,7 @@ export function ProductForm() {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-bold text-gray-900">
-          {isEdit ? 'Edit Product' : 'Add Product'}
+          {isEdit ? t('editProduct') : t('addProduct')}
         </h1>
       </div>
 
@@ -276,17 +277,29 @@ export function ProductForm() {
 
         {/* ── Basic info ─────────────────────────────────── */}
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-          <h2 className="font-semibold text-gray-900">Basic Info</h2>
+          <h2 className="font-semibold text-gray-900">{t('basicInfo')}</h2>
 
-          <Field label="Product Name" error={errors.name} required>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => set('name', e.target.value)}
-              className={input(errors.name)}
-              placeholder="e.g. USB-C 65W Fast Charger"
-            />
-          </Field>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label={`${t('productName')} (EN)`} error={errors.name} required>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) => set('name', e.target.value)}
+                className={input(errors.name)}
+                placeholder="e.g. USB-C 65W Fast Charger"
+              />
+            </Field>
+            <Field label={`${t('productName')} (中文)`}>
+              <input
+                type="text"
+                value={form.name_zh}
+                onChange={(e) => set('name_zh', e.target.value)}
+                className={input()}
+                placeholder="例如:USB-C 65瓦快速充电器"
+                lang="zh"
+              />
+            </Field>
+          </div>
 
           <Field label="URL Slug" error={errors.slug} required>
             <input
@@ -299,33 +312,48 @@ export function ProductForm() {
             <p className="text-xs text-gray-400 mt-1">shop/{form.slug}</p>
           </Field>
 
-          <Field label="Category">
+          <Field label={t('category')}>
             <select
               value={form.category_id}
               onChange={(e) => set('category_id', e.target.value)}
               className={input()}
             >
-              <option value="">— Select category —</option>
+              <option value="">— {t('category')} —</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </Field>
 
-          <Field label="Description">
-            <textarea
-              value={form.description}
-              onChange={(e) => set('description', e.target.value)}
-              rows={4}
-              className={input()}
-              placeholder="Describe the product — features, specs, compatibility..."
-            />
-          </Field>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label={`${t('description')} (EN)`}>
+              <textarea
+                value={form.description}
+                onChange={(e) => set('description', e.target.value)}
+                rows={4}
+                className={input()}
+                placeholder="Describe the product — features, specs, compatibility..."
+              />
+            </Field>
+            <Field label={`${t('description')} (中文)`}>
+              <textarea
+                value={form.description_zh}
+                onChange={(e) => set('description_zh', e.target.value)}
+                rows={4}
+                className={input()}
+                placeholder="产品介绍 — 功能、规格、兼容性..."
+                lang="zh"
+              />
+            </Field>
+          </div>
+          <p className="text-xs text-gray-400 -mt-2">
+            Chinese fields are optional. When filled, they show on the storefront when a customer toggles to 中文.
+          </p>
         </section>
 
         {/* ── Images ─────────────────────────────────────── */}
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-          <h2 className="font-semibold text-gray-900">Images</h2>
+          <h2 className="font-semibold text-gray-900">{t('images')}</h2>
 
           {/* Active image preview */}
           {form.imageUrls.length > 0 && (
@@ -431,9 +459,9 @@ export function ProductForm() {
 
         {/* ── Pricing ────────────────────────────────────── */}
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-          <h2 className="font-semibold text-gray-900">Pricing</h2>
+          <h2 className="font-semibold text-gray-900">{t('pricing')}</h2>
 
-          <Field label="Retail Price (R)" error={errors.retail_price} required>
+          <Field label={`${t('retailPrice')} (R)`} error={errors.retail_price} required>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">R</span>
               <input
@@ -450,8 +478,8 @@ export function ProductForm() {
 
           <div className="flex items-center justify-between py-2">
             <div>
-              <p className="text-sm font-medium text-gray-700">Bulk / Wholesale Available</p>
-              <p className="text-xs text-gray-400">Show bulk pricing to wholesale customers</p>
+              <p className="text-sm font-medium text-gray-700">Wholesale Available 可批发</p>
+              <p className="text-xs text-gray-400">Unlock wholesale pricing for buyers ordering in volume (min 6 units)</p>
             </div>
             <button
               type="button"
@@ -470,7 +498,7 @@ export function ProductForm() {
 
           {form.is_bulk_available && (
             <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <Field label="Bulk Price (R)" error={errors.bulk_price} required>
+              <Field label={`${t('bulkPrice')} (R)`} error={errors.bulk_price} required>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R</span>
                   <input
@@ -484,7 +512,7 @@ export function ProductForm() {
                   />
                 </div>
               </Field>
-              <Field label="Min. Quantity" error={errors.bulk_min_qty} required>
+              <Field label={t('minQty')} error={errors.bulk_min_qty} required>
                 <input
                   type="number"
                   min="1"
@@ -492,7 +520,7 @@ export function ProductForm() {
                   value={form.bulk_min_qty}
                   onChange={(e) => set('bulk_min_qty', e.target.value)}
                   className={input(errors.bulk_min_qty)}
-                  placeholder="e.g. 10"
+                  placeholder="e.g. 6"
                 />
               </Field>
             </div>
@@ -503,7 +531,7 @@ export function ProductForm() {
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-gray-900">Variants</h2>
+              <h2 className="font-semibold text-gray-900">{t('variants')}</h2>
               <p className="text-xs text-gray-400 mt-0.5">e.g. Color, Size, Weight — shown as selectors on the product page</p>
             </div>
             <button
@@ -608,21 +636,21 @@ export function ProductForm() {
 
         {/* ── Status ─────────────────────────────────────── */}
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-          <h2 className="font-semibold text-gray-900">Status</h2>
+          <h2 className="font-semibold text-gray-900">{t('status')}</h2>
 
-          <Field label="Stock Status">
+          <Field label={t('stockStatus')}>
             <select
               value={form.stock_status}
               onChange={(e) => set('stock_status', e.target.value as StockStatus)}
               className={input()}
             >
-              <option value="in_stock">In Stock</option>
-              <option value="out_of_stock">Out of Stock</option>
-              <option value="on_order">On Order</option>
+              <option value="in_stock">{t('inStock')}</option>
+              <option value="out_of_stock">{t('outOfStock')}</option>
+              <option value="on_order">{t('onOrder')}</option>
             </select>
           </Field>
 
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -630,7 +658,7 @@ export function ProductForm() {
                 onChange={(e) => set('active', e.target.checked)}
                 className="rounded border-gray-300 text-cxx-blue focus:ring-cxx-blue"
               />
-              <span className="text-sm font-medium text-gray-700">Active (visible in store)</span>
+              <span className="text-sm font-medium text-gray-700">{t('active')} ({t('visibleInStore')})</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -640,7 +668,7 @@ export function ProductForm() {
                 onChange={(e) => set('featured', e.target.checked)}
                 className="rounded border-gray-300 text-cxx-blue focus:ring-cxx-blue"
               />
-              <span className="text-sm font-medium text-gray-700">Featured (show on homepage)</span>
+              <span className="text-sm font-medium text-gray-700">{t('featured')} ({t('showOnHome')})</span>
             </label>
           </div>
         </section>
@@ -653,14 +681,14 @@ export function ProductForm() {
             className="flex items-center gap-2 bg-cxx-blue hover:bg-cxx-blue-hover text-white font-medium px-6 py-2.5 rounded-lg text-sm transition-colors disabled:opacity-60"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-            {saving ? 'Saving...' : 'Save Product'}
+            {saving ? t('saving') : t('saveProduct')}
           </button>
           <button
             type="button"
             onClick={() => navigate('/admin/products')}
             className="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
           >
-            Cancel
+            {t('cancel')}
           </button>
         </div>
       </form>

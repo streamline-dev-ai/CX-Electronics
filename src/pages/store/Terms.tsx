@@ -223,7 +223,7 @@ export function Terms() {
                 </Bullet>
                 <Bullet>
                   <strong className="text-white">Shipping costs are the responsibility of the customer.</strong>{' '}
-                  Store collection is always free at our Fordsburg location.
+                  Store collection is always free at our Crown Mines location.
                 </Bullet>
                 <Bullet>
                   Orders placed and paid before 12:00 PM on business days are generally dispatched the

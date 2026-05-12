@@ -1,7 +1,7 @@
 import { Zap, Printer } from 'lucide-react'
 
 const INVOICE = {
-  number: 'CXX-WHL-2026-0038',
+  number: 'CW-WHL-2026-0038',
   date: '30 April 2026',
   dueDate: '14 May 2026',
   paymentTerms: 'Net 14 days',
@@ -14,13 +14,13 @@ const INVOICE = {
     address: '22 Industrial Road, Germiston, Gauteng, 1401',
   },
   items: [
-    { name: '65W GaN USB-C Fast Charger', sku: 'CXX-CHR-65W', qty: 50, unit: 159.00 },
-    { name: '20W USB-C Wall Charger', sku: 'CXX-CHR-20W', qty: 100, unit: 79.00 },
-    { name: 'USB-C to USB-C Braided Cable 1.5m', sku: 'CXX-CBL-USBC', qty: 100, unit: 49.00 },
-    { name: '10000mAh Slim Power Bank 22.5W', sku: 'CXX-PWR-10K', qty: 30, unit: 219.00 },
-    { name: 'Wireless TWS Earbuds ANC', sku: 'CXX-AUD-TWS', qty: 20, unit: 529.00 },
+    { name: '65W GaN USB-C Fast Charger', sku: 'CW-CHR-65W', qty: 50, unit: 159.00 },
+    { name: '20W USB-C Wall Charger', sku: 'CW-CHR-20W', qty: 100, unit: 79.00 },
+    { name: 'USB-C to USB-C Braided Cable 1.5m', sku: 'CW-CBL-USBC', qty: 100, unit: 49.00 },
+    { name: '10000mAh Slim Power Bank 22.5W', sku: 'CW-PWR-10K', qty: 30, unit: 219.00 },
+    { name: 'Wireless TWS Earbuds ANC', sku: 'CW-AUD-TWS', qty: 20, unit: 529.00 },
   ],
-  notes: 'Goods to be collected from Dragon City, Fordsburg or delivered via agreed courier. All prices exclude VAT. Payment via EFT only.',
+  notes: 'Goods to be collected from China Mart, Crown Mines or delivered via agreed courier. All prices exclude VAT. Payment via EFT only.',
 }
 
 const VAT_RATE = 0.15
@@ -52,7 +52,7 @@ export function WholesaleInvoice() {
               <Zap className="w-5 h-5 text-white fill-white" />
             </div>
             <div>
-              <p className="font-extrabold text-white text-xl tracking-tight">CXX Electronics</p>
+              <p className="font-extrabold text-white text-xl tracking-tight">CW Electronics</p>
               <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Wholesale Division</p>
             </div>
           </div>
@@ -70,9 +70,9 @@ export function WholesaleInvoice() {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">From</p>
-              <p className="font-bold text-gray-900">CXX Electronics (Pty) Ltd</p>
-              <p className="text-sm text-gray-600 mt-0.5">Shop 14, Dragon City</p>
-              <p className="text-sm text-gray-600">Fordsburg, Johannesburg, 2092</p>
+              <p className="font-bold text-gray-900">CW Electronics (Pty) Ltd</p>
+              <p className="text-sm text-gray-600 mt-0.5">China Mart, Shop C15</p>
+              <p className="text-sm text-gray-600">3 Press Avenue, Crown Mines, Johannesburg, 2092</p>
               <p className="text-sm text-gray-600 mt-1">Tel: +27 11 123 4567</p>
               <p className="text-sm text-gray-600">info@cxxelectronics.co.za</p>
               <p className="text-sm text-gray-500 mt-1">VAT No: 4123456789</p>
@@ -146,7 +146,7 @@ export function WholesaleInvoice() {
             <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 text-sm">
               {[
                 ['Bank', 'First National Bank (FNB)'],
-                ['Account Name', 'CXX Electronics (Pty) Ltd'],
+                ['Account Name', 'CW Electronics (Pty) Ltd'],
                 ['Account Number', '62841239876'],
                 ['Branch Code', '250655'],
                 ['Account Type', 'Business Cheque'],
@@ -170,12 +170,12 @@ export function WholesaleInvoice() {
             )}
             <div className="border-t border-gray-100 pt-4 flex items-end justify-between">
               <p className="text-xs text-gray-400">
-                CXX Electronics · Dragon City, Fordsburg, JHB · VAT Reg: 4123456789<br />
+                CW Electronics · China Mart, Crown Mines, JHB · VAT Reg: 4123456789<br />
                 This is a computer-generated invoice and requires no signature.
               </p>
               <div className="text-right">
                 <p className="text-sm font-bold text-gray-900">Thank you for your business.</p>
-                <p className="text-xs text-gray-400 mt-0.5">cxxelectronics.co.za</p>
+                <p className="text-xs text-gray-400 mt-0.5">cw-electronics.co.za</p>
               </div>
             </div>
           </div>

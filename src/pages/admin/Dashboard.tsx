@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Package, ShoppingCart, TrendingUp, BarChart2, Calendar, AlertTriangle, Trash2, Loader2, FlaskConical } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, BarChart2, Calendar, AlertTriangle } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend,
 } from 'recharts'
 import { supabase } from '../../lib/supabase'
-import { useAdminMode } from '../../hooks/useAdminMode'
-import { deleteDemoOrders } from '../../hooks/useOrders'
 
 type DateFilter = 'today' | '7d' | '30d' | '90d' | 'all' | 'custom'
 
@@ -90,15 +88,15 @@ function StatCard({
   icon: typeof ShoppingCart; label: string; value: string | number; sub?: string; color: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-500">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-xs sm:text-sm text-gray-500">{label}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1 truncate">{value}</p>
           {sub && <p className="text-xs text-gray-400 mt-0.5 leading-tight">{sub}</p>}
         </div>
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ml-3 ${color}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ml-2 ${color}`}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </div>
     </div>
@@ -134,8 +132,6 @@ function ProductTooltip({ active, payload, label }: { active?: boolean; payload?
 }
 
 export function AdminDashboard() {
-  const [adminMode] = useAdminMode()
-  const isDemo = adminMode === 'demo'
   const [filter, setFilter] = useState<DateFilter>('30d')
   const [customFrom, setCustomFrom] = useState('')
   const [customTo, setCustomTo] = useState('')
@@ -146,33 +142,23 @@ export function AdminDashboard() {
   })
   const [alerts, setAlerts] = useState({ pending: 0, outOfStock: 0 })
 
-  // Always-fresh alert stats (not date-filtered, scoped to current mode)
   useEffect(() => {
-    let pendingQ = supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending')
-    if (isDemo) pendingQ = pendingQ.like('order_number', 'DEMO-%')
-    else pendingQ = pendingQ.not('order_number', 'like', 'DEMO-%')
-
     Promise.all([
-      pendingQ,
+      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
       supabase.from('products').select('id', { count: 'exact', head: true }).eq('stock_status', 'out_of_stock').eq('active', true),
     ]).then(([p, o]) => setAlerts({ pending: p.count ?? 0, outOfStock: o.count ?? 0 }))
-  }, [isDemo])
+  }, [])
 
   const loadData = useCallback(async () => {
     setLoading(true)
     const range = getDateRange(filter, customFrom, customTo)
 
-    let ordersQ = supabase
+    const { data: orders } = await supabase
       .from('orders')
       .select('id, total, payment_status, created_at')
       .gte('created_at', range.from)
       .lte('created_at', range.to)
       .order('created_at', { ascending: true })
-
-    if (isDemo) ordersQ = ordersQ.like('order_number', 'DEMO-%')
-    else ordersQ = ordersQ.not('order_number', 'like', 'DEMO-%')
-
-    const { data: orders } = await ordersQ
 
     const ordersData = orders ?? []
     const paidOrders = ordersData.filter((o) => o.payment_status === 'paid')
@@ -200,7 +186,7 @@ export function AdminDashboard() {
       topProducts: buildTopProducts(itemsData),
     })
     setLoading(false)
-  }, [filter, customFrom, customTo, isDemo])
+  }, [filter, customFrom, customTo])
 
   useEffect(() => {
     if (filter !== 'custom' || (customFrom && customTo)) {
@@ -208,59 +194,16 @@ export function AdminDashboard() {
     }
   }, [loadData])
 
-  const [clearingDemo, setClearingDemo] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
-  async function handleClearAllDemo() {
-    const ok = window.confirm('Delete ALL demo orders? This permanently removes every order whose number starts with "DEMO-". Cannot be undone.')
-    if (!ok) return
-    setClearingDemo(true)
-    const { count, error } = await deleteDemoOrders()
-    setClearingDemo(false)
-    if (error) setToast(`Failed: ${error}`)
-    else {
-      setToast(`Cleared ${count} demo order${count === 1 ? '' : 's'} — analytics will refresh.`)
-      loadData()
-    }
-    setTimeout(() => setToast(null), 3500)
-  }
-
   return (
-    <div className="space-y-6">
-
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#0F172A] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-2xl">
-          {toast}
-        </div>
-      )}
-
-      {/* Demo-mode banner */}
-      {isDemo && (
-        <div className="flex items-center justify-between gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-          <div className="flex items-center gap-2">
-            <FlaskConical className="w-4 h-4 text-amber-600 flex-shrink-0" />
-            <p className="text-sm text-amber-800">
-              <span className="font-semibold">Demo mode</span> — showing only orders that came through the fake checkout. Real orders are hidden.
-            </p>
-          </div>
-          <button
-            onClick={handleClearAllDemo}
-            disabled={clearingDemo}
-            className="flex items-center gap-1.5 text-xs font-semibold text-red-700 bg-white hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-60 flex-shrink-0"
-          >
-            {clearingDemo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-            Clear all demo data
-          </button>
-        </div>
-      )}
-
+    <div className="space-y-5">
       {/* Header + filter row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">
             Analytics <span className="text-sm font-normal text-gray-400">销售分析</span>
           </h1>
           {(alerts.pending > 0 || alerts.outOfStock > 0) && (
-            <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex flex-wrap items-center gap-3 mt-1.5">
               {alerts.pending > 0 && (
                 <span className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
                   <AlertTriangle className="w-3.5 h-3.5" />
@@ -298,19 +241,19 @@ export function AdminDashboard() {
       {filter === 'custom' && (
         <div className="flex flex-wrap items-center gap-3 bg-white border border-gray-200 rounded-xl p-4">
           <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
             <input
               type="date"
               value={customFrom}
               onChange={(e) => setCustomFrom(e.target.value)}
-              className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#E63939]"
+              className="flex-1 min-w-0 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#E63939]"
             />
             <span className="text-gray-400 text-sm">to</span>
             <input
               type="date"
               value={customTo}
               onChange={(e) => setCustomTo(e.target.value)}
-              className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#E63939]"
+              className="flex-1 min-w-0 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#E63939]"
             />
             {customFrom && customTo && (
               <button
@@ -331,7 +274,7 @@ export function AdminDashboard() {
       ) : (
         <>
           {/* Stat cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatCard
               icon={TrendingUp}
               label="Total Revenue"
@@ -357,13 +300,13 @@ export function AdminDashboard() {
               icon={BarChart2}
               label="Avg Order Value"
               value={fmt(data.avgOrderValue)}
-              sub={`From paid orders`}
+              sub="From paid orders"
               color="bg-amber-50 text-amber-600"
             />
           </div>
 
           {/* Revenue over time */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
             <div className="flex items-baseline justify-between mb-4">
               <div>
                 <h2 className="font-semibold text-gray-900">Revenue Over Time</h2>
@@ -381,7 +324,7 @@ export function AdminDashboard() {
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={data.revenueChart} margin={{ top: 4, right: 20, bottom: 0, left: 0 }}>
+                <LineChart data={data.revenueChart} margin={{ top: 4, right: 16, bottom: 0, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
                   <XAxis
                     dataKey="date"
@@ -401,7 +344,7 @@ export function AdminDashboard() {
                     tick={{ fontSize: 11, fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
-                    width={52}
+                    width={48}
                   />
                   <YAxis
                     yAxisId="ord"
@@ -410,7 +353,7 @@ export function AdminDashboard() {
                     tick={{ fontSize: 11, fill: '#9CA3AF' }}
                     axisLine={false}
                     tickLine={false}
-                    width={32}
+                    width={28}
                   />
                   <Tooltip content={<RevenueTooltip />} />
                   <Legend
@@ -442,7 +385,7 @@ export function AdminDashboard() {
           </div>
 
           {/* Top products */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
             <div className="mb-4">
               <h2 className="font-semibold text-gray-900">Top Products</h2>
               <p className="text-xs text-gray-400 mt-0.5">By units sold in selected period</p>
@@ -461,7 +404,7 @@ export function AdminDashboard() {
                   <BarChart
                     data={data.topProducts}
                     layout="vertical"
-                    margin={{ top: 0, right: 48, bottom: 0, left: 4 }}
+                    margin={{ top: 0, right: 40, bottom: 0, left: 4 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
                     <XAxis
@@ -474,11 +417,11 @@ export function AdminDashboard() {
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={160}
+                      width={120}
                       tick={{ fontSize: 11, fill: '#374151' }}
                       axisLine={false}
                       tickLine={false}
-                      tickFormatter={(v: string) => v.length > 24 ? v.slice(0, 24) + '…' : v}
+                      tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 18) + '…' : v}
                     />
                     <Tooltip content={<ProductTooltip />} />
                     <Bar
@@ -491,7 +434,6 @@ export function AdminDashboard() {
                   </BarChart>
                 </ResponsiveContainer>
 
-                {/* Revenue breakdown table */}
                 <div className="mt-5 border-t border-gray-100 pt-4">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Revenue Breakdown</p>
                   <div className="space-y-2">
@@ -499,8 +441,8 @@ export function AdminDashboard() {
                       <div key={p.name} className="flex items-center gap-3">
                         <span className="text-xs text-gray-400 font-mono w-4">{i + 1}</span>
                         <span className="flex-1 text-sm text-gray-700 truncate">{p.name}</span>
-                        <span className="text-xs text-gray-500">{p.units} units</span>
-                        <span className="text-sm font-bold text-gray-900 w-24 text-right">{fmt(p.revenue)}</span>
+                        <span className="text-xs text-gray-500 hidden sm:inline">{p.units} units</span>
+                        <span className="text-sm font-bold text-gray-900 text-right">{fmt(p.revenue)}</span>
                       </div>
                     ))}
                   </div>
@@ -510,7 +452,7 @@ export function AdminDashboard() {
           </div>
 
           {/* Quick actions */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
             <h2 className="font-semibold text-gray-900 mb-4">Quick Actions</h2>
             <div className="flex flex-wrap gap-3">
               <Link

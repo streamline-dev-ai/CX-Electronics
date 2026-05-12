@@ -4,7 +4,6 @@ import { Printer, ArrowLeft, Loader2 } from 'lucide-react'
 import { getOrder } from '../../hooks/useOrders'
 import type { OrderWithDetails } from '../../lib/supabase'
 
-const VAT_RATE = 0.15
 const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png'
 
 export function AdminOrderInvoice() {
@@ -36,8 +35,6 @@ export function AdminOrderInvoice() {
 
   const addr = order.shipping_address
   const isCollection = order.fulfillment_type === 'collection'
-  const subtotalExVat = order.subtotal / (1 + VAT_RATE)
-  const vatAmount = order.subtotal - subtotalExVat
 
   const customerName = order.customers?.name ?? addr?.name ?? 'Customer'
   const customerEmail = order.customers?.email ?? ''
@@ -107,7 +104,7 @@ export function AdminOrderInvoice() {
             <div className="mt-2 space-y-0.5">
               {isCollection ? (
                 <>
-                  <p className="text-sm text-gray-600">Dragon City Mall, Shop 14, Fordsburg, Johannesburg</p>
+                  <p className="text-sm text-gray-600">China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg</p>
                   {order.collection_name && (
                     <p className="text-sm text-gray-600">Collector: {order.collection_name}</p>
                   )}
@@ -151,12 +148,8 @@ export function AdminOrderInvoice() {
         <div className="flex justify-end">
           <div className="w-64 space-y-1.5">
             <div className="flex justify-between text-sm text-gray-500">
-              <span>Subtotal (excl. VAT)</span>
-              <span>R {subtotalExVat.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>VAT (15%)</span>
-              <span>R {vatAmount.toFixed(2)}</span>
+              <span>Subtotal</span>
+              <span>R {order.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
               <span>Shipping</span>
@@ -172,7 +165,7 @@ export function AdminOrderInvoice() {
         {/* Footer */}
         <div className="border-t border-gray-100 mt-10 pt-5 flex items-start justify-between">
           <p className="text-xs text-gray-400 leading-relaxed">
-            CW Electronics · Dragon City, Shop 14, Fordsburg, Johannesburg<br />
+            CW Electronics · China Mart, Shop C15, Crown Mines, Johannesburg<br />
             info@cw-electronics.co.za
           </p>
           <p className="text-xs text-gray-400 text-right leading-relaxed">

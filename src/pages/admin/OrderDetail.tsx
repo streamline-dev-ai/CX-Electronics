@@ -136,17 +136,19 @@ export function AdminOrderDetail() {
       )}
 
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/admin/orders')} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">{order.order_number}</h1>
-          <p className="text-sm text-gray-400">
-            {new Date(order.created_at).toLocaleString('en-ZA')} · {order.order_type}
-          </p>
+      <div className="mb-5">
+        <div className="flex items-center gap-3 mb-2">
+          <button onClick={() => navigate('/admin/orders')} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 flex-shrink-0">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-gray-900 truncate">{order.order_number}</h1>
+            <p className="text-sm text-gray-400 truncate">
+              {new Date(order.created_at).toLocaleString('en-ZA')} · {order.order_type}
+            </p>
+          </div>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 pl-10">
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${
             isCollection ? 'bg-teal-100 text-teal-700' : 'bg-sky-100 text-sky-700'
           }`}>
@@ -160,15 +162,15 @@ export function AdminOrderDetail() {
             onClick={handleDelete}
             disabled={updating}
             title="Delete order"
-            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-60"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Two-column layout */}
-      <div className="flex gap-5 items-start">
+      {/* Two-column layout — stacks on mobile, side-by-side on large screens */}
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
 
         {/* ── Left column ─────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 space-y-5">
@@ -218,6 +220,7 @@ export function AdminOrderDetail() {
                 Order Items ({order.order_items.length})
               </h2>
             </div>
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
@@ -238,6 +241,7 @@ export function AdminOrderDetail() {
                 ))}
               </tbody>
             </table>
+            </div>
             <div className="px-5 py-4 border-t border-gray-200 space-y-1.5 text-sm bg-gray-50">
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span><span>R{order.subtotal.toFixed(2)}</span>
@@ -302,7 +306,7 @@ export function AdminOrderDetail() {
         </div>
 
         {/* ── Right column ─────────────────────────────────────────────────── */}
-        <div className="w-72 flex-shrink-0 space-y-4">
+        <div className="w-full lg:w-72 lg:flex-shrink-0 space-y-4">
 
           {/* Customer */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -402,7 +406,7 @@ export function AdminOrderDetail() {
                   <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Collector</p>
                   <p className="font-medium text-gray-900">{order.collection_name ?? order.customers?.name ?? '—'}</p>
                   <p className="text-gray-500">{order.collection_phone ?? order.customers?.phone ?? ''}</p>
-                  <p className="text-gray-400 text-xs mt-1">Dragon City, Shop 14, Fordsburg</p>
+                  <p className="text-gray-400 text-xs mt-1">China Mart, Shop C15, Crown Mines</p>
                 </div>
               )}
             </div>

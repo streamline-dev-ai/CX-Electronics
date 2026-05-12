@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { supabase } from '../../lib/supabase'
 import {
   Zap, MapPin, Phone, Mail, MessageCircle, Clock, Send,
   Globe, Truck, Tag, ShieldCheck, Navigation, ArrowRight, CheckCircle2,
@@ -63,8 +64,21 @@ export function About() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setSubmitting(true)
-    // Simulate submission — wire to a real endpoint when ready
-    await new Promise((r) => setTimeout(r, 700))
+
+    // Persist to admin inbox — fire-and-forget so a transient DB error
+    // never blocks the customer from getting a confirmation.
+    try {
+      await supabase.from('cw_contact_messages').insert({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+        inquiry_type: form.type,
+        message: form.message.trim(),
+      })
+    } catch {
+      /* ignore — message is also sent via n8n */
+    }
+
     setSubmitting(false)
     setSubmitted(true)
     setForm({ name: '', email: '', phone: '', type: 'retail', message: '' })
