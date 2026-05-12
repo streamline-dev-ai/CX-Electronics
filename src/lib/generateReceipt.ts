@@ -143,23 +143,68 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
     </tr>
   </table>
 
-  <!-- Footer -->
-  <div style="border-top:1px solid #e5e7eb;margin-top:40px;padding-top:20px;"></div>
-  <table width="100%" cellpadding="0" cellspacing="0">
+  <!-- Payment method & reference -->
+  <div style="border-top:1px solid #e5e7eb;margin-top:28px;padding-top:14px;"></div>
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
     <tr>
-      <td style="vertical-align:bottom;">
-        <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          CW Electronics · China Mart, Shop C15, Crown Mines, Johannesburg<br />
-          info@cw-electronics.co.za
+      <td style="vertical-align:top;">
+        <p style="margin:0;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Payment</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#111827;text-transform:capitalize;">
+          ${order.payment_method ?? 'EFT'} · ${order.payment_status ?? 'paid'}
         </p>
+        ${order.payment_reference ? `<p style="margin:2px 0 0;font-size:11px;color:#9ca3af;">Ref: ${order.payment_reference}</p>` : ''}
       </td>
-      <td style="vertical-align:bottom;text-align:right;">
-        <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
-          Thank you for your purchase.
+      <td style="vertical-align:top;text-align:right;">
+        <p style="margin:0;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Status</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#059669;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+          ${order.status === 'paid' ? '✓ Paid' : order.status.replace(/_/g, ' ')}
         </p>
       </td>
     </tr>
   </table>
+
+  <!-- Support strip -->
+  <div style="margin-top:24px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:16px 20px;">
+    <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#0F172A;text-transform:uppercase;letter-spacing:0.8px;">Need help with this order?</p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="vertical-align:top;width:33%;">
+          <p style="margin:0;font-size:11px;color:#64748B;">WhatsApp</p>
+          <p style="margin:2px 0 0;font-size:13px;color:#111827;font-weight:600;">+27 64 953 3333</p>
+        </td>
+        <td style="vertical-align:top;width:33%;">
+          <p style="margin:0;font-size:11px;color:#64748B;">Phone</p>
+          <p style="margin:2px 0 0;font-size:13px;color:#111827;font-weight:600;">+27 62 805 8899</p>
+        </td>
+        <td style="vertical-align:top;width:34%;">
+          <p style="margin:0;font-size:11px;color:#64748B;">Email</p>
+          <p style="margin:2px 0 0;font-size:13px;color:#111827;font-weight:600;">info@cw-electronics.co.za</p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="vertical-align:top;">
+          <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
+            <strong style="color:#374151;">CW Electronics</strong><br />
+            China Mart, Shop C15, 3 Press Avenue<br />
+            Crown Mines, Johannesburg, 2092<br />
+            Mon–Sat · 09:00–15:00
+          </p>
+        </td>
+        <td style="vertical-align:top;text-align:right;">
+          <p style="margin:0;font-size:11px;color:#9ca3af;line-height:1.7;">
+            Thank you for your purchase.<br />
+            <span style="color:#cbd5e1;">This receipt is a proof of purchase.<br />Not a tax invoice.</span>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </div>
 
 </body>
 </html>`

@@ -225,11 +225,18 @@ export function About() {
               className="relative"
             >
               <div className="absolute -inset-3 bg-[#E63939]/10 rounded-3xl blur-2xl pointer-events-none" />
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5">
+              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5 group">
+                {/* Premium hover sheen — matches product cards */}
+                <div className="absolute inset-0 z-[5] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/0 via-white/20 to-transparent" />
                 <img
-                  src="/about/warehouse.jpg"
-                  alt="CW Electronics warehouse and team at China Mart, Crown Mines, Johannesburg"
-                  className="w-full h-full object-cover"
+                  src="https://images.unsplash.com/photo-1607734834519-d8bdc52f6c5f?auto=format&fit=crop&w=1400&q=85"
+                  alt="CW Electronics wholesale electronics showroom — chargers, CCTV cameras, routers and accessories at China Mart, Crown Mines, Johannesburg"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                  loading="lazy"
+                  onError={(e) => {
+                    // Fallback to one of our own Cloudinary hero shots if Unsplash fails
+                    e.currentTarget.src = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777485480/n2kIN_lmgy9y.jpg'
+                  }}
                 />
               </div>
               {/* Floating badge */}
@@ -332,8 +339,8 @@ export function About() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                   <div>
-                    <div className="font-semibold">Mon – Sun</div>
-                    <div className="text-white/60">09:00 – 15:00</div>
+                    <div className="font-semibold">Mon – Sat</div>
+                    <div className="text-white/60">09:00 – 15:00 · Closed Sundays</div>
                   </div>
                 </div>
               </div>
@@ -595,9 +602,9 @@ export function About() {
                       Business Hours
                     </div>
                     <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
-                      Mon – Sun: 09:00 – 15:00
+                      Mon – Sat: 09:00 – 15:00
                       <br />
-                      <span className="text-gray-500">Open every day</span>
+                      <span className="text-gray-500">Closed Sundays</span>
                     </div>
                   </div>
                 </div>

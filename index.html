@@ -14,7 +14,7 @@
 
     <!-- Viewport & mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a3d8a" />
+    <meta name="theme-color" content="#0F172A" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -65,14 +65,14 @@
       "image": "https://res.cloudinary.com/dzhwylkfr/image/upload/v1778137000/CW-Logo-black_mbfsn7.png",
       "description": "Wholesale & Retail Electronics Importer in Johannesburg — chargers, CCTV, solar inverters, routers, smartwatches & accessories.",
       "url": "https://cw-electronics.co.za",
-      "telephone": "+27000000000",
+      "telephone": "+27649533333",
       "priceRange": "R",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "China Mart, 3 Press Avenue, Crown Mines",
+        "streetAddress": "China Mart, Shop C15, 3 Press Avenue, Crown Mines",
         "addressLocality": "Johannesburg",
         "addressRegion": "Gauteng",
-        "postalCode": "2025",
+        "postalCode": "2092",
         "addressCountry": "ZA"
       },
       "geo": {
@@ -88,11 +88,110 @@
           "closes": "15:00"
         }
       ],
-      "areaServed": {
-        "@type": "Country",
-        "name": "South Africa"
-      },
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+27649533333",
+          "contactType": "sales",
+          "areaServed": "ZA",
+          "availableLanguage": ["English", "Chinese"],
+          "contactOption": "TollFree"
+        },
+        {
+          "@type": "ContactPoint",
+          "telephone": "+27628058899",
+          "contactType": "customer support",
+          "areaServed": "ZA",
+          "availableLanguage": ["English"]
+        }
+      ],
+      "areaServed": [
+        { "@type": "Country", "name": "South Africa" },
+        { "@type": "AdministrativeArea", "name": "Gauteng" },
+        { "@type": "City", "name": "Johannesburg" },
+        { "@type": "City", "name": "Pretoria" },
+        { "@type": "City", "name": "Cape Town" },
+        { "@type": "City", "name": "Durban" }
+      ],
+      "currenciesAccepted": "ZAR",
+      "paymentAccepted": ["Cash", "Credit Card", "EFT", "PayFast"],
+      "knowsAbout": [
+        "CCTV cameras", "NVR kits", "WiFi routers", "Solar street lights",
+        "USB chargers", "Smartwatches", "Phone accessories",
+        "Wholesale electronics", "Direct import electronics South Africa"
+      ],
       "sameAs": []
+    }
+    </script>
+
+    <!-- Structured data — FAQ (rich-result eligible) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Where is CW Electronics located?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We are based at China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092. Open Monday to Saturday, 09:00 – 15:00."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you offer wholesale pricing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Wholesale prices are available from 6 units per product line. Quotes can be requested via WhatsApp on +27 64 953 3333 or by email at info@cw-electronics.co.za."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you ship across South Africa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — we deliver nationwide via The Courier Guy and Fastway. Same-day dispatch on orders placed before 12:00 weekdays. Gauteng usually arrives in 1–2 business days, other major cities 2–3 days."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is your return policy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We offer a 7-day return window from delivery for faulty, damaged or not-as-described items. Customers must send a photo before returning, and return shipping is the customer's responsibility."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What payment methods do you accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We accept all major credit and debit cards via PayFast, Instant EFT, Capitec Pay, SnapScan, and manual EFT for wholesale orders. Cash on collection is accepted at our Crown Mines showroom."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you stock CCTV systems and security cameras?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — we are a direct importer of 4MP and 8MP IP cameras, NVR kits, access control, and intercoms. Installer pricing is available from 6 units."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured data — Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://cw-electronics.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Shop", "item": "https://cw-electronics.co.za/shop" },
+        { "@type": "ListItem", "position": 3, "name": "Wholesale", "item": "https://cw-electronics.co.za/wholesale" }
+      ]
     }
     </script>
   </head>

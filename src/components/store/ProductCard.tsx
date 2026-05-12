@@ -125,20 +125,23 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
+      className="will-change-transform"
     >
       <Link to={href} className="group block h-full">
-        <div className="relative bg-[#1F2937] rounded-2xl border border-white/10 group-hover:border-[#E63939]/50 group-hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 overflow-hidden h-full flex flex-col">
+        <div className="relative bg-[#1F2937] rounded-2xl border border-white/10 group-hover:border-[#E63939]/50 transition-all duration-500 overflow-hidden h-full flex flex-col shadow-sm group-hover:shadow-[0_20px_40px_-15px_rgba(230,57,57,0.25),0_8px_16px_-8px_rgba(0,0,0,0.5)]">
           {/* Image */}
           <div
             className="relative aspect-square bg-white overflow-hidden"
             onMouseEnter={startCycling}
             onMouseLeave={stopCycling}
           >
+            {/* Premium sheen on hover — diagonal light sweep (matches light card variant) */}
+            <div className="absolute inset-0 z-[5] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/0 via-white/30 to-transparent" />
             {cardImages.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
@@ -251,10 +254,10 @@ export function ProductCard({ product, basePath = '/shop', columns = 4 }: Produc
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-all ${
+                className={`flex-shrink-0 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   isOutOfStock
                     ? 'bg-[#374151] text-gray-500 cursor-not-allowed'
-                    : 'bg-[#E63939] hover:bg-[#C82020] text-white group-hover:shadow-md group-hover:shadow-[#E63939]/40'
+                    : 'bg-[#E63939] hover:bg-[#C82020] text-white group-hover:shadow-lg group-hover:shadow-[#E63939]/50 hover:scale-[1.03]'
                 }`}
               >
                 <ShoppingCart className="w-3.5 h-3.5" />

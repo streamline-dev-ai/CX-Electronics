@@ -12,7 +12,7 @@ import { ProductCard } from '../../components/store/ProductCard'
 import { useProducts, type ProductSort } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 
-const WHATSAPP_NUMBER = '27000000000' // TODO: replace with client's WhatsApp number
+const WHATSAPP_NUMBER = '27649533333'
 
 const PRICE_RANGES = [
   { label: 'Under R100', min: 0, max: 100 },

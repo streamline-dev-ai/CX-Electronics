@@ -6,6 +6,13 @@ import { useCart } from '../../context/CartContext'
 
 const HIDDEN_PREFIXES = ['/admin', '/checkout', '/account', '/invoice', '/receipt', '/order']
 
+// On these pages a sticky bottom Add-to-Cart bar exists (mobile) — hide the FAB
+// on phones to avoid stacking, but keep it on desktop.
+function hasStickyBottomBar(pathname: string): boolean {
+  // /shop/:slug and /shop/group/:slug — product detail pages
+  return /^\/shop\/[^/]+/.test(pathname) || /^\/bulk\/[^/]+/.test(pathname)
+}
+
 export function CartFAB() {
   const { itemCount, openCart } = useCart()
   const { pathname } = useLocation()
@@ -25,6 +32,9 @@ export function CartFAB() {
     return null
   }
 
+  // Mobile: shift up so it sits above the sticky add-to-cart bar.
+  const liftedOnMobile = hasStickyBottomBar(pathname)
+
   return (
     <motion.button
       onClick={openCart}
@@ -37,7 +47,9 @@ export function CartFAB() {
       transition={{ duration: 0.7, ease: 'easeInOut' }}
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.94 }}
-      className="fixed bottom-5 right-5 z-40 w-14 h-14 sm:w-16 sm:h-16 bg-[#E63939] hover:bg-[#C82020] text-white rounded-full shadow-2xl shadow-[#E63939]/40 flex items-center justify-center transition-colors"
+      className={`fixed right-5 z-40 w-14 h-14 sm:w-16 sm:h-16 bg-[#E63939] hover:bg-[#C82020] text-white rounded-full shadow-2xl shadow-[#E63939]/40 flex items-center justify-center transition-colors ${
+        liftedOnMobile ? 'bottom-24 lg:bottom-5' : 'bottom-5'
+      }`}
     >
       <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={2.2} />
 

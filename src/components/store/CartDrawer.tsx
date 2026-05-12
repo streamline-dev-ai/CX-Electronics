@@ -160,7 +160,7 @@ export function CartDrawer() {
                       return (
                         <div key={p.id} className="flex-shrink-0 w-28 snap-start">
                           <Link
-                            to={`/product/${p.slug}`}
+                            to={`/shop/${p.slug}`}
                             onClick={closeCart}
                             className="block w-28 h-28 rounded-xl bg-gray-100 overflow-hidden mb-1.5"
                           >
@@ -224,6 +224,28 @@ export function CartDrawer() {
                 >
                   {t('continueShopping')}
                 </button>
+
+                {/* Trust strip — secure / returns / contact */}
+                <div className="grid grid-cols-3 gap-2 pt-3 mt-2 border-t border-gray-100 text-[10px] text-gray-500">
+                  <div className="flex flex-col items-center gap-1">
+                    <svg className="w-4 h-4 text-[#E63939]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    <span className="font-bold text-gray-700 text-center leading-tight">Secure</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <svg className="w-4 h-4 text-[#E63939]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    <span className="font-bold text-gray-700 text-center leading-tight">7-day returns</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <svg className="w-4 h-4 text-[#E63939]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                    </svg>
+                    <span className="font-bold text-gray-700 text-center leading-tight">Real support</span>
+                  </div>
+                </div>
               </div>
             )}
           </motion.div>

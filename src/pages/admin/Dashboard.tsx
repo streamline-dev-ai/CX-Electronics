@@ -6,6 +6,7 @@ import {
   ResponsiveContainer, Legend,
 } from 'recharts'
 import { supabase } from '../../lib/supabase'
+import { useAdminLang } from '../../context/AdminLangContext'
 
 type DateFilter = 'today' | '7d' | '30d' | '90d' | 'all' | 'custom'
 
@@ -132,6 +133,7 @@ function ProductTooltip({ active, payload, label }: { active?: boolean; payload?
 }
 
 export function AdminDashboard() {
+  const { t, lang } = useAdminLang()
   const [filter, setFilter] = useState<DateFilter>('30d')
   const [customFrom, setCustomFrom] = useState('')
   const [customTo, setCustomTo] = useState('')
@@ -199,21 +201,19 @@ export function AdminDashboard() {
       {/* Header + filter row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Analytics <span className="text-sm font-normal text-gray-400">销售分析</span>
-          </h1>
+          <h1 className="text-xl font-bold text-gray-900">{t('dashboardPage')}</h1>
           {(alerts.pending > 0 || alerts.outOfStock > 0) && (
             <div className="flex flex-wrap items-center gap-3 mt-1.5">
               {alerts.pending > 0 && (
                 <span className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  {alerts.pending} pending orders
+                  {alerts.pending} {lang === 'zh' ? '个待处理订单' : 'pending orders'}
                 </span>
               )}
               {alerts.outOfStock > 0 && (
                 <span className="flex items-center gap-1 text-xs text-red-500 font-semibold">
                   <Package className="w-3.5 h-3.5" />
-                  {alerts.outOfStock} out of stock
+                  {alerts.outOfStock} {lang === 'zh' ? '个缺货商品' : 'out of stock'}
                 </span>
               )}
             </div>

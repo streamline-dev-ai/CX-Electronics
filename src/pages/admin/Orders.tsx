@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X, Trash2, Loader2 } from 'lucide-react'
 import { useOrders, updateOrderStatus, deleteOrder } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
+import { useAdminLang } from '../../context/AdminLangContext'
 import type { OrderStatus, OrderWithDetails } from '../../lib/supabase'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
@@ -48,6 +49,7 @@ const ALL_STATUSES: OrderStatus[] = [
 ]
 
 export function AdminOrders() {
+  const { t, lang } = useAdminLang()
   const [status, setStatus] = useState<OrderStatus | undefined>()
   const [page, setPage] = useState(1)
   const [advancing, setAdvancing] = useState<string | null>(null)
@@ -105,10 +107,8 @@ export function AdminOrders() {
 
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Orders <span className="text-sm font-normal text-gray-400">订单</span>
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">{totalCount} total</p>
+          <h1 className="text-xl font-bold text-gray-900">{t('ordersPage')}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{totalCount} {t('total')}</p>
         </div>
 
         {/* Search */}
@@ -122,7 +122,7 @@ export function AdminOrders() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Order #, name, email, phone…"
+              placeholder={lang === 'zh' ? '订单号、姓名、邮箱、电话…' : 'Order #, name, email, phone…'}
               className="pl-9 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] w-full sm:w-48"
             />
             {searchInput && (
@@ -132,7 +132,7 @@ export function AdminOrders() {
             )}
           </div>
           <button type="submit" className="px-3 py-2 text-sm font-semibold bg-[#0F172A] text-white rounded-lg hover:bg-[#1e293b] transition-colors flex-shrink-0">
-            Search
+            {t('search')}
           </button>
         </form>
       </div>
@@ -145,7 +145,7 @@ export function AdminOrders() {
             !status ? 'bg-cxx-blue text-white border-cxx-blue' : 'border-gray-300 text-gray-600 hover:border-gray-400'
           }`}
         >
-          All
+          {lang === 'zh' ? '全部' : 'All'}
         </button>
         {ALL_STATUSES.map((s) => (
           <button

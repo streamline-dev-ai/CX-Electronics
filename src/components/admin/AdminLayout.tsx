@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, Users, MessageSquare, LogOut, Globe } from 'lucide-react'
 import { signOut } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 import { AdminLangProvider, useAdminLang } from '../../context/AdminLangContext'
 
 function LangToggle() {
@@ -29,9 +31,44 @@ function LangToggle() {
   )
 }
 
+function useUnreadMessages(): number {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      const { count: n } = await supabase
+        .from('cw_contact_messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('read', false)
+      if (!cancelled) setCount(n ?? 0)
+    }
+
+    load()
+    // Re-poll every 30s so the badge stays fresh while admin is open.
+    const interval = setInterval(load, 30_000)
+
+    // Subscribe to realtime changes too (no-op if realtime isn't enabled on the table).
+    const channel = supabase
+      .channel('cw_contact_messages_unread')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cw_contact_messages' }, load)
+      .subscribe()
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
+  return count
+}
+
 function AdminShell() {
   const navigate = useNavigate()
   const { t } = useAdminLang()
+  const unread = useUnreadMessages()
 
   async function handleLogout() {
     await signOut()
@@ -43,7 +80,7 @@ function AdminShell() {
     { to: '/admin/products',  icon: Package,         key: 'products' as const },
     { to: '/admin/orders',    icon: ShoppingCart,    key: 'orders' as const },
     { to: '/admin/customers', icon: Users,           key: 'customers' as const },
-    { to: '/admin/messages',  icon: MessageSquare,   key: 'messages' as const },
+    { to: '/admin/messages',  icon: MessageSquare,   key: 'messages' as const, badge: unread },
   ]
 
   return (
@@ -64,7 +101,7 @@ function AdminShell() {
         </div>
 
         <nav className="flex-1 py-4 space-y-0.5">
-          {navLinks.map(({ to, icon: Icon, key }) => (
+          {navLinks.map(({ to, icon: Icon, key, badge }) => (
             <NavLink
               key={to}
               to={to}
@@ -77,7 +114,12 @@ function AdminShell() {
               }
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
-              <span>{t(key)}</span>
+              <span className="flex-1">{t(key)}</span>
+              {badge && badge > 0 && (
+                <span className="bg-[#E63939] text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1.5 flex items-center justify-center ring-2 ring-cxx-navy">
+                  {badge > 99 ? '99+' : badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -111,17 +153,22 @@ function AdminShell() {
 
         {/* Mobile bottom nav — fixed so it stays on screen while scrolling */}
         <nav className="md:hidden print:hidden fixed bottom-0 left-0 right-0 z-30 flex bg-cxx-navy border-t border-white/10">
-          {navLinks.map(({ to, icon: Icon, key }) => (
+          {navLinks.map(({ to, icon: Icon, key, badge }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex-1 flex flex-col items-center py-2 pt-2.5 text-[10px] transition-colors ${
+                `relative flex-1 flex flex-col items-center py-2 pt-2.5 text-[10px] transition-colors ${
                   isActive ? 'text-cxx-blue' : 'text-white/60'
                 }`
               }
             >
               <Icon className="w-5 h-5 mb-0.5" />
+              {badge && badge > 0 && (
+                <span className="absolute top-1 right-1/2 translate-x-3 bg-[#E63939] text-white text-[9px] font-bold rounded-full min-w-[14px] h-[14px] px-1 flex items-center justify-center ring-2 ring-cxx-navy">
+                  {badge > 9 ? '9+' : badge}
+                </span>
+              )}
               <span className="truncate max-w-full px-1">{t(key)}</span>
             </NavLink>
           ))}

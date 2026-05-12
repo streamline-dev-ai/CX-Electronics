@@ -6,7 +6,7 @@ import SEO from '../../components/SEO'
 
 const LAST_UPDATED = '1 May 2025'
 const EMAIL = 'info@cw-electronics.co.za'
-const WA_NUMBER = '27000000000'
+const WA_NUMBER = '27649533333'
 const WA_LINK = `https://wa.me/${WA_NUMBER}`
 
 interface Section {
@@ -447,7 +447,7 @@ export function Terms() {
                     <p className="text-white font-bold text-sm">Visit Us In-Store</p>
                     <p className="text-white/55 text-xs mt-1 leading-relaxed">
                       China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092<br />
-                      Mon&ndash;Sun: 09:00&ndash;15:00 &nbsp;&bull;&nbsp; Open every day
+                      Mon&ndash;Sat: 09:00&ndash;15:00 &nbsp;&bull;&nbsp; Closed Sundays
                     </p>
                   </div>
                 </div>

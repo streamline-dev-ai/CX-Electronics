@@ -523,7 +523,7 @@ export function Shop() {
                   </p>
                 </div>
                 <a
-                  href="https://wa.me/27000000000?text=Hi%20CW%2C%20I%27d%20like%20to%20enquire%20about%20a%20product."
+                  href="https://wa.me/27649533333?text=Hi%20CW%2C%20I%27d%20like%20to%20enquire%20about%20a%20product."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm whitespace-nowrap"

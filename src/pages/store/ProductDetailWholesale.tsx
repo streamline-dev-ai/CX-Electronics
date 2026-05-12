@@ -12,7 +12,7 @@ import { useProduct } from '../../hooks/useProduct'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 
 export function ProductDetailWholesale() {
   const { slug } = useParams<{ slug: string }>()

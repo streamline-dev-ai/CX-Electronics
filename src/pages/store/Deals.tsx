@@ -7,7 +7,7 @@ import SEO from '../../components/SEO'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { useProducts } from '../../hooks/useProducts'
 
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 
 const TIER_HIGHLIGHTS = [
   { qty: '6+', save: '15% off', tone: 'from-[#0F172A] to-[#1E293B]' },

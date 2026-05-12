@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Search, Users, ChevronLeft, ChevronRight, Mail, Phone } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { useAdminLang } from '../../context/AdminLangContext'
 
 interface CustomerRow {
   id: string
@@ -22,6 +23,7 @@ function fmt(n: number) {
 }
 
 export function AdminCustomers() {
+  const { t, lang } = useAdminLang()
   const [customers, setCustomers] = useState<CustomerRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -95,10 +97,8 @@ export function AdminCustomers() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Customers <span className="text-sm font-normal text-gray-400">客户</span>
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">{total} total</p>
+          <h1 className="text-xl font-bold text-gray-900">{t('customersPage')}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{total} {t('total')}</p>
         </div>
 
         <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
@@ -108,7 +108,7 @@ export function AdminCustomers() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Name, email or phone…"
+              placeholder={lang === 'zh' ? '姓名、邮箱或电话…' : 'Name, email or phone…'}
               className="pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E63939] w-full sm:w-64"
             />
           </div>
@@ -116,7 +116,7 @@ export function AdminCustomers() {
             type="submit"
             className="px-4 py-2 text-sm font-semibold bg-[#0F172A] text-white rounded-lg hover:bg-[#1e293b] transition-colors"
           >
-            Search
+            {t('search')}
           </button>
           {query && (
             <button
@@ -124,7 +124,7 @@ export function AdminCustomers() {
               onClick={() => { setSearch(''); setQuery(''); setPage(1) }}
               className="px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Clear
+              {t('clear')}
             </button>
           )}
         </form>

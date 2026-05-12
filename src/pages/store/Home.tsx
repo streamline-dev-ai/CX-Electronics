@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Zap, Wifi, Shield, Watch, Sun, Plug, Smartphone,
-  ArrowRight, ChevronLeft, ChevronRight,
+  ArrowRight, ChevronLeft, ChevronRight, ChevronDown,
   Clock, Tag, BadgeCheck, RotateCcw, MapPin, TrendingUp,
-  Phone, MessageCircle, Sparkles,
+  Phone, MessageCircle, Sparkles, HelpCircle,
 } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { Navbar } from '../../components/store/Navbar'
@@ -13,6 +13,7 @@ import SEO from '../../components/SEO'
 import { useProducts } from '../../hooks/useProducts'
 import { ProductCardLight } from '../../components/store/ProductCardLight'
 import { CategoryGrid } from '../../components/store/CategoryGrid'
+import { MagneticButton } from '../../components/store/MagneticButton'
 
 // ── Branded contact constants ─────────────────────────────────
 const WHATSAPP_NUMBER = '27649533333'
@@ -87,9 +88,9 @@ export function Home() {
     <div className="min-h-screen bg-[#F8FAFC]">
       <SEO
         title="CW Electronics — Wholesale & Retail Electronics in Johannesburg"
-        description="Direct importer of chargers, CCTV cameras, solar inverters, routers, smartwatches & accessories. Trade pricing for resellers, fast nationwide delivery. China Mart, Crown Mines, JHB."
+        description="Direct importer of CCTV cameras, NVR kits, WiFi routers, USB chargers, solar lights and smartwatches. Wholesale pricing from 6 units. Same-day Gauteng dispatch, nationwide delivery. China Mart, Crown Mines, JHB."
         url="/"
-        keywords="electronics wholesale Johannesburg, CCTV South Africa, solar inverters, chargers, routers, China Mart Crown Mines, electronics importer JHB, wholesale electronics South Africa"
+        keywords="electronics wholesale Johannesburg, CCTV cameras South Africa, NVR kits, WiFi routers, USB chargers, solar lights, smartwatches, China Mart Crown Mines, electronics importer JHB, wholesale electronics South Africa, trade pricing installers"
       />
       <Navbar />
       <HeroCarousel />
@@ -104,9 +105,145 @@ export function Home() {
       <BestSellers />
       <LocationSection />
       <WhyChooseCW />
+      <FAQSection />
       <FinalCTA />
       <Footer />
     </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FAQ SECTION — accordion of high-intent questions (SEO + conversion)
+// Mirrors the FAQPage schema in index.html — both signals reinforce
+// Google's rich-results eligibility.
+// ═══════════════════════════════════════════════════════════════
+const FAQS = [
+  {
+    q: 'Where is CW Electronics located?',
+    a: "We're at China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092. Open Monday to Saturday, 09:00 – 15:00. Walk-ins welcome — bring your order number if collecting.",
+  },
+  {
+    q: 'Do you offer wholesale or trade pricing?',
+    a: "Yes — wholesale rates start at 6 units per product line, with bigger discounts at 20+ and 50+ units. Get a quote via WhatsApp (+27 64 953 3333) or browse Wholesale to see live trade prices.",
+  },
+  {
+    q: 'How fast is delivery across South Africa?',
+    a: "Same-day dispatch on orders placed before 12:00 weekdays. Gauteng typically arrives in 1–2 business days. Major cities (Cape Town, Durban, PE) 2–3 days. Remote areas 3–5 days. Tracking sent via email and WhatsApp.",
+  },
+  {
+    q: 'What is your return policy?',
+    a: "7-day returns from the date of delivery for faulty, damaged or not-as-described items. Send us a photo first via WhatsApp or email, then ship the item back in original packaging. Return shipping is the customer's responsibility.",
+  },
+  {
+    q: 'What payment methods do you accept?',
+    a: "All major credit/debit cards via PayFast, Instant EFT, Capitec Pay, SnapScan, and manual EFT for wholesale orders. Cash on collection accepted at our Crown Mines showroom.",
+  },
+  {
+    q: 'Do you sell CCTV camera systems and security?',
+    a: "Yes — we are a direct importer of 4MP and 8MP IP cameras, NVR kits, PTZ cameras, access control and intercoms. Installer pricing available from 6 units.",
+  },
+]
+
+function FAQItem({ q, a, isOpen, onToggle }: { q: string; a: string; isOpen: boolean; onToggle: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="border-b border-gray-100 last:border-b-0"
+    >
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="w-full flex items-center justify-between gap-4 py-5 text-left hover:text-[#E63939] transition-colors"
+      >
+        <span className="text-base sm:text-lg font-bold text-gray-900 hover:text-[#E63939] transition-colors">
+          {q}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-[#E63939] flex-shrink-0 transition-transform duration-300 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="overflow-hidden"
+          >
+            <p className="pb-5 text-sm sm:text-base text-gray-600 leading-relaxed pr-8 text-pretty">
+              {a}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  return (
+    <section className="py-16 sm:py-24 bg-white" aria-label="Frequently Asked Questions">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10 sm:mb-12"
+        >
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E63939] uppercase tracking-widest mb-3">
+            <HelpCircle className="w-3.5 h-3.5" />
+            Common Questions
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 tracking-tight text-balance">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-gray-500 mt-3 text-pretty max-w-xl mx-auto">
+            Quick answers about delivery, wholesale rates, returns and payment.
+          </p>
+        </motion.div>
+
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm px-5 sm:px-8">
+          {FAQS.map((item, i) => (
+            <FAQItem
+              key={item.q}
+              q={item.q}
+              a={item.a}
+              isOpen={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+            />
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 text-center"
+        >
+          <p className="text-sm text-gray-500 mb-3">
+            Still got a question? We usually reply within an hour during business hours.
+          </p>
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%20%E2%80%94%20I%27ve%20got%20a%20question.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold px-7 py-3 rounded-xl transition-all text-sm hover:-translate-y-0.5"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Ask Us on WhatsApp
+          </a>
+        </motion.div>
+      </div>
+    </section>
   )
 }
 
@@ -165,6 +302,16 @@ function HeroCarousel() {
             </motion.div>
           </AnimatePresence>
         </motion.div>
+
+        {/* Grain texture — barely visible, gives premium analog feel (Apple/Nothing trick) */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none z-[2]"
+          style={{
+            backgroundImage:
+              'url("data:image/svg+xml;utf8,<svg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'n\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'3\' stitchTiles=\'stitch\'/></filter><rect width=\'100%\' height=\'100%\' filter=\'url(%23n)\'/></svg>")',
+          }}
+        />
 
         {/* Decorative red lightning bolt */}
         <motion.div
@@ -234,13 +381,13 @@ function HeroCarousel() {
                 transition={{ delay: 0.36, duration: 0.5 }}
                 className="flex flex-wrap gap-3"
               >
-                <Link
-                  to={slide.primary.href}
-                  className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#E63939]/40 text-sm hover:shadow-xl hover:shadow-[#E63939]/50 hover:-translate-y-0.5"
+                <MagneticButton
+                  href={slide.primary.href}
+                  className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-colors shadow-lg shadow-[#E63939]/40 text-sm hover:shadow-xl hover:shadow-[#E63939]/50"
                 >
                   {slide.primary.label}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </MagneticButton>
                 <Link
                   to={slide.secondary.href}
                   className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-md"
@@ -270,7 +417,7 @@ function HeroCarousel() {
         </button>
 
         {/* Dots */}
-        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-7 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
           {HERO_SLIDES.map((_, i) => (
             <button
               key={i}
@@ -282,6 +429,22 @@ function HeroCarousel() {
             />
           ))}
         </div>
+
+        {/* Scroll cue — gently pulsing mouse icon (desktop only) */}
+        <motion.div
+          aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute right-6 bottom-7 hidden lg:flex flex-col items-center gap-2 z-10 pointer-events-none"
+        >
+          <span className="text-[10px] uppercase tracking-widest text-white/40 font-bold rotate-90 origin-bottom translate-y-3">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-px h-12 bg-gradient-to-b from-white/60 to-transparent"
+          />
+        </motion.div>
       </div>
     </section>
   )
@@ -480,13 +643,39 @@ function AnimatedStat({
 }
 
 // ═══════════════════════════════════════════════════════════════
-// BEST SELLERS — real featured products from Supabase
+// BEST SELLERS — horizontal scroll-snap row (desktop) / grid (mobile)
 // ═══════════════════════════════════════════════════════════════
 function BestSellers() {
   const { products, loading } = useProducts({ sort: 'featured', pageSize: 8 })
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [canPrev, setCanPrev] = useState(false)
+  const [canNext, setCanNext] = useState(true)
+
+  function updateArrows() {
+    const el = scrollRef.current
+    if (!el) return
+    setCanPrev(el.scrollLeft > 4)
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+  }
+
+  useEffect(() => {
+    updateArrows()
+    const el = scrollRef.current
+    if (!el) return
+    el.addEventListener('scroll', updateArrows, { passive: true })
+    window.addEventListener('resize', updateArrows)
+    return () => {
+      el.removeEventListener('scroll', updateArrows)
+      window.removeEventListener('resize', updateArrows)
+    }
+  }, [products.length])
+
+  function scrollBy(delta: number) {
+    scrollRef.current?.scrollBy({ left: delta, behavior: 'smooth' })
+  }
 
   return (
-    <section className="py-16 sm:py-24 bg-[#F8FAFC]">
+    <section className="py-16 sm:py-24 bg-[#F8FAFC] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -507,25 +696,87 @@ function BestSellers() {
               Real products. Real installer prices. Stocked in Crown Mines.
             </p>
           </div>
-          <Link
-            to="/shop"
-            className="inline-flex items-center gap-1 text-sm font-bold text-[#E63939] hover:gap-2 transition-all"
-          >
-            View All <ArrowRight className="w-4 h-4" />
-          </Link>
+
+          {/* Desktop: arrows + view all  ·  Mobile: just view all */}
+          <div className="flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-1.5">
+              <button
+                onClick={() => scrollBy(-360)}
+                disabled={!canPrev}
+                aria-label="Previous"
+                className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center ${
+                  canPrev
+                    ? 'bg-white border-gray-200 text-gray-700 hover:bg-[#E63939] hover:text-white hover:border-[#E63939] hover:-translate-y-0.5 shadow-sm hover:shadow-md hover:shadow-[#E63939]/30'
+                    : 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => scrollBy(360)}
+                disabled={!canNext}
+                aria-label="Next"
+                className={`w-10 h-10 rounded-full border transition-all flex items-center justify-center ${
+                  canNext
+                    ? 'bg-white border-gray-200 text-gray-700 hover:bg-[#E63939] hover:text-white hover:border-[#E63939] hover:-translate-y-0.5 shadow-sm hover:shadow-md hover:shadow-[#E63939]/30'
+                    : 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed'
+                }`}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-1 text-sm font-bold text-[#E63939] hover:gap-2 transition-all"
+            >
+              View All <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Mobile: 2-col grid as before */}
+        <div className="grid grid-cols-2 gap-4 lg:hidden">
           {loading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white animate-pulse rounded-2xl aspect-square"
-                />
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
               ))
-            : products.map((p) => (
+            : products.slice(0, 4).map((p) => (
                 <ProductCardLight key={p.id} product={p} basePath="/shop" />
               ))}
+        </div>
+
+        {/* Desktop: horizontal scroll-snap row with edge fades */}
+        <div className="relative hidden lg:block">
+          {/* Left edge gradient fade */}
+          <div
+            className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 pointer-events-none transition-opacity duration-300 ${
+              canPrev ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          {/* Right edge gradient fade */}
+          <div
+            className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 pointer-events-none transition-opacity duration-300 ${
+              canNext ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+
+          <div
+            ref={scrollRef}
+            className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2 -mx-1 px-1"
+            style={{ scrollPaddingLeft: '4px', scrollPaddingRight: '4px' }}
+          >
+            {loading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex-shrink-0 w-[280px] snap-start">
+                    <ProductCardSkeleton />
+                  </div>
+                ))
+              : products.map((p) => (
+                  <div key={p.id} className="flex-shrink-0 w-[280px] snap-start">
+                    <ProductCardLight product={p} basePath="/shop" />
+                  </div>
+                ))}
+          </div>
         </div>
 
         <div className="mt-12 text-center">
@@ -539,6 +790,21 @@ function BestSellers() {
         </div>
       </div>
     </section>
+  )
+}
+
+// Branded skeleton — subtle shimmer that matches our motion language
+function ProductCardSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden h-full flex flex-col">
+      <div className="aspect-square bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 animate-pulse" />
+      <div className="p-4 flex-1 space-y-2">
+        <div className="h-3 w-1/3 bg-gray-100 rounded animate-pulse" />
+        <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
+        <div className="h-5 w-1/2 bg-gray-100 rounded animate-pulse mt-2" />
+        <div className="h-9 w-full bg-gray-100 rounded-lg animate-pulse mt-3" />
+      </div>
+    </div>
   )
 }
 
@@ -642,7 +908,7 @@ function LocationSection() {
                 <Sparkles className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
                   <div className="text-white/60 text-xs">Trading Hours</div>
-                  <div className="font-semibold">Mon–Sun: 09:00 – 15:00</div>
+                  <div className="font-semibold">Mon – Sat: 09:00 – 15:00</div>
                 </div>
               </div>
             </div>
@@ -702,15 +968,15 @@ function WhyChooseCW() {
               prices — backed by quality testing and fast nationwide delivery.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a
+              <MagneticButton
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20CW%20%E2%80%94%20I%27d%20like%20to%20chat%20about%20wholesale%20pricing.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#E63939]/30 text-sm hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-7 py-3.5 rounded-xl transition-colors shadow-lg shadow-[#E63939]/30 text-sm"
               >
                 <MessageCircle className="w-4 h-4" />
                 Talk to Us on WhatsApp
-              </a>
+              </MagneticButton>
               <a
                 href="tel:+27649533333"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors border border-white/20 text-sm backdrop-blur-md"
@@ -783,13 +1049,13 @@ function FinalCTA() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/shop"
-              className="group inline-flex items-center gap-2 bg-white text-[#E63939] font-bold px-8 py-4 rounded-xl transition-all shadow-2xl shadow-black/20 text-sm hover:-translate-y-0.5"
+            <MagneticButton
+              href="/shop"
+              className="group inline-flex items-center gap-2 bg-white text-[#E63939] font-bold px-8 py-4 rounded-xl shadow-2xl shadow-black/20 text-sm"
             >
               Shop Retail Now
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </MagneticButton>
             <Link
               to="/deals"
               className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold px-8 py-4 rounded-xl transition-all text-sm"

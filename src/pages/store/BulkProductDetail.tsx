@@ -16,7 +16,7 @@ import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { getWholesalePrice, getWholesaleMinQty, getWholesaleSavingsPct } from '../../lib/wholesale'
 
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 
 export function BulkProductDetail() {
   const { slug } = useParams<{ slug: string }>()

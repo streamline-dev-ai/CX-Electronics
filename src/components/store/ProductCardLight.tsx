@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ShoppingCart, Zap, Heart } from 'lucide-react'
+import { ShoppingCart, Zap, Heart, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
@@ -110,14 +110,15 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      whileHover={{ y: -2 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      className="will-change-transform"
     >
       <Link to={href} className="group block h-full">
-        <div className="relative bg-white rounded-xl border border-gray-200 group-hover:border-gray-300 group-hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
+        <div className="relative bg-white rounded-2xl border border-gray-200 group-hover:border-[#E63939]/30 transition-all duration-500 overflow-hidden h-full flex flex-col shadow-sm group-hover:shadow-[0_20px_40px_-15px_rgba(230,57,57,0.18),0_8px_16px_-8px_rgba(15,23,42,0.12)]">
 
           {/* Image area — light gray so white-bg product images have a visible edge */}
           <div
@@ -125,6 +126,8 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
             onMouseEnter={startCycling}
             onMouseLeave={stopCycling}
           >
+            {/* Premium sheen on hover — diagonal light sweep */}
+            <div className="absolute inset-0 z-[5] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/0 via-white/30 to-transparent" />
             {/* Carousel dots — top center, Makro style */}
             {cardImages.length > 1 && (
               <div className="absolute top-2.5 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
@@ -241,19 +244,31 @@ export function ProductCardLight({ product, basePath = '/shop' }: ProductCardLig
                 <p className="text-[10px] text-gray-400 mb-1 font-medium">per unit</p>
               )}
 
-              {/* Full-width Add to Cart — Makro style, red on hover */}
+              {/* Full-width Add to Cart — premium hover with sliding arrow */}
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`w-full flex items-center justify-center gap-2 text-xs font-bold px-3 py-2.5 rounded-lg transition-all duration-200 mt-2 ${
+                className={`group/btn relative w-full flex items-center justify-center gap-2 text-xs font-bold px-3 py-2.5 rounded-lg overflow-hidden transition-all duration-300 mt-2 ${
                   isOutOfStock
                     ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                    : 'bg-white border border-gray-300 text-gray-800 hover:bg-[#E63939] hover:text-white hover:border-[#E63939]'
+                    : 'bg-white border border-gray-300 text-gray-800 hover:text-white hover:border-[#E63939]'
                 }`}
               >
-                <ShoppingCart className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>
-                  {isOutOfStock ? 'Out of Stock' : isBulkView ? `Add ${wholesaleMinQty}+` : 'Add to Cart'}
+                {/* Red fill that slides in from left on hover */}
+                {!isOutOfStock && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 bg-[#E63939] -translate-x-full group-hover/btn:translate-x-0 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  />
+                )}
+                <span className="relative inline-flex items-center gap-1.5">
+                  <ShoppingCart className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>
+                    {isOutOfStock ? 'Out of Stock' : isBulkView ? `Add ${wholesaleMinQty}+` : 'Add to Cart'}
+                  </span>
+                  {!isOutOfStock && (
+                    <ArrowRight className="w-3 h-3 -ml-1 opacity-0 -translate-x-1 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all duration-300" />
+                  )}
                 </span>
               </button>
             </div>

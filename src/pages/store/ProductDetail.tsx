@@ -19,7 +19,7 @@ import { useLang } from '../../context/LangContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { getWholesalePrice, getWholesaleMinQty, getWholesaleSavingsPct } from '../../lib/wholesale'
 
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -208,7 +208,7 @@ export function ProductDetail() {
       />
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-28 lg:pb-10">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-6">
           <Link to="/shop" className="flex items-center gap-1 hover:text-[#E63939] transition-colors">
@@ -260,22 +260,25 @@ export function ProductDetail() {
 
               {/* Main image */}
               <div className={`col-span-12 ${images.length > 1 ? 'sm:col-span-10' : ''} order-1 sm:order-2`}>
-                <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-100 group">
+                <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-100 group shadow-sm hover:shadow-2xl hover:shadow-[#E63939]/10 transition-shadow duration-500">
+                  {/* Premium sheen overlay on hover */}
+                  <div className="absolute inset-0 z-[5] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/0 via-white/40 to-transparent" />
+
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={activeImage}
                       initial={{ opacity: 0, scale: 0.97 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       src={images[activeImage] || '/placeholder.svg'}
                       alt={name}
-                      className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-8 group-hover:scale-[1.04] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                     />
                   </AnimatePresence>
 
                   {product.featured && (
-                    <span className="absolute top-4 left-4 bg-[#E63939] text-white text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider">
+                    <span className="absolute top-4 left-4 bg-[#E63939] text-white text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider z-10 shadow-lg shadow-[#E63939]/30">
                       Best Seller
                     </span>
                   )}
@@ -605,6 +608,47 @@ export function ProductDetail() {
             )}
           </div>
         </div>
+
+        {/* ── Sticky mobile Add-to-Cart bar ──────────────── */}
+        {!isOutOfStock && (
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-3 py-3 shadow-2xl">
+            <div className="max-w-7xl mx-auto flex items-center gap-2">
+              <div className="flex-shrink-0">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-500 leading-none mb-1">
+                  {isWholesaleUnlocked ? 'Wholesale' : 'Total'}
+                </p>
+                <p className="text-lg font-extrabold text-[#E63939] leading-none">
+                  R{(activePrice * qty).toFixed(2)}
+                </p>
+              </div>
+              <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden ml-auto">
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  className="px-3 py-2.5 hover:bg-gray-100 text-gray-600"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2 font-bold text-sm text-gray-900 min-w-[1.75rem] text-center">{qty}</span>
+                <button
+                  onClick={() => setQty((q) => q + 1)}
+                  className="px-3 py-2.5 hover:bg-gray-100 text-gray-600"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={handleAddToCart}
+                className="flex items-center gap-1.5 bg-[#E63939] hover:bg-[#C82020] text-white font-bold px-4 py-2.5 rounded-lg text-sm shadow-lg shadow-[#E63939]/30"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Add
+              </motion.button>
+            </div>
+          </div>
+        )}
 
         {/* ── Related Products ────────────────────────────── */}
         {relatedProducts.length > 0 && (

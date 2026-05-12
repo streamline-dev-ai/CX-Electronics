@@ -44,7 +44,7 @@ function absoluteUrl(url: string | undefined): string {
 
 export default function SEO({
   title = `${SITE_NAME} — Wholesale & Retail Electronics in Johannesburg`,
-  description = 'Direct importer of chargers, CCTV, solar, routers, smartwatches & more. Best prices in Johannesburg. Trade pricing & bulk discounts available.',
+  description = 'Direct importer of CCTV cameras, NVR kits, WiFi routers, USB chargers, solar lights & smartwatches. Wholesale pricing from 6 units. Same-day Gauteng dispatch, nationwide delivery. China Mart, Crown Mines, Johannesburg.',
   image = DEFAULT_IMAGE,
   url,
   type = 'website',

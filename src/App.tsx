@@ -10,6 +10,7 @@ import { AddToCartDrawer } from './components/store/AddToCartDrawer'
 import { ExitIntentPopup } from './components/store/ExitIntentPopup'
 import { CartFAB } from './components/store/CartFAB'
 import { PWAPrompt } from './components/PWAPrompt'
+import { ScrollProgress } from './components/store/ScrollProgress'
 
 // Customer account — lazy loaded
 const AccountLogin    = lazy(() => import('./pages/account/Login').then((m) => ({ default: m.AccountLogin })))
@@ -68,6 +69,7 @@ export default function App() {
       <CartProvider>
         <BrowserRouter>
           <ScrollToTop />
+          <ScrollProgress />
           <AddToCartDrawer />
           <ExitIntentPopup />
           <CartFAB />

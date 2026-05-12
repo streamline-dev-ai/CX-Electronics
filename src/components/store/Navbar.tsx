@@ -10,6 +10,17 @@ import { CartDrawer } from './CartDrawer'
 import { NavbarSearch } from './NavbarSearch'
 import { getCategoryIcon } from '../../lib/categoryIcons'
 
+function useScrolled(threshold = 12): boolean {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    function onScroll() { setScrolled(window.scrollY > threshold) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [threshold])
+  return scrolled
+}
+
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
   { to: '/shop', label: 'Shop' },
@@ -18,7 +29,7 @@ const navLinks = [
   { to: '/about', label: 'About' },
 ]
 
-const WHATSAPP_NUMBER = '27000000000'
+const WHATSAPP_NUMBER = '27649533333'
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi CW Electronics — I'd like to chat about a product.")}`
 
 // CW Electronics logo URL
@@ -32,6 +43,7 @@ export function Navbar() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [catsOpen, setCatsOpen] = useState(false)
   const catsRef = useRef<HTMLDivElement>(null)
+  const scrolled = useScrolled(8)
 
   const navCategories = categories.map((c) => ({
     slug: c.slug,
@@ -51,7 +63,13 @@ export function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0F172A] border-b border-slate-700">
+      <header
+        className={`sticky top-0 z-40 transition-all duration-300 ${
+          scrolled
+            ? 'bg-[#0F172A]/85 backdrop-blur-xl border-b border-slate-700/60 shadow-lg shadow-black/20'
+            : 'bg-[#0F172A] border-b border-slate-700'
+        }`}
+      >
         {/* ── Mobile row (lg:hidden) ── */}
         <div className="lg:hidden px-3 sm:px-4 h-16 grid grid-cols-[auto_1fr_auto] items-center gap-2">
           {/* Left: hamburger */}
