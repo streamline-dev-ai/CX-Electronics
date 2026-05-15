@@ -63,6 +63,7 @@ export function useOrders(opts: UseOrdersOptions = {}): UseOrdersResult {
       let query = supabase
         .from('orders')
         .select(ORDER_SELECT, { count: 'exact' })
+        .ilike('order_number', 'CW-%')
         .order('created_at', { ascending: false })
         .range(from, to)
 
@@ -105,6 +106,7 @@ export async function getOrder(orderId: string): Promise<OrderWithDetails | null
     .from('orders')
     .select(ORDER_DETAIL_SELECT)
     .eq('id', orderId)
+    .ilike('order_number', 'CW-%')
     .order('created_at', { referencedTable: 'order_status_events', ascending: true })
     .single()
 
@@ -131,6 +133,37 @@ export async function updateOrderStatus(
     .insert({ order_id: orderId, status, triggered_by: triggeredBy, created_at: now })
 
   if (eventErr) console.warn('Failed to log status event:', eventErr.message)
+
+  return { error: null }
+}
+
+export async function markOrderPaid(
+  orderId: string,
+  paymentReference?: string,
+): Promise<{ error: string | null }> {
+  const now = new Date().toISOString()
+
+  const updatePayload: Record<string, unknown> = {
+    status: 'processing',
+    payment_status: 'paid',
+    updated_at: now,
+  }
+  if (paymentReference && paymentReference.trim()) {
+    updatePayload.payment_reference = paymentReference.trim()
+  }
+
+  const { error: updateErr } = await supabase
+    .from('orders')
+    .update(updatePayload)
+    .eq('id', orderId)
+
+  if (updateErr) return { error: updateErr.message }
+
+  // Log paid + processing so the timeline reflects both transitions.
+  await supabase.from('order_status_events').insert([
+    { order_id: orderId, status: 'paid',       triggered_by: 'admin', created_at: now },
+    { order_id: orderId, status: 'processing', triggered_by: 'admin', created_at: now },
+  ])
 
   return { error: null }
 }

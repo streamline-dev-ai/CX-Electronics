@@ -146,7 +146,7 @@ export function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending').ilike('order_number', 'CW-%'),
       supabase.from('products').select('id', { count: 'exact', head: true }).eq('stock_status', 'out_of_stock').eq('active', true),
     ]).then(([p, o]) => setAlerts({ pending: p.count ?? 0, outOfStock: o.count ?? 0 }))
   }, [])
@@ -158,6 +158,7 @@ export function AdminDashboard() {
     const { data: orders } = await supabase
       .from('orders')
       .select('id, total, payment_status, created_at')
+      .ilike('order_number', 'CW-%')
       .gte('created_at', range.from)
       .lte('created_at', range.to)
       .order('created_at', { ascending: true })

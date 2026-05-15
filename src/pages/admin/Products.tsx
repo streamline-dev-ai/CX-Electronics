@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
-import { supabase } from '../../lib/supabase'
+import { supabase, getProductImageUrl } from '../../lib/supabase'
 import { useAdminLang } from '../../context/AdminLangContext'
 import type { ProductWithCategory, StockStatus } from '../../lib/supabase'
 
@@ -522,9 +522,15 @@ export function AdminProducts() {
                         <div className="flex items-center gap-3">
                           {product.thumbnail_url ? (
                             <img
-                              src={product.thumbnail_url}
+                              src={getProductImageUrl(product.thumbnail_url, 80)}
                               alt={product.name}
                               className="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0"
+                              onError={(e) => {
+                                const fallback = product.images?.[0]
+                                if (fallback && e.currentTarget.src !== fallback) {
+                                  e.currentTarget.src = getProductImageUrl(fallback, 80)
+                                }
+                              }}
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-300">
