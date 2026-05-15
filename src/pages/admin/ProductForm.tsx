@@ -203,7 +203,6 @@ export function ProductForm() {
     if (!form.retail_price || isNaN(Number(form.retail_price))) errs.retail_price = 'Valid retail price required'
     if (form.is_bulk_available) {
       if (!form.bulk_price || isNaN(Number(form.bulk_price))) errs.bulk_price = 'Bulk price required'
-      if (!form.bulk_min_qty || isNaN(Number(form.bulk_min_qty))) errs.bulk_min_qty = 'Min quantity required'
     }
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -216,15 +215,15 @@ export function ProductForm() {
 
     const payload = {
       name: form.name.trim(),
-      name_zh: form.name_zh.trim() || null,
+      name_zh: null,
       slug: form.slug.trim(),
       description: form.description.trim() || null,
-      description_zh: form.description_zh.trim() || null,
+      description_zh: null,
       category_id: form.category_id || null,
       retail_price: Number(form.retail_price),
       is_bulk_available: form.is_bulk_available,
       bulk_price: form.is_bulk_available && form.bulk_price ? Number(form.bulk_price) : null,
-      bulk_min_qty: form.is_bulk_available && form.bulk_min_qty ? Number(form.bulk_min_qty) : null,
+      bulk_min_qty: form.is_bulk_available ? 6 : null,
       active: form.active,
       featured: form.featured,
       stock_status: form.stock_status,
@@ -279,27 +278,15 @@ export function ProductForm() {
         <section className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
           <h2 className="font-semibold text-gray-900">{t('basicInfo')}</h2>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label={`${t('productName')} (EN)`} error={errors.name} required>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => set('name', e.target.value)}
-                className={input(errors.name)}
-                placeholder="e.g. USB-C 65W Fast Charger"
-              />
-            </Field>
-            <Field label={`${t('productName')} (中文)`}>
-              <input
-                type="text"
-                value={form.name_zh}
-                onChange={(e) => set('name_zh', e.target.value)}
-                className={input()}
-                placeholder="例如:USB-C 65瓦快速充电器"
-                lang="zh"
-              />
-            </Field>
-          </div>
+          <Field label={t('productName')} error={errors.name} required>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => set('name', e.target.value)}
+              className={input(errors.name)}
+              placeholder="e.g. USB-C 65W Fast Charger"
+            />
+          </Field>
 
           <Field label="URL Slug" error={errors.slug} required>
             <input
@@ -325,30 +312,15 @@ export function ProductForm() {
             </select>
           </Field>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label={`${t('description')} (EN)`}>
-              <textarea
-                value={form.description}
-                onChange={(e) => set('description', e.target.value)}
-                rows={4}
-                className={input()}
-                placeholder="Describe the product — features, specs, compatibility..."
-              />
-            </Field>
-            <Field label={`${t('description')} (中文)`}>
-              <textarea
-                value={form.description_zh}
-                onChange={(e) => set('description_zh', e.target.value)}
-                rows={4}
-                className={input()}
-                placeholder="产品介绍 — 功能、规格、兼容性..."
-                lang="zh"
-              />
-            </Field>
-          </div>
-          <p className="text-xs text-gray-400 -mt-2">
-            Chinese fields are optional. When filled, they show on the storefront when a customer toggles to 中文.
-          </p>
+          <Field label={t('description')}>
+            <textarea
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
+              rows={4}
+              className={input()}
+              placeholder="Describe the product — features, specs, compatibility..."
+            />
+          </Field>
         </section>
 
         {/* ── Images ─────────────────────────────────────── */}
@@ -512,16 +484,15 @@ export function ProductForm() {
                   />
                 </div>
               </Field>
-              <Field label={t('minQty')} error={errors.bulk_min_qty} required>
+              <Field label={t('minQty')}>
                 <input
                   type="number"
-                  min="1"
-                  step="1"
-                  value={form.bulk_min_qty}
-                  onChange={(e) => set('bulk_min_qty', e.target.value)}
-                  className={input(errors.bulk_min_qty)}
-                  placeholder="e.g. 6"
+                  value={6}
+                  readOnly
+                  disabled
+                  className={`${input()} bg-gray-100 cursor-not-allowed text-gray-500`}
                 />
+                <p className="text-xs text-gray-400 mt-1">Fixed at 6 units site-wide</p>
               </Field>
             </div>
           )}
