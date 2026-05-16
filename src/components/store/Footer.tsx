@@ -1,176 +1,169 @@
 import { Link } from 'react-router-dom'
-import {
-  MapPin, Phone, Mail, MessageCircle, Clock,
-  CreditCard,
-} from 'lucide-react'
+import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { useLang } from '../../context/LangContext'
 
-// CW Electronics logo URL
 const LOGO_URL = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
+
+function VisaIcon() {
+  return (
+    <svg viewBox="0 0 60 20" className="h-5 w-auto" aria-label="Visa">
+      <rect width="60" height="20" rx="3" fill="#1A1F71" />
+      <text x="8" y="14.5" fill="white" fontFamily="Arial, sans-serif" fontSize="11" fontWeight="bold" fontStyle="italic">
+        VISA
+      </text>
+    </svg>
+  )
+}
+
+function MastercardIcon() {
+  return (
+    <svg viewBox="0 0 42 28" className="h-5 w-auto" aria-label="Mastercard">
+      <circle cx="15" cy="14" r="12" fill="#EB001B" />
+      <circle cx="27" cy="14" r="12" fill="#F79E1B" />
+      <path
+        d="M21 4.68A12 12 0 0 1 24.74 14 12 12 0 0 1 21 23.32 12 12 0 0 1 17.26 14 12 12 0 0 1 21 4.68Z"
+        fill="#FF5F00"
+      />
+    </svg>
+  )
+}
+
+function PaystackIcon() {
+  return (
+    <svg viewBox="0 0 60 20" className="h-5 w-auto" aria-label="Paystack">
+      <rect width="60" height="20" rx="3" fill="#011B33" />
+      <rect x="8" y="5" width="44" height="3.5" rx="1.5" fill="#00C3F7" />
+      <rect x="8" y="11.5" width="32" height="3.5" rx="1.5" fill="#00C3F7" opacity="0.6" />
+    </svg>
+  )
+}
+
+function EFTIcon() {
+  return (
+    <svg viewBox="0 0 60 20" className="h-5 w-auto" aria-label="Instant EFT">
+      <rect width="60" height="20" rx="3" fill="#0F4C81" />
+      <text x="6" y="14" fill="white" fontFamily="Arial, sans-serif" fontSize="8.5" fontWeight="bold" letterSpacing="0.5">
+        INSTANT EFT
+      </text>
+    </svg>
+  )
+}
 
 export function Footer() {
   const { t } = useLang()
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#0F172A] text-white border-t border-slate-700">
+    <footer className="bg-[#0B1120] text-white border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
           {/* Brand */}
-          <div>
+          <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <img 
-                src={LOGO_URL} 
-                alt="CW Electronics" 
-                className="h-12 w-auto"
-              />
+              <img src={LOGO_URL} alt="CW Electronics" className="h-10 w-auto" />
               <div className="leading-tight">
-                <span className="font-bold text-white text-xl tracking-tight">CW Electronics</span>
-                <span className="block text-[10px] text-slate-400 font-semibold uppercase tracking-[0.18em] -mt-0.5">
+                <span className="font-bold text-white text-lg tracking-tight">CW Electronics</span>
+                <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-[0.18em] -mt-0.5">
                   Wholesale &amp; Retail
                 </span>
               </div>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed mb-5">
-              Wholesale &amp; retail electronics importer based at China Mart, Crown Mines, Johannesburg.
-              Powering South Africa with quality CCTV, solar, networking &amp; mobile electronics.
+            <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
+              Direct importer of consumer electronics. Wholesale &amp; retail from our showroom at
+              China Mart, Crown Mines, Johannesburg.
             </p>
-            <div className="flex items-center gap-2">
-              <a
-                href="https://wa.me/27649533333"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp"
-                className="w-9 h-9 bg-slate-700 hover:bg-[#E63939] rounded-lg flex items-center justify-center transition-colors"
-              >
-                <MessageCircle className="w-4 h-4" />
-              </a>
-            </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Shop */}
           <div>
-            <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
-              Quick Links
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-4">
+              Shop
             </h3>
             <ul className="space-y-2.5 text-sm text-slate-400">
-              <li><Link to="/" className="hover:text-[#E63939] transition-colors">{t('home')}</Link></li>
-              <li><Link to="/shop" className="hover:text-[#E63939] transition-colors">{t('shop')}</Link></li>
-              <li><Link to="/wholesale" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
-              <li><Link to="/about" className="hover:text-[#E63939] transition-colors">About &amp; Contact</Link></li>
-              <li><Link to="/shop?category=chargers" className="hover:text-[#E63939] transition-colors">Chargers &amp; Cables</Link></li>
-              <li><Link to="/shop?category=cctv" className="hover:text-[#E63939] transition-colors">CCTV &amp; Security</Link></li>
-              <li><Link to="/shop?category=solar" className="hover:text-[#E63939] transition-colors">Solar Lighting</Link></li>
+              <li><Link to="/" className="hover:text-white transition-colors">{t('home')}</Link></li>
+              <li><Link to="/shop" className="hover:text-white transition-colors">{t('shop')}</Link></li>
+              <li><Link to="/wholesale" className="hover:text-white transition-colors">Wholesale</Link></li>
+              <li><Link to="/deals" className="hover:text-white transition-colors">Deals</Link></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">About &amp; Contact</Link></li>
             </ul>
           </div>
 
-          {/* Customer Service */}
+          {/* Policies */}
           <div>
-            <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
-              Customer Service
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-4">
+              Policies
             </h3>
             <ul className="space-y-2.5 text-sm text-slate-400">
-              <li><Link to="/shipping-policy" className="hover:text-[#E63939] transition-colors">Shipping Policy</Link></li>
-              <li><Link to="/refund-policy" className="hover:text-[#E63939] transition-colors">Refund Policy</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-[#E63939] transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-[#E63939] transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
-              {t('contactUs')}
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-4">
+              Contact
             </h3>
             <ul className="space-y-3 text-sm text-slate-400">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#E63939]" />
-                <span>{t('address_store')}</span>
+              <li className="flex items-start gap-2.5">
+                <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-slate-500" />
+                <span className="leading-snug">
+                  Shop C15, China Mart<br />
+                  3 Press Avenue, Crown Mines<br />
+                  Johannesburg, 2092
+                </span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
-                <a href="tel:+27649533333" className="hover:text-white transition-colors">
-                  Emily: 064 953 3333
-                </a>
+              <li className="flex items-center gap-2.5">
+                <Phone className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
+                <div className="space-y-0.5">
+                  <a href="tel:+27649533333" className="block hover:text-white transition-colors">
+                    064 953 3333 <span className="text-slate-600">(Emily)</span>
+                  </a>
+                  <a href="tel:+27628058899" className="block hover:text-white transition-colors">
+                    062 805 8899 <span className="text-slate-600">(Kevin)</span>
+                  </a>
+                </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
-                <a href="tel:+27628058899" className="hover:text-white transition-colors">
-                  Kevin: 062 805 8899
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <MessageCircle className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
-                <a
-                  href="https://wa.me/27649533333"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  WhatsApp Chat
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 flex-shrink-0 text-[#E63939]" />
+              <li className="flex items-center gap-2.5">
+                <Mail className="w-3.5 h-3.5 flex-shrink-0 text-slate-500" />
                 <a href="mailto:info@cw-electronics.co.za" className="hover:text-white transition-colors">
                   info@cw-electronics.co.za
                 </a>
               </li>
-              <li className="flex items-start gap-3">
-                <Clock className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#E63939]" />
-                <span>Mon - Sun: 09:00 - 15:00<br />Open every day</span>
+              <li className="flex items-start gap-2.5">
+                <Clock className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-slate-500" />
+                <span>Mon – Sun, 09:00 – 15:00<br /><span className="text-slate-600 text-xs">Open every day</span></span>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter / Contact CTA */}
-          <div>
-            <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
-              Can't Find Something?
-            </h3>
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-              Want a product you don't see here? Send us a message and we'll source it for you.
-            </p>
-            <a
-              href="https://wa.me/27649533333?text=Hi%20CW%20Electronics%20%E2%80%94%20I%27m%20looking%20for%20a%20product%20I%20don%27t%20see%20on%20your%20site."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-[#E63939] hover:bg-[#C82020] text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm w-full"
-            >
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp Us
-            </a>
-
-            <div className="mt-6">
-              <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-2">
-                We Accept
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="px-2.5 py-1.5 bg-slate-700 border border-slate-600 rounded-md text-[10px] font-semibold text-slate-300 tracking-wider">
-                  VISA
-                </div>
-                <div className="px-2.5 py-1.5 bg-slate-700 border border-slate-600 rounded-md text-[10px] font-semibold text-slate-300 tracking-wider">
-                  MASTERCARD
-                </div>
-                <div className="px-2.5 py-1.5 bg-slate-700 border border-slate-600 rounded-md text-[10px] font-semibold text-slate-300 tracking-wider">
-                  EFT
-                </div>
-                <div className="w-7 h-7 bg-slate-700 border border-slate-600 rounded-md flex items-center justify-center">
-                  <CreditCard className="w-3.5 h-3.5 text-slate-300" />
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-slate-700 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-500">
+        <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-600 order-2 sm:order-1">
             &copy; {year} CW Electronics. {t('allRightsReserved')}
           </p>
-          <p className="text-xs text-slate-600">
-            China Mart, Shop C15, Crown Mines, Johannesburg
-          </p>
+
+          {/* Payment icons */}
+          <div className="flex items-center gap-2 order-1 sm:order-2">
+            <span className="text-[10px] text-slate-600 font-medium mr-1">We accept</span>
+            <div className="p-1.5 bg-white/5 rounded-md border border-white/8">
+              <VisaIcon />
+            </div>
+            <div className="p-1.5 bg-white/5 rounded-md border border-white/8">
+              <MastercardIcon />
+            </div>
+            <div className="p-1.5 bg-white/5 rounded-md border border-white/8">
+              <PaystackIcon />
+            </div>
+            <div className="p-1.5 bg-white/5 rounded-md border border-white/8">
+              <EFTIcon />
+            </div>
+          </div>
         </div>
       </div>
     </footer>
