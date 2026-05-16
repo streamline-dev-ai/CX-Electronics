@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { LangProvider } from './context/LangContext'
 import { CustomerAuthProvider } from './context/CustomerAuthContext'
@@ -11,6 +11,23 @@ import { ExitIntentPopup } from './components/store/ExitIntentPopup'
 import { CartFAB } from './components/store/CartFAB'
 import { PWAPrompt } from './components/PWAPrompt'
 import { ScrollProgress } from './components/store/ScrollProgress'
+import { isStandalone } from './lib/pwaInstall'
+
+// When running as an installed PWA, force every route back into /admin/*.
+// The manifest scope already enforces this at the browser level, but this
+// guards against any in-app navigation slipping out of admin.
+function StandaloneAdminGuard() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isStandalone() && !location.pathname.startsWith('/admin')) {
+      navigate('/admin/login', { replace: true })
+    }
+  }, [location.pathname, navigate])
+
+  return null
+}
 
 // Customer account — lazy loaded
 const AccountLogin    = lazy(() => import('./pages/account/Login').then((m) => ({ default: m.AccountLogin })))
@@ -33,6 +50,9 @@ import { BulkProductDetail } from './pages/store/BulkProductDetail'
 import { Deals } from './pages/store/Deals'
 import { About } from './pages/store/About'
 import { Terms } from './pages/store/Terms'
+import { ShippingPolicy } from './pages/store/ShippingPolicy'
+import { RefundPolicy } from './pages/store/RefundPolicy'
+import { PrivacyPolicy } from './pages/store/PrivacyPolicy'
 import { CartPage } from './pages/store/CartPage'
 import { Checkout } from './pages/store/Checkout'
 import { OrderConfirmation } from './pages/store/OrderConfirmation'
@@ -68,6 +88,7 @@ export default function App() {
       <WishlistProvider>
       <CartProvider>
         <BrowserRouter>
+          <StandaloneAdminGuard />
           <ScrollToTop />
           <ScrollProgress />
           <AddToCartDrawer />
@@ -88,6 +109,9 @@ export default function App() {
             <Route path="/contact" element={<About />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/returns" element={<Terms />} />
+            <Route path="/shipping-policy" element={<ShippingPolicy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order/:id" element={<OrderConfirmation />} />

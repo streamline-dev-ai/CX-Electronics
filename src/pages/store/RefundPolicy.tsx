@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Scale, CreditCard, Truck, RefreshCcw, Package, ShieldCheck, Phone, AlertCircle, Globe } from 'lucide-react'
+import {
+  ArrowLeft, RefreshCcw, ShieldCheck, ClipboardList,
+  CreditCard, XCircle, Truck, Phone,
+} from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import SEO from '../../components/SEO'
 
 const LAST_UPDATED = '16 May 2026'
 const EMAIL = 'info@cw-electronics.co.za'
-const WA_NUMBER = '27649533333'
-const WA_LINK = `https://wa.me/${WA_NUMBER}`
+const WA_LINK = 'https://wa.me/27649533333'
 
 interface Section {
   id: string
@@ -18,15 +20,13 @@ interface Section {
 }
 
 const SECTIONS: Section[] = [
-  { id: 'products-pricing', number: '1', title: 'Products & Pricing',       icon: Scale        },
-  { id: 'orders',           number: '2', title: 'Orders',                   icon: Package      },
-  { id: 'payment',          number: '3', title: 'Payment',                  icon: CreditCard   },
-  { id: 'shipping',         number: '4', title: 'Delivery',                 icon: Truck        },
-  { id: 'returns',          number: '5', title: 'Returns',                  icon: RefreshCcw   },
-  { id: 'warranty',         number: '6', title: 'Warranty',                 icon: ShieldCheck  },
-  { id: 'liability',        number: '7', title: 'Limitation of Liability',  icon: AlertCircle  },
-  { id: 'governing-law',    number: '8', title: 'Governing Law',            icon: Globe        },
-  { id: 'contact',          number: '9', title: 'Contact Us',               icon: Phone        },
+  { id: 'returns-window',      number: '1', title: 'Returns Window',        icon: RefreshCcw   },
+  { id: 'defective-products',  number: '2', title: 'Defective Products',    icon: ShieldCheck  },
+  { id: 'how-to-return',       number: '3', title: 'How to Return an Item', icon: ClipboardList },
+  { id: 'refund-method',       number: '4', title: 'Refund Method',         icon: CreditCard   },
+  { id: 'non-returnable',      number: '5', title: 'Non-Returnable Items',  icon: XCircle      },
+  { id: 'return-shipping',     number: '6', title: 'Return Shipping Costs', icon: Truck        },
+  { id: 'contact',             number: '7', title: 'Contact Us',            icon: Phone        },
 ]
 
 function SectionHeading({ id, number, title, icon: Icon }: Section) {
@@ -51,6 +51,17 @@ function Bullet({ children }: { children: React.ReactNode }) {
   )
 }
 
+function NumberedStep({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3 text-white/70 text-sm leading-relaxed">
+      <span className="mt-0.5 w-5 h-5 rounded-full bg-[#E63939]/15 border border-[#E63939]/30 flex items-center justify-center text-[10px] font-bold text-[#E63939] flex-shrink-0">
+        {n}
+      </span>
+      <span>{children}</span>
+    </li>
+  )
+}
+
 function Note({ children }: { children: React.ReactNode }) {
   return (
     <div className="mt-4 rounded-xl border border-[#E63939]/25 bg-[#E63939]/5 px-5 py-4 text-sm text-white/70 leading-relaxed">
@@ -59,19 +70,18 @@ function Note({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function Terms() {
+export function RefundPolicy() {
   return (
     <div className="min-h-screen bg-[#0F172A]">
       <SEO
-        title="Terms & Conditions | CW Electronics"
-        description="Terms and conditions for shopping at CW Electronics. Covers pricing, orders, payment, delivery, returns, warranty, and governing law."
-        url="https://cw-electronics.co.za/terms"
+        title="Refund & Returns Policy | CW Electronics"
+        description="7-day return window, 6-month warranty on defects, and full refund process. CW Electronics complies with the South African Consumer Protection Act."
+        url="https://cw-electronics.co.za/refund-policy"
       />
       <Navbar />
 
-      {/* Page hero */}
+      {/* Hero */}
       <section className="relative bg-[#0B1120] border-b border-white/5 overflow-hidden">
-        {/* Subtle dot pattern */}
         <div
           aria-hidden
           className="absolute inset-0 opacity-[0.04]"
@@ -80,35 +90,28 @@ export function Terms() {
             backgroundSize: '28px 28px',
           }}
         />
-        {/* Red glow */}
         <div aria-hidden className="absolute -top-24 -right-24 w-72 h-72 bg-[#E63939]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <p className="text-[#E63939] text-xs font-bold uppercase tracking-widest mb-3">
-            Legal
-          </p>
+          <p className="text-[#E63939] text-xs font-bold uppercase tracking-widest mb-3">Legal</p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4 text-balance leading-tight">
-            Terms &amp; Conditions
+            Refund &amp; Returns Policy
           </h1>
           <p className="text-white/55 text-sm sm:text-base max-w-xl text-pretty">
-            By using cw-electronics.co.za and placing an order, you agree to the following terms.
+            We want you to be completely satisfied with your purchase. This policy is in full
+            compliance with the South African Consumer Protection Act (CPA).
           </p>
-          <p className="text-white/30 text-xs mt-5 font-medium">
-            Last updated: {LAST_UPDATED}
-          </p>
+          <p className="text-white/30 text-xs mt-5 font-medium">Last updated: {LAST_UPDATED}</p>
         </div>
       </section>
 
-      {/* Table of contents — visible on larger screens as sticky sidebar, inline on mobile */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
         <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-14 xl:gap-20">
 
           {/* Sticky sidebar TOC */}
           <aside className="hidden lg:block">
             <div className="sticky top-24">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-4">
-                Contents
-              </p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-4">Contents</p>
               <nav className="space-y-1">
                 {SECTIONS.map(({ id, number, title }) => (
                   <a
@@ -126,7 +129,7 @@ export function Terms() {
 
               <div className="mt-8 p-4 rounded-xl bg-white/3 border border-white/8">
                 <p className="text-xs text-white/50 leading-relaxed">
-                  Questions about our policies? Chat with us on WhatsApp for a quick response.
+                  Need to start a return? WhatsApp us for the quickest response.
                 </p>
                 <a
                   href={WA_LINK}
@@ -148,109 +151,104 @@ export function Terms() {
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
 
-            {/* 1. Products & Pricing */}
+            {/* 1. Returns Window */}
             <section>
               <SectionHeading {...SECTIONS[0]} />
+              <p className="text-sm text-white/70 leading-relaxed mb-4">
+                You may return any unused product within <strong className="text-white">7 days of receipt</strong> for
+                a refund or exchange, provided that:
+              </p>
               <ul className="space-y-3">
-                <Bullet>All prices are displayed in South African Rand (ZAR)</Bullet>
-                <Bullet>Product images are for illustrative purposes; actual products may vary slightly</Bullet>
-                <Bullet>We reserve the right to change prices at any time</Bullet>
-                <Bullet>While we do our best to keep stock levels accurate, availability cannot be guaranteed at all times</Bullet>
+                <Bullet>The item is in its original, unopened packaging</Bullet>
+                <Bullet>All accessories, manuals, and documentation are included</Bullet>
+                <Bullet>The item has not been used, damaged, or tampered with</Bullet>
+                <Bullet>You have proof of purchase (order number or invoice)</Bullet>
               </ul>
             </section>
 
             <hr className="border-white/8" />
 
-            {/* 2. Orders */}
+            {/* 2. Defective Products */}
             <section>
               <SectionHeading {...SECTIONS[1]} />
-              <ul className="space-y-3">
-                <Bullet>Orders are subject to acceptance and stock availability</Bullet>
-                <Bullet>We reserve the right to cancel any order due to pricing errors, stock issues, or suspected fraudulent activity</Bullet>
-                <Bullet>A full refund will be issued for any cancelled order</Bullet>
-              </ul>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 3. Payment */}
-            <section>
-              <SectionHeading {...SECTIONS[2]} />
-              <ul className="space-y-3 mb-4">
-                <Bullet>Payment is required in full before dispatch</Bullet>
-                <Bullet>We accept card payments, EFT, and instant EFT via <strong className="text-white">Paystack</strong></Bullet>
-                <Bullet>All payment data is processed securely by Paystack — we do not store card details</Bullet>
-              </ul>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 4. Delivery */}
-            <section>
-              <SectionHeading {...SECTIONS[3]} />
               <p className="text-sm text-white/70 leading-relaxed mb-4">
-                For full delivery details, options, and estimated times, please see our{' '}
-                <Link to="/shipping-policy" className="text-[#E63939] underline underline-offset-2 hover:text-red-400 transition-colors">
-                  Shipping Policy
-                </Link>.
-              </p>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 5. Returns */}
-            <section>
-              <SectionHeading {...SECTIONS[4]} />
-              <p className="text-sm text-white/70 leading-relaxed mb-4">
-                For our full returns process, please see our{' '}
-                <Link to="/refund-policy" className="text-[#E63939] underline underline-offset-2 hover:text-red-400 transition-colors">
-                  Refund &amp; Returns Policy
-                </Link>.
-              </p>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 6. Warranty */}
-            <section>
-              <SectionHeading {...SECTIONS[5]} />
-              <p className="text-sm text-white/70 leading-relaxed">
                 All products carry a <strong className="text-white">6-month warranty</strong> against
                 manufacturing defects, in line with the South African Consumer Protection Act.
               </p>
+              <p className="text-sm text-white/70 leading-relaxed">
+                If you receive a defective product, contact us within 7 days of receipt. We will
+                arrange a repair, replacement, or full refund at no cost to you.
+              </p>
             </section>
 
             <hr className="border-white/8" />
 
-            {/* 7. Liability */}
+            {/* 3. How to Return */}
+            <section>
+              <SectionHeading {...SECTIONS[2]} />
+              <ol className="space-y-4">
+                <NumberedStep n={1}>
+                  Email us at{' '}
+                  <a href={`mailto:${EMAIL}`} className="text-[#E63939] underline underline-offset-2">
+                    {EMAIL}
+                  </a>{' '}
+                  with your order number and reason for return
+                </NumberedStep>
+                <NumberedStep n={2}>
+                  We will respond within 1–2 business days with return instructions
+                </NumberedStep>
+                <NumberedStep n={3}>
+                  Ship the item back, or drop it off at our store (Shop C15, China Mart, Crown Mines)
+                </NumberedStep>
+                <NumberedStep n={4}>
+                  Once received and inspected, we will process your refund within 5–10 business days
+                </NumberedStep>
+              </ol>
+            </section>
+
+            <hr className="border-white/8" />
+
+            {/* 4. Refund Method */}
+            <section>
+              <SectionHeading {...SECTIONS[3]} />
+              <p className="text-sm text-white/70 leading-relaxed">
+                Refunds are issued via the same method used for the original payment. Card payments
+                are refunded to the original card, and EFT payments are refunded by bank transfer.
+              </p>
+            </section>
+
+            <hr className="border-white/8" />
+
+            {/* 5. Non-Returnable */}
+            <section>
+              <SectionHeading {...SECTIONS[4]} />
+              <p className="text-sm text-white/70 leading-relaxed mb-4">
+                The following cannot be returned, for hygiene or safety reasons:
+              </p>
+              <ul className="space-y-3">
+                <Bullet>Items that have been opened, used, or installed</Bullet>
+                <Bullet>Products with broken seals or removed packaging</Bullet>
+                <Bullet>Items damaged by misuse, accident, or improper handling</Bullet>
+                <Bullet>Clearance or final-sale items (clearly marked at time of purchase)</Bullet>
+              </ul>
+            </section>
+
+            <hr className="border-white/8" />
+
+            {/* 6. Return Shipping */}
+            <section>
+              <SectionHeading {...SECTIONS[5]} />
+              <ul className="space-y-3">
+                <Bullet>If the return is due to a defect, damage, or our error, we cover the return shipping</Bullet>
+                <Bullet>For change-of-mind returns, the customer is responsible for the return shipping cost</Bullet>
+              </ul>
+            </section>
+
+            <hr className="border-white/8" />
+
+            {/* 7. Contact */}
             <section>
               <SectionHeading {...SECTIONS[6]} />
-              <p className="text-sm text-white/70 leading-relaxed">
-                CW Electronics is not liable for any indirect, incidental, or consequential damages
-                arising from the use of our products or website.
-              </p>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 8. Governing Law */}
-            <section>
-              <SectionHeading {...SECTIONS[7]} />
-              <p className="text-sm text-white/70 leading-relaxed">
-                These terms are governed by the laws of the Republic of South Africa.
-              </p>
-            </section>
-
-            <hr className="border-white/8" />
-
-            {/* 9. Contact Us */}
-            <section id="contact">
-              <SectionHeading {...SECTIONS[8]} />
-              <p className="text-sm text-white/70 leading-relaxed mb-5">
-                If you have any questions about these terms, your order, or our policies, please reach
-                out through any of the channels below. We aim to respond within one business day.
-              </p>
-
               <div className="grid sm:grid-cols-2 gap-4">
                 <a
                   href={WA_LINK}
@@ -300,14 +298,20 @@ export function Terms() {
               </div>
             </section>
 
-            {/* Back to home */}
-            <div className="pt-4 pb-2">
+            {/* Back links */}
+            <div className="pt-4 pb-2 flex flex-wrap gap-6">
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white/60 hover:text-white transition-colors group"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 Back to Home
+              </Link>
+              <Link
+                to="/terms"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white/60 hover:text-white transition-colors"
+              >
+                View Terms &amp; Conditions
               </Link>
             </div>
 

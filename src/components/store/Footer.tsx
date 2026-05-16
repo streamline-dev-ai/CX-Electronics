@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className="bg-[#0F172A] text-white border-t border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-14 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -58,10 +58,22 @@ export function Footer() {
               <li><Link to="/shop" className="hover:text-[#E63939] transition-colors">{t('shop')}</Link></li>
               <li><Link to="/wholesale" className="hover:text-[#E63939] transition-colors">{t('bulk')}</Link></li>
               <li><Link to="/about" className="hover:text-[#E63939] transition-colors">About &amp; Contact</Link></li>
-              <li><Link to="/terms" className="hover:text-[#E63939] transition-colors">Terms &amp; Returns Policy</Link></li>
               <li><Link to="/shop?category=chargers" className="hover:text-[#E63939] transition-colors">Chargers &amp; Cables</Link></li>
               <li><Link to="/shop?category=cctv" className="hover:text-[#E63939] transition-colors">CCTV &amp; Security</Link></li>
               <li><Link to="/shop?category=solar" className="hover:text-[#E63939] transition-colors">Solar Lighting</Link></li>
+            </ul>
+          </div>
+
+          {/* Customer Service */}
+          <div>
+            <h3 className="font-semibold text-sm mb-4 text-white uppercase tracking-wider">
+              Customer Service
+            </h3>
+            <ul className="space-y-2.5 text-sm text-slate-400">
+              <li><Link to="/shipping-policy" className="hover:text-[#E63939] transition-colors">Shipping Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-[#E63939] transition-colors">Refund Policy</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-[#E63939] transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-[#E63939] transition-colors">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
 
@@ -106,7 +118,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#E63939]" />
-                <span>Mon - Sat: 09:00 - 15:00<br />Closed Sundays</span>
+                <span>Mon - Sun: 09:00 - 15:00<br />Open every day</span>
               </li>
             </ul>
           </div>
