@@ -51,14 +51,6 @@ function Bullet({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Note({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mt-4 rounded-xl border border-[#E63939]/25 bg-[#E63939]/5 px-5 py-4 text-sm text-white/70 leading-relaxed">
-      {children}
-    </div>
-  )
-}
-
 export function Terms() {
   return (
     <div className="min-h-screen bg-[#0F172A]">

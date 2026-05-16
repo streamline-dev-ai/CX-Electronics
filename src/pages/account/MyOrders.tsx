@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Package, Loader2, FileText } from 'lucide-react'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
-import { supabase } from '../../lib/supabase'
+import { customerSupabase } from '../../lib/customerAuth'
 
 interface OrderRow {
   id: string
@@ -52,15 +52,18 @@ export function MyOrders() {
   async function fetchOrders(email: string) {
     setLoading(true)
 
-    // Look up customer record by email, then fetch their orders
-    const { data: customer } = await supabase
+    // Look up customer record by email, then fetch their orders.
+    // Uses the authenticated customer client — RLS on `customers`/`orders`
+    // requires auth.role() = 'authenticated', so the anon admin client
+    // would silently return nothing here.
+    const { data: customer } = await customerSupabase
       .from('customers')
       .select('id')
       .eq('email', email)
-      .single()
+      .maybeSingle()
 
     if (customer?.id) {
-      const { data } = await supabase
+      const { data } = await customerSupabase
         .from('orders')
         .select('id, order_number, status, payment_status, total, created_at, order_type, fulfillment_type')
         .eq('customer_id', customer.id)

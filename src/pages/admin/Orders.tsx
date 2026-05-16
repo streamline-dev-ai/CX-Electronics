@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X, Trash2, Loader2 } from 'lucide-react'
-import { useOrders, updateOrderStatus, deleteOrder } from '../../hooks/useOrders'
+import { ChevronLeft, ChevronRight, ShoppingCart, Truck, Store, ChevronRight as ArrowNext, FileText, Search, X, Trash2, Loader2, CheckCircle2 } from 'lucide-react'
+import { useOrders, updateOrderStatus, markOrderPaid, deleteOrder } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
 import { useAdminLang } from '../../context/AdminLangContext'
 import type { OrderStatus, OrderWithDetails } from '../../lib/supabase'
@@ -80,6 +80,32 @@ export function AdminOrders() {
       refetch()
     }
     setAdvancing(null)
+  }
+
+  async function confirmPayment(order: OrderWithDetails) {
+    const promptMsg = lang === 'zh'
+      ? `确认订单 ${order.order_number} 的付款？\n\n(可选) 输入银行参考号码：`
+      : `Confirm payment for ${order.order_number}?\n\n(Optional) Enter the bank reference seen on your statement:`
+    const ref = window.prompt(promptMsg, order.payment_reference ?? '')
+    // Cancelled
+    if (ref === null) return
+
+    setAdvancing(order.id)
+    const { error } = await markOrderPaid(order.id, ref || undefined)
+    if (error) {
+      setToast(`Failed: ${error}`)
+    } else {
+      // Fire the status-change webhook so the customer gets the "payment received" email.
+      notifyStatusChange(
+        { ...order, status: 'paid', payment_status: 'paid' },
+        order.status,
+        'paid',
+      )
+      setToast(lang === 'zh' ? `${order.order_number} 已标记为已付款` : `${order.order_number} marked as paid`)
+      refetch()
+    }
+    setAdvancing(null)
+    setTimeout(() => setToast(null), 3500)
   }
 
   async function handleDelete(order: OrderWithDetails) {
@@ -179,6 +205,7 @@ export function AdminOrders() {
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Customer</th>
                   <th className="px-3 py-3 text-center font-medium text-gray-600">Via</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-600 whitespace-nowrap">Total</th>
+                  <th className="px-3 py-3 text-center font-medium text-gray-600">Payment</th>
                   <th className="px-4 py-3 text-center font-medium text-gray-600">Status</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600 whitespace-nowrap">Date</th>
                   <th className="px-4 py-3 text-right font-medium text-gray-600">Actions</th>
@@ -218,6 +245,21 @@ export function AdminOrders() {
                     <td className="px-4 py-3 text-right font-medium text-gray-900 whitespace-nowrap">
                       R{order.total.toFixed(2)}
                     </td>
+                    <td className="px-3 py-3 text-center">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                        order.payment_status === 'paid'
+                          ? 'bg-green-100 text-green-700'
+                          : order.payment_status === 'refunded'
+                            ? 'bg-gray-100 text-gray-600'
+                            : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {order.payment_status === 'paid'
+                          ? (lang === 'zh' ? '已付款' : 'Paid')
+                          : order.payment_status === 'refunded'
+                            ? (lang === 'zh' ? '已退款' : 'Refunded')
+                            : (lang === 'zh' ? '待付款' : 'Unpaid')}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${STATUS_STYLES[order.status]}`}>
                         {fmt(order.status)}
@@ -237,7 +279,20 @@ export function AdminOrders() {
                         >
                           <FileText className="w-4 h-4" />
                         </Link>
-                        {next && (
+                        {order.payment_status === 'unpaid' ? (
+                          <button
+                            onClick={() => confirmPayment(order)}
+                            disabled={isAdvancing}
+                            title={lang === 'zh' ? '标记为已付款' : 'Mark as Paid'}
+                            className="flex items-center gap-1 text-xs font-semibold px-2 py-1.5 rounded-lg
+                              bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-60 whitespace-nowrap"
+                          >
+                            {isAdvancing
+                              ? <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                              : <CheckCircle2 className="w-3 h-3" />}
+                            <span className="hidden sm:inline">{lang === 'zh' ? '已付款' : 'Mark Paid'}</span>
+                          </button>
+                        ) : next && (
                           <button
                             onClick={() => advanceOrder(order, next)}
                             disabled={isAdvancing}

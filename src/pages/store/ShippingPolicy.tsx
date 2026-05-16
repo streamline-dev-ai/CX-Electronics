@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
-  ArrowLeft, Truck, MapPin, Clock, Package,
+  ArrowLeft, Truck, MapPin, Package,
   AlertTriangle, BarChart2, AlertCircle,
 } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'

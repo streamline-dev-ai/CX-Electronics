@@ -5,7 +5,33 @@ import {
   CheckCircle2, Circle, Truck, Store,
 } from 'lucide-react'
 import { getOrder } from '../../hooks/useOrders'
+import { customerSupabase } from '../../lib/customerAuth'
 import type { OrderWithDetails, OrderStatus } from '../../lib/supabase'
+
+const ACCOUNT_ORDER_SELECT = `
+  id, order_number, customer_id, order_type, status,
+  fulfillment_type, collection_name, collection_phone,
+  subtotal, shipping_fee, total,
+  shipping_address, notes, payment_method, payment_status, payment_reference,
+  created_at, updated_at,
+  customers ( id, name, email, phone ),
+  order_items ( id, product_name, quantity, unit_price, line_total, thumbnail_url ),
+  order_status_events ( id, status, note, triggered_by, created_at )
+`
+
+// Fetch via the authenticated customer client so RLS
+// (auth.role() = 'authenticated') is satisfied — works on any device,
+// not just the one the order was placed on.
+async function getOrderForCustomer(orderId: string): Promise<OrderWithDetails | null> {
+  const { data, error } = await customerSupabase
+    .from('orders')
+    .select(ACCOUNT_ORDER_SELECT)
+    .eq('id', orderId)
+    .order('created_at', { referencedTable: 'order_status_events', ascending: true })
+    .maybeSingle()
+  if (error || !data) return null
+  return data as unknown as OrderWithDetails
+}
 
 const LOCAL_ORDERS_KEY = 'cxx-local-orders'
 
@@ -53,21 +79,27 @@ export function AccountOrderDetail() {
   useEffect(() => {
     if (!id) return
 
+    let cancelled = false
+
+    // Instant paint from the copy saved at checkout (same device).
     try {
       const stored: Record<string, OrderWithDetails> = JSON.parse(
         localStorage.getItem(LOCAL_ORDERS_KEY) ?? '{}',
       )
-      if (stored[id]) {
-        setOrder(stored[id])
-        setLoading(false)
-        return
-      }
+      if (stored[id]) setOrder(stored[id])
     } catch { /* fall through */ }
 
-    getOrder(id).then((o) => {
-      setOrder(o)
+    // Authoritative fetch via the authenticated customer client (works
+    // cross-device); fall back to the shared anon fetch as a last resort.
+    ;(async () => {
+      let fresh = await getOrderForCustomer(id)
+      if (!fresh) fresh = await getOrder(id)
+      if (cancelled) return
+      if (fresh) setOrder(fresh)
       setLoading(false)
-    })
+    })()
+
+    return () => { cancelled = true }
   }, [id])
 
   if (loading) {
@@ -217,7 +249,7 @@ export function AccountOrderDetail() {
           <div className="text-sm text-white/70 space-y-0.5">
             <p className="font-semibold text-white">China Mart, Shop C15</p>
             <p>3 Press Avenue, Crown Mines, Johannesburg</p>
-            <p className="text-white/40 text-xs mt-1">Mon–Sat 09:00–15:00</p>
+            <p className="text-white/40 text-xs mt-1">Mon–Sun 09:00–15:00</p>
             {order.collection_name && (
               <p className="text-white/50 text-xs">Collecting: {order.collection_name}</p>
             )}

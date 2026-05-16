@@ -2,9 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import {
   ShoppingCart, Menu, X, Search, Heart, User, ChevronDown, MessageCircle,
+  Package, LogOut, LogIn,
 } from 'lucide-react'
 import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
+import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { useCategories } from '../../hooks/useCategories'
 import { CartDrawer } from './CartDrawer'
 import { NavbarSearch } from './NavbarSearch'
@@ -39,11 +41,16 @@ export function Navbar() {
   const { itemCount, openCart } = useCart()
   const { ids: wishlistIds } = useWishlist()
   const { categories } = useCategories()
+  const { user, signOut } = useCustomerAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [catsOpen, setCatsOpen] = useState(false)
+  const [acctOpen, setAcctOpen] = useState(false)
   const catsRef = useRef<HTMLDivElement>(null)
+  const acctRef = useRef<HTMLDivElement>(null)
   const scrolled = useScrolled(8)
+
+  const firstName = user?.name?.trim().split(/\s+/)[0] || 'Account'
 
   const navCategories = categories.map((c) => ({
     slug: c.slug,
@@ -55,6 +62,9 @@ export function Navbar() {
     const onClick = (e: MouseEvent) => {
       if (catsRef.current && !catsRef.current.contains(e.target as Node)) {
         setCatsOpen(false)
+      }
+      if (acctRef.current && !acctRef.current.contains(e.target as Node)) {
+        setAcctOpen(false)
       }
     }
     document.addEventListener('mousedown', onClick)
@@ -170,13 +180,55 @@ export function Navbar() {
               )}
             </Link>
 
-            <Link
-              to="/account/login"
-              aria-label="My Account"
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <User className="w-5 h-5" />
-            </Link>
+            {user ? (
+              <div ref={acctRef} className="relative">
+                <button
+                  onClick={() => setAcctOpen((v) => !v)}
+                  className="flex items-center gap-1.5 p-2 pr-2.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                  aria-label="My Account"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-sm font-medium max-w-[7rem] truncate">{firstName}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${acctOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {acctOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-60 bg-slate-800 rounded-xl border border-slate-700 p-2 z-50 shadow-2xl">
+                    <div className="px-3 py-2 mb-1 border-b border-slate-700">
+                      <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mb-0.5">Signed in as</p>
+                      <p className="text-sm font-semibold text-white truncate">{user.email}</p>
+                    </div>
+                    <Link to="/account/profile" onClick={() => setAcctOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-slate-200 hover:bg-slate-700 transition-colors">
+                      <User className="w-4 h-4" /> Profile
+                    </Link>
+                    <Link to="/account/orders" onClick={() => setAcctOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-slate-200 hover:bg-slate-700 transition-colors">
+                      <Package className="w-4 h-4" /> My Orders
+                    </Link>
+                    <Link to="/account/wishlist" onClick={() => setAcctOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-slate-200 hover:bg-slate-700 transition-colors">
+                      <Heart className="w-4 h-4" /> Wishlist
+                    </Link>
+                    <button
+                      onClick={() => { setAcctOpen(false); signOut() }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 mt-1 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-700 transition-colors border-t border-slate-700"
+                    >
+                      <LogOut className="w-4 h-4" /> Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/account/login"
+                aria-label="Sign in"
+                className="flex items-center gap-1.5 p-2 pr-2.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <User className="w-5 h-5" />
+                <span className="text-sm font-medium">Sign in</span>
+              </Link>
+            )}
 
             <button
               onClick={openCart}
@@ -278,14 +330,44 @@ export function Navbar() {
               ))}
             </div>
 
-            <Link
-              to="/account/login"
-              onClick={() => setMobileOpen(false)}
-              className="mt-4 flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
-            >
-              <User className="w-4 h-4" />
-              My Account
-            </Link>
+            {user ? (
+              <div className="mt-4 space-y-2">
+                <div className="px-1">
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Signed in as</p>
+                  <p className="text-sm font-semibold text-white truncate">{user.email}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Link to="/account/profile" onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center gap-1 py-3 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200">
+                    <User className="w-4 h-4" /> Profile
+                  </Link>
+                  <Link to="/account/orders" onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center gap-1 py-3 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200">
+                    <Package className="w-4 h-4" /> Orders
+                  </Link>
+                  <Link to="/account/wishlist" onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center gap-1 py-3 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200">
+                    <Heart className="w-4 h-4" /> Wishlist
+                  </Link>
+                </div>
+                <button
+                  onClick={() => { setMobileOpen(false); signOut() }}
+                  className="flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-300 text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/account/login"
+                onClick={() => setMobileOpen(false)}
+                className="mt-4 flex items-center justify-center gap-2 bg-slate-800 border border-slate-700 hover:border-slate-500 text-slate-200 text-sm font-semibold px-4 py-3 rounded-lg w-full transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Sign in
+              </Link>
+            )}
 
             <p className="mt-4 mb-2 text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
               Categories

@@ -4,6 +4,13 @@ import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App'
 import { LoadingScreen } from './components/LoadingScreen'
+import { isStandalone } from './lib/pwaInstall'
+
+// Installed PWA must never land on a public route. If launched standalone
+// outside /admin/*, replace history to /admin/login before React mounts.
+if (isStandalone() && !window.location.pathname.startsWith('/admin')) {
+  window.location.replace('/admin/login')
+}
 
 function Root() {
   const [ready, setReady] = useState(false)

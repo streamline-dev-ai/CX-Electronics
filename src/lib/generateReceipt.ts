@@ -193,7 +193,7 @@ export function getReceiptHTMLString(order: OrderWithDetails): string {
             <strong style="color:#374151;">CW Electronics</strong><br />
             China Mart, Shop C15, 3 Press Avenue<br />
             Crown Mines, Johannesburg, 2092<br />
-            Mon–Sat · 09:00–15:00
+            Mon–Sun · 09:00–15:00
           </p>
         </td>
         <td style="vertical-align:top;text-align:right;">

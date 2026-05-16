@@ -339,8 +339,8 @@ export function About() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                   <div>
-                    <div className="font-semibold">Mon – Sat</div>
-                    <div className="text-white/60">09:00 – 15:00 · Closed Sundays</div>
+                    <div className="font-semibold">Open every day</div>
+                    <div className="text-white/60">09:00 – 15:00 · Mon – Sun</div>
                   </div>
                 </div>
               </div>
@@ -602,9 +602,9 @@ export function About() {
                       Business Hours
                     </div>
                     <div className="text-sm font-semibold text-[#0F172A] leading-relaxed">
-                      Mon – Sat: 09:00 – 15:00
+                      Mon – Sun: 09:00 – 15:00
                       <br />
-                      <span className="text-gray-500">Closed Sundays</span>
+                      <span className="text-gray-500">Open every day</span>
                     </div>
                   </div>
                 </div>

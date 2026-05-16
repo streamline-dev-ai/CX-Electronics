@@ -1,10 +1,12 @@
 import type { OrderWithDetails } from '../lib/supabase'
+import type { BankingDetails } from '../lib/banking'
 
 const NAVY   = '#0B1929'
 const RED    = '#E63939'
 const DARK   = '#111827'
 const LOGO   = 'https://res.cloudinary.com/dzhwylkfr/image/upload/v1777722832/CW-Logo_ujfdip.png'
 const SITE   = 'https://cw-electronics.co.za'
+const WA     = 'https://wa.me/27649533333'
 
 function wrap(body: string): string {
   return `<!DOCTYPE html>
@@ -244,7 +246,7 @@ export function orderPackedCollection(order: OrderWithDetails): string {
         <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:1px;">Collection Details</p>
         <p style="margin:0;font-size:15px;font-weight:700;color:#111827;">China Mart, Shop C15</p>
         <p style="margin:4px 0 0;font-size:14px;color:#374151;">3 Press Avenue, Crown Mines, Johannesburg</p>
-        <p style="margin:4px 0 0;font-size:13px;color:#64748B;">Mon–Sat 09:00–15:00</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#64748B;">Mon–Sun 09:00–15:00</p>
         ${order.collection_name ? `<p style="margin:10px 0 0;font-size:13px;color:#64748B;">Collector: <strong>${order.collection_name}</strong></p>` : ''}
       </div>
       <div style="background:#FEF9C3;border:1px solid #FDE68A;padding:14px 20px;margin-bottom:24px;">
@@ -400,6 +402,103 @@ export function orderCancelled(order: OrderWithDetails): string {
         Questions? <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;">info@cw-electronics.co.za</a>
       </p>
     </td></tr>`
+  return wrap(body)
+}
+
+// ─── Template: Awaiting EFT Payment (customer) ───────────────────────────────
+
+export function orderPlacedAwaitingPayment(order: OrderWithDetails, banking: BankingDetails): string {
+  const name = order.customers?.name ?? 'Customer'
+  const reference = order.payment_reference ?? order.order_number
+
+  const bankingRows = [
+    { label: 'Bank',           value: banking.bank },
+    { label: 'Account Holder', value: banking.accountHolder },
+    { label: 'Account Number', value: banking.accountNumber },
+    { label: 'Branch Code',    value: banking.branchCode },
+    { label: 'Account Type',   value: banking.accountType },
+  ].map((r, i, arr) => `
+    <tr>
+      <td style="padding:12px 24px;border-bottom:${i === arr.length - 1 ? 'none' : '1px solid #E5E7EB'};font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">${r.label}</td>
+      <td style="padding:12px 24px;border-bottom:${i === arr.length - 1 ? 'none' : '1px solid #E5E7EB'};font-size:15px;font-weight:700;color:#0F172A;text-align:right;font-family:ui-monospace,Menlo,monospace;">${r.value}</td>
+    </tr>`).join('')
+
+  const body = `
+    <tr><td style="padding:36px 40px 12px;">
+      <h1 style="margin:0 0 8px;font-size:26px;color:#111827;">Order received — please make payment</h1>
+      <p style="margin:0 0 6px;font-size:16px;color:#4B5563;">订单已收到 — 请付款</p>
+      <p style="margin:14px 0 6px;font-size:15px;line-height:1.6;color:#374151;">
+        Hi ${name}, thank you for ordering with CW Electronics. Your order
+        <strong>#${order.order_number}</strong> is reserved. To complete your
+        purchase, please make payment using the banking details below.
+      </p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#64748B;">
+        您好 ${name}，感谢您在 CW Electronics 下单。订单 <strong>#${order.order_number}</strong>
+        已保留。请使用以下银行详情完成付款。
+      </p>
+    </td></tr>
+
+    <!-- Amount due — big and clear -->
+    <tr><td style="padding:18px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#0F172A;border-radius:0;">
+        <tr>
+          <td style="padding:18px 24px;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;">Amount to pay / 应付金额</td>
+          <td style="padding:18px 24px;color:#fff;font-size:24px;font-weight:800;text-align:right;">R${order.total.toFixed(2)}</td>
+        </tr>
+      </table>
+    </td></tr>
+
+    <!-- Banking details table -->
+    <tr><td style="padding:18px 40px 0;">
+      <p style="margin:0 0 10px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;">Banking Details / 银行详情</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#FAFAFB;border:1px solid #E5E7EB;border-collapse:collapse;">
+        ${bankingRows}
+      </table>
+    </td></tr>
+
+    <!-- Reference highlight -->
+    <tr><td style="padding:18px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#FEF9C3;border:2px solid #FACC15;border-collapse:collapse;">
+        <tr><td style="padding:18px 24px;">
+          <p style="margin:0 0 4px;font-size:11px;font-weight:800;color:#854D0E;text-transform:uppercase;letter-spacing:0.12em;">⚠ Use this exact reference / 请使用此参考号码</p>
+          <p style="margin:6px 0 0;font-size:24px;font-weight:800;color:#0F172A;font-family:ui-monospace,Menlo,monospace;letter-spacing:0.04em;">${reference}</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#854D0E;">
+            Without the correct reference we can't match your payment to your order.<br>
+            没有正确的参考号码我们无法将付款与订单匹配。
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    ${itemsTable(order)}
+
+    <tr><td style="padding:0 40px 8px;">
+      ${fulfillmentBlock(order)}
+    </td></tr>
+
+    <!-- What happens next -->
+    <tr><td style="padding:0 40px 24px;">
+      <p style="margin:0 0 10px;font-size:12px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;">What happens next</p>
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#374151;"><strong>1.</strong> &nbsp;Pay R${order.total.toFixed(2)} via EFT using the reference above</td></tr>
+        <tr><td style="padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#374151;"><strong>2.</strong> &nbsp;We confirm payment during trading hours (Mon–Sun 09:00–15:00 SAST)</td></tr>
+        <tr><td style="padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:14px;color:#374151;"><strong>3.</strong> &nbsp;You receive a "payment confirmed" email</td></tr>
+        <tr><td style="padding:8px 0;font-size:14px;color:#374151;"><strong>4.</strong> &nbsp;We pack and ship your order</td></tr>
+      </table>
+    </td></tr>
+
+    <!-- Footer info -->
+    <tr><td style="padding:0 40px 36px;text-align:center;">
+      <p style="margin:0 0 10px;font-size:13px;color:#64748B;">
+        Questions? <a href="${WA}" style="color:${RED};text-decoration:none;font-weight:600;">Message us on WhatsApp</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:info@cw-electronics.co.za" style="color:${RED};text-decoration:none;font-weight:600;">info@cw-electronics.co.za</a>
+      </p>
+      <p style="margin:0;font-size:12px;color:#94A3B8;">
+        Payments made outside trading hours will be confirmed the next business day.
+      </p>
+    </td></tr>`
+
   return wrap(body)
 }
 

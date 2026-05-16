@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft, Loader2, Truck, Store, CheckCircle2, XCircle,
-  FileText, Download, Bell, User, MapPin, Package, Trash2,
+  FileText, Download, Bell, User, MapPin, Package, Trash2, Landmark,
 } from 'lucide-react'
-import { getOrder, updateOrderStatus, deleteOrder } from '../../hooks/useOrders'
+import { getOrder, updateOrderStatus, markOrderPaid, deleteOrder } from '../../hooks/useOrders'
 import { notifyStatusChange } from '../../lib/webhooks'
 import type { OrderWithDetails, OrderStatus } from '../../lib/supabase'
 
@@ -72,6 +72,29 @@ export function AdminOrderDetail() {
     notifyStatusChange({ ...order, status: newStatus }, prev, newStatus)
     getOrder(order.id).then((o) => { if (o) setOrder(o) })
     showToast(`Marked as ${fmt(newStatus)}`, true)
+    setUpdating(false)
+  }
+
+  async function confirmPayment() {
+    if (!order) return
+    const ref = window.prompt(
+      `Confirm payment for ${order.order_number}?\n\n(Optional) Enter the bank reference seen on your statement:`,
+      order.payment_reference ?? '',
+    )
+    if (ref === null) return // cancelled
+
+    setUpdating(true)
+    const prev = order.status
+    const { error } = await markOrderPaid(order.id, ref || undefined)
+    if (error) { showToast(`Failed: ${error}`, false); setUpdating(false); return }
+
+    notifyStatusChange(
+      { ...order, status: 'paid', payment_status: 'paid' },
+      prev,
+      'paid',
+    )
+    getOrder(order.id).then((o) => { if (o) setOrder(o) })
+    showToast('Payment confirmed', true)
     setUpdating(false)
   }
 
@@ -175,8 +198,46 @@ export function AdminOrderDetail() {
         {/* ── Left column ─────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 space-y-5">
 
+          {/* Awaiting Payment — shown until admin confirms the EFT lands */}
+          {order.payment_status === 'unpaid' && !isTerminal && (
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-300 p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center flex-shrink-0">
+                  <Landmark className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">
+                    {order.payment_method === 'eft' ? 'Awaiting EFT' : 'Awaiting Payment'}
+                  </p>
+                  <p className="text-sm text-amber-900">
+                    Customer was shown the banking details and asked to use{' '}
+                    <span className="font-mono font-bold bg-white/60 px-1.5 py-0.5 rounded">
+                      {order.payment_reference ?? order.order_number}
+                    </span>{' '}
+                    as the reference.
+                  </p>
+                  <p className="text-xs text-amber-800 mt-1.5">
+                    Once you see the funds in Nedbank, click below — the customer gets an automatic
+                    "payment confirmed" email and the order moves into Processing.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={confirmPayment}
+                disabled={updating}
+                className="mt-4 w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm text-white
+                  bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 transition-all"
+              >
+                {updating
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <CheckCircle2 className="w-4 h-4" />}
+                Mark as Paid
+              </button>
+            </div>
+          )}
+
           {/* Next Step */}
-          {!isTerminal && (
+          {!isTerminal && order.payment_status === 'paid' && (
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>

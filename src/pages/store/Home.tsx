@@ -120,7 +120,7 @@ export function Home() {
 const FAQS = [
   {
     q: 'Where is CW Electronics located?',
-    a: "We're at China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092. Open Monday to Saturday, 09:00 – 15:00. Walk-ins welcome — bring your order number if collecting.",
+    a: "We're at China Mart, Shop C15, 3 Press Avenue, Crown Mines, Johannesburg, 2092. Open every day, 09:00 – 15:00. Walk-ins welcome — bring your order number if collecting.",
   },
   {
     q: 'Do you offer wholesale or trade pricing?',
@@ -908,7 +908,7 @@ function LocationSection() {
                 <Sparkles className="w-4 h-4 mt-0.5 text-[#E63939] flex-shrink-0" />
                 <div>
                   <div className="text-white/60 text-xs">Trading Hours</div>
-                  <div className="font-semibold">Mon – Sat: 09:00 – 15:00</div>
+                  <div className="font-semibold">Mon – Sun: 09:00 – 15:00</div>
                 </div>
               </div>
             </div>

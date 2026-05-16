@@ -20,19 +20,19 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['robots.txt'],
       manifest: {
-        name: 'CW Electronics',
-        short_name: 'CW Electronics',
-        description: 'Wholesale & Retail Electronics in Johannesburg — CCTV, solar, chargers, routers & more.',
-        theme_color: '#0a3d8a',
-        background_color: '#0f1117',
+        name: 'CW Electronics Admin',
+        short_name: 'CW Admin',
+        description: 'Admin panel for CW Electronics — orders, products, customers and messages.',
+        theme_color: '#0F172A',
+        background_color: '#0F172A',
         display: 'standalone',
         orientation: 'portrait-primary',
-        scope: '/',
-        // Installed PWA opens directly into the admin dashboard.
-        // If not signed in, ProtectedRoute bounces to /admin/login.
-        start_url: '/admin/dashboard',
+        // Scope locks the installed app to /admin/*. Manifest install is also
+        // password-gated at runtime (see src/lib/pwaInstall.ts).
+        scope: '/admin/',
+        start_url: '/admin/login',
         lang: 'en-ZA',
-        categories: ['shopping', 'business'],
+        categories: ['business', 'productivity'],
         icons: [
           { src: ICON_192, sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: ICON_512, sizes: '512x512', type: 'image/png', purpose: 'any' },
@@ -40,24 +40,24 @@ export default defineConfig({
         ],
         shortcuts: [
           {
-            name: 'Shop',
-            short_name: 'Shop',
-            description: 'Browse products',
-            url: '/shop',
-            icons: [{ src: ICON_192, sizes: '192x192', type: 'image/png' }],
-          },
-          {
-            name: 'My Account',
-            short_name: 'Account',
-            description: 'View orders and account',
-            url: '/account',
-            icons: [{ src: ICON_192, sizes: '192x192', type: 'image/png' }],
-          },
-          {
-            name: 'Admin Panel',
-            short_name: 'Admin',
-            description: 'Open the admin dashboard',
+            name: 'Dashboard',
+            short_name: 'Dashboard',
+            description: 'Admin dashboard',
             url: '/admin/dashboard',
+            icons: [{ src: ICON_192, sizes: '192x192', type: 'image/png' }],
+          },
+          {
+            name: 'Orders',
+            short_name: 'Orders',
+            description: 'Manage orders',
+            url: '/admin/orders',
+            icons: [{ src: ICON_192, sizes: '192x192', type: 'image/png' }],
+          },
+          {
+            name: 'Messages',
+            short_name: 'Messages',
+            description: 'Customer inbox',
+            url: '/admin/messages',
             icons: [{ src: ICON_192, sizes: '192x192', type: 'image/png' }],
           },
         ],

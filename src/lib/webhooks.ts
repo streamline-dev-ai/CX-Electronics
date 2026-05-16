@@ -1,6 +1,7 @@
 import type { OrderWithDetails, OrderStatus } from './supabase'
 import {
   orderPlacedCustomer,
+  orderPlacedAwaitingPayment,
   orderConfirmedCustomer,
   orderPackedDelivery,
   orderPackedCollection,
@@ -12,6 +13,7 @@ import {
   welcomeEmail,
 } from '../emails'
 import { getReceiptHTMLString } from './generateReceipt'
+import { BANKING_DETAILS } from './banking'
 
 const N8N_NEW_ORDER     = import.meta.env.VITE_N8N_NEW_ORDER as string | undefined
 const N8N_STATUS_CHANGE = import.meta.env.VITE_N8N_STATUS_CHANGE as string | undefined
@@ -86,12 +88,35 @@ export async function notifySignup(name: string, email: string): Promise<void> {
 }
 
 export async function notifyNewOrder(order: OrderWithDetails): Promise<void> {
+  const awaitingEft = order.payment_method === 'eft' && order.payment_status === 'unpaid'
+
+  const customerHtml = awaitingEft
+    ? orderPlacedAwaitingPayment(order, BANKING_DETAILS)
+    : orderPlacedCustomer(order)
+
+  const customerSubject = awaitingEft
+    ? `Order #${order.order_number} received — please make payment`
+    : `Order Received — #${order.order_number}`
+
+  const ownerSubject = awaitingEft
+    ? `New EFT order — #${order.order_number} · R${order.total.toFixed(2)} · awaiting payment`
+    : `New Order — #${order.order_number} · R${order.total.toFixed(2)}`
+
   await send(N8N_NEW_ORDER, {
     event: 'order_placed',
-    customer_email_subject: `Order Received — #${order.order_number}`,
-    customer_email_html: orderPlacedCustomer(order),
-    owner_email_subject: `New Order — #${order.order_number} · R${order.total.toFixed(2)}`,
+    awaiting_payment: awaitingEft,
+    customer_email_subject: customerSubject,
+    customer_email_html: customerHtml,
+    owner_email_subject: ownerSubject,
     owner_email_html: ownerNewOrder(order),
+    banking: awaitingEft ? {
+      bank: BANKING_DETAILS.bank,
+      account_holder: BANKING_DETAILS.accountHolder,
+      account_number: BANKING_DETAILS.accountNumber,
+      branch_code: BANKING_DETAILS.branchCode,
+      account_type: BANKING_DETAILS.accountType,
+      reference: order.payment_reference ?? order.order_number,
+    } : null,
     ...basePayload(order),
   })
 }

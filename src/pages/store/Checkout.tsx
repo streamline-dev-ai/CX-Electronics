@@ -1,18 +1,23 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Loader2, CheckCircle, Store, Truck, Zap } from 'lucide-react'
+import { ShoppingCart, Loader2, Landmark, Store, Truck, Zap, Clock } from 'lucide-react'
 import { Navbar } from '../../components/store/Navbar'
 import { Footer } from '../../components/store/Footer'
 import { useCart } from '../../context/CartContext'
 import { useLang } from '../../context/LangContext'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { supabase, type ShippingAddress, type OrderWithDetails } from '../../lib/supabase'
-import { notifyNewOrder, notifyStatusChange } from '../../lib/webhooks'
+import { customerSupabase } from '../../lib/customerAuth'
+import { notifyNewOrder } from '../../lib/webhooks'
 import { AddressAutocomplete, type ParsedAddress } from '../../components/store/AddressAutocomplete'
+import { getEnabledPaymentMethods, type PaymentMethodId } from '../../lib/payments'
 
-// PayFast activation pending — orders are written to Supabase and emailed
-// instantly so the receipt + admin flow can be tested end-to-end. Swap to
-// redirectToPayFast() in handleSubmit once the merchant account is verified.
+// PayFast still pending Credit Risk approval — orders are created as
+// `pending` / `payment_status=unpaid` with payment_method=eft. The Order
+// Confirmation page shows banking details + reference, and admin flips the
+// order to `paid` once the EFT lands. When PayFast / Yoco / Paystack
+// approve, flip the relevant entry in `src/lib/payments.ts` to enabled:true
+// and branch on the selected method here.
 
 type DeliveryMethod = 'collection' | 'economic' | 'nextday' | 'express'
 
@@ -113,13 +118,19 @@ function saveOrderLocally(order: OrderWithDetails) {
 
 export function Checkout() {
   const { items, subtotal, clearCart } = useCart()
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const { user } = useCustomerAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormData>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [delivery, setDelivery] = useState<DeliveryMethod>('economic')
+
+  const paymentMethods = getEnabledPaymentMethods()
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId>(
+    paymentMethods[0]?.id ?? 'eft',
+  )
 
   // Pre-fill form from logged-in customer account + last shipping address
   useEffect(() => {
@@ -133,11 +144,11 @@ export function Checkout() {
     // Look up the customer's most recent order to reuse their shipping details
     let cancelled = false
     ;(async () => {
-      const { data: customer } = await supabase
+      const { data: customer } = await customerSupabase
         .from('customers')
         .select('id, phone, address_line1, address_line2, city, province, postal_code')
         .eq('email', user.email)
-        .single()
+        .maybeSingle()
       if (cancelled || !customer) return
 
       setForm((prev) => ({
@@ -213,6 +224,7 @@ export function Checkout() {
     e.preventDefault()
     if (!validate()) return
     setSubmitting(true)
+    setSubmitError(null)
 
     const orderNumber = generateOrderNumber()
     const fulfillmentType = isCollection ? 'collection' : 'delivery'
@@ -228,10 +240,18 @@ export function Checkout() {
 
     const orderType = items.some((i) => i.orderType === 'bulk') ? 'bulk' : 'retail'
     const now = new Date().toISOString()
-    const paymentReference = `CW-${Date.now()}`
+    // The order number IS the EFT reference — easiest for the customer to type
+    // accurately and easiest for us to match against the bank statement.
+    const paymentReference = orderNumber
+
+    // When the customer is logged in, run the writes through their
+    // authenticated client. RLS on customers/orders/order_items requires
+    // auth.role() = 'authenticated', so the anon client cannot return the
+    // upserted customer id (leaving the order unlinked) nor RETURNING rows.
+    const db = user ? customerSupabase : supabase
 
     try {
-      const { data: customer } = await supabase
+      const { data: customer } = await db
         .from('customers')
         .upsert(
           {
@@ -247,14 +267,13 @@ export function Checkout() {
         .select('id')
         .single()
 
-      // Insert the order already marked as paid — no PayFast, no demo modal.
-      const { data: order, error: orderErr } = await supabase
+      const { data: order, error: orderErr } = await db
         .from('orders')
         .insert({
           order_number: orderNumber,
           customer_id: customer?.id ?? null,
           order_type: orderType,
-          status: 'paid',
+          status: 'pending',
           fulfillment_type: fulfillmentType,
           collection_name: isCollection ? form.name : null,
           collection_phone: isCollection ? form.phone : null,
@@ -262,114 +281,85 @@ export function Checkout() {
           shipping_fee: shippingFee,
           total,
           shipping_address: shippingAddr,
-          payment_method: 'eft',
-          payment_status: 'paid',
+          payment_method: paymentMethod,
+          payment_status: 'unpaid',
           payment_reference: paymentReference,
+          notes: `Delivery: ${selectedDelivery.label}`,
           created_at: now,
           updated_at: now,
         })
         .select('id, order_number')
         .single()
 
-      if (!orderErr && order) {
-        await supabase.from('order_items').insert(
-          items.map((item) => ({
-            order_id: order.id,
-            product_id: item.productId,
-            product_name: item.name,
-            quantity: item.quantity,
-            unit_price: item.price,
-            line_total: item.price * item.quantity,
-            thumbnail_url: item.image || null,
-            created_at: now,
-          })),
-        )
-
-        // Log the full pending → paid timeline so the admin timeline looks right.
-        await supabase.from('order_status_events').insert([
-          { order_id: order.id, status: 'pending', triggered_by: 'system', created_at: now },
-          { order_id: order.id, status: 'paid', triggered_by: 'system', created_at: now },
-        ])
-
-        const fullOrder: OrderWithDetails = {
-          id: order.id,
-          order_number: order.order_number,
-          customer_id: customer?.id ?? null,
-          order_type: orderType,
-          status: 'paid',
-          fulfillment_type: fulfillmentType,
-          collection_name: isCollection ? form.name : null,
-          collection_phone: isCollection ? form.phone : null,
-          payment_status: 'paid',
-          payment_method: 'eft',
-          payment_reference: paymentReference,
-          notes: `Delivery: ${selectedDelivery.label}`,
-          subtotal,
-          shipping_fee: shippingFee,
-          total,
-          shipping_address: shippingAddr,
-          created_at: now,
-          updated_at: now,
-          customers: { id: customer?.id ?? '', name: form.name, email: form.email, phone: form.phone },
-          order_items: items.map((item, i) => ({
-            id: String(i),
-            product_name: item.name,
-            quantity: item.quantity,
-            unit_price: item.price,
-            line_total: item.price * item.quantity,
-            thumbnail_url: item.image || null,
-          })),
-        }
-
-        saveOrderLocally(fullOrder)
-        // Fire both webhooks: new-order alert + payment-received receipt
-        notifyNewOrder(fullOrder)
-        notifyStatusChange(fullOrder, 'pending', 'paid')
-        clearCart()
-
-        navigate(`/order/${order.id}`)
+      if (orderErr || !order) {
+        setSubmitError(orderErr?.message ?? 'Could not place your order. Please try again.')
+        setSubmitting(false)
         return
       }
-    } catch { /* fall through to local order */ }
 
-    // Fallback: Supabase write failed — keep a local-only paid order so the
-    // confirmation page still renders and emails still fire.
-    const localId = crypto.randomUUID()
-    const localOrder: OrderWithDetails = {
-      id: localId,
-      order_number: orderNumber,
-      customer_id: null,
-      order_type: orderType,
-      status: 'paid',
-      fulfillment_type: fulfillmentType,
-      collection_name: isCollection ? form.name : null,
-      collection_phone: isCollection ? form.phone : null,
-      payment_status: 'paid',
-      payment_method: 'eft',
-      payment_reference: paymentReference,
-      notes: `Delivery: ${selectedDelivery.label}`,
-      subtotal,
-      shipping_fee: shippingFee,
-      total,
-      shipping_address: shippingAddr,
-      created_at: now,
-      updated_at: now,
-      customers: { id: '', name: form.name, email: form.email, phone: form.phone },
-      order_items: items.map((item, i) => ({
-        id: String(i),
-        product_name: item.name,
-        quantity: item.quantity,
-        unit_price: item.price,
-        line_total: item.price * item.quantity,
-        thumbnail_url: item.image ?? '',
-      })),
+      const { error: itemsErr } = await db.from('order_items').insert(
+        items.map((item) => ({
+          order_id: order.id,
+          product_id: item.productId,
+          product_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          line_total: item.price * item.quantity,
+          thumbnail_url: item.image || null,
+          created_at: now,
+        })),
+      )
+
+      if (itemsErr) {
+        // Roll back the order header so the customer can retry cleanly.
+        await db.from('orders').delete().eq('id', order.id)
+        setSubmitError('Could not save your order items. Please try again.')
+        setSubmitting(false)
+        return
+      }
+
+      await db.from('order_status_events').insert([
+        { order_id: order.id, status: 'pending', triggered_by: 'system', created_at: now },
+      ])
+
+      const fullOrder: OrderWithDetails = {
+        id: order.id,
+        order_number: order.order_number,
+        customer_id: customer?.id ?? null,
+        order_type: orderType,
+        status: 'pending',
+        fulfillment_type: fulfillmentType,
+        collection_name: isCollection ? form.name : null,
+        collection_phone: isCollection ? form.phone : null,
+        payment_status: 'unpaid',
+        payment_method: paymentMethod as OrderWithDetails['payment_method'],
+        payment_reference: paymentReference,
+        notes: `Delivery: ${selectedDelivery.label}`,
+        subtotal,
+        shipping_fee: shippingFee,
+        total,
+        shipping_address: shippingAddr,
+        created_at: now,
+        updated_at: now,
+        customers: { id: customer?.id ?? '', name: form.name, email: form.email, phone: form.phone },
+        order_items: items.map((item, i) => ({
+          id: String(i),
+          product_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          line_total: item.price * item.quantity,
+          thumbnail_url: item.image || null,
+        })),
+      }
+
+      saveOrderLocally(fullOrder)
+      notifyNewOrder(fullOrder)
+      clearCart()
+      navigate(`/order/${order.id}`)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Network error. Please try again.')
+      setSubmitting(false)
     }
-
-    saveOrderLocally(localOrder)
-    notifyNewOrder(localOrder)
-    notifyStatusChange(localOrder, 'pending', 'paid')
-    clearCart()
-    navigate(`/order/${localId}`)
   }
 
   return (
@@ -488,15 +478,54 @@ export function Checkout() {
                 </div>
               </div>
 
-              {/* Trust note */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-emerald-800">Secure Checkout</p>
-                  <p className="text-xs text-emerald-700 mt-0.5">
-                    Your order is processed instantly and a confirmation email is sent. We'll be in touch as soon as it's packed.
-                  </p>
+              {/* Payment method */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 className="font-semibold text-gray-900 mb-4">
+                  {lang === 'zh' ? '付款方式' : 'Payment Method'}
+                </h2>
+
+                <div className="space-y-2">
+                  {paymentMethods.map((m) => {
+                    const isSelected = paymentMethod === m.id
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setPaymentMethod(m.id)}
+                        className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+                          isSelected
+                            ? 'border-[#E63939] bg-[#FEF2F2]'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          isSelected ? 'bg-[#E63939] text-white' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <Landmark className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 text-sm">
+                            {lang === 'zh' ? m.labelZh : m.label}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {lang === 'zh' ? m.descriptionZh : m.description}
+                          </p>
+                        </div>
+                      </button>
+                    )
+                  })}
                 </div>
+
+                {paymentMethod === 'eft' && (
+                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2 text-amber-800">
+                    <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs leading-relaxed">
+                      {lang === 'zh'
+                        ? '下单后您将看到银行详情，请使用订单号作为付款参考。我们在营业时间（每天 09:00–15:00）确认付款后会以电子邮件通知您。'
+                        : 'After placing your order, you\'ll see our banking details. Use the order number as the payment reference. We confirm payments during trading hours (Mon–Sun 09:00–15:00) and email you once received.'}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -541,8 +570,18 @@ export function Checkout() {
                   className="w-full flex items-center justify-center gap-2 bg-cxx-blue hover:bg-cxx-blue-hover text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-60"
                 >
                   {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {submitting ? 'Placing order…' : `Place order — R${total.toFixed(2)}`}
+                  {submitting
+                    ? (lang === 'zh' ? '正在下单…' : 'Placing order…')
+                    : paymentMethod === 'eft'
+                      ? (lang === 'zh' ? `下单 — R${total.toFixed(2)}` : `Place order — R${total.toFixed(2)}`)
+                      : `Pay R${total.toFixed(2)}`}
                 </button>
+
+                {submitError && (
+                  <p className="text-xs text-red-600 text-center mt-3 bg-red-50 border border-red-200 rounded-lg p-2">
+                    {submitError}
+                  </p>
+                )}
 
                 <p className="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1.5">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
